@@ -11,7 +11,7 @@ pnpm install -D @hookform/devtools
 ### folders:
 - 001: basics (form, submission)
 - 002: validations & error messages
-
+- 003: default values
 
 
 
@@ -124,8 +124,16 @@ export const MyForm = () => {
                   type="text"
                   id="username"
                   {...register("username", {
-                    required: "Username is required",
-                  })}
+                  required: "Username is required",
+                  validate: {
+                    valid1: (fieldValue) => {
+                      return (
+                        fieldValue != "admin" ||
+                        "'admin' is not acceptable username"
+                      );
+                    },
+                  },
+                })}
                 />
                 {errors.username && (
                   <span className="error-message">{errors.username.message}</span>
@@ -154,4 +162,28 @@ export const MyForm = () => {
             </form>
             <DevTool control={control} />
           </div>
+```
+
+## Giving default FormValues
+
+```bash
+  const form = useForm<FormValues>({
+    defaultValues:{
+      "username":"def"
+    },
+    mode: "onSubmit",
+  });
+
+    defaultValues: async () => {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/users/1"
+      );
+      const data = await response.json();
+      return {
+        username: "def",
+        email: data.email,
+      };
+    },
+    mode: "onSubmit",
+  });
 ```

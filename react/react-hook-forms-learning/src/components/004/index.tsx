@@ -14,6 +14,7 @@ export const MyForm = () => {
   const form = useForm<FormValues>({
     mode: "onSubmit",
   });
+
   const {
     register,
     control,
@@ -37,14 +38,6 @@ export const MyForm = () => {
             id="username"
             {...register("username", {
               required: "Username is required",
-              validate: {
-                valid1: (fieldValue) => {
-                  return (
-                    fieldValue != "admin" ||
-                    "'admin' is not acceptable username"
-                  );
-                },
-              },
             })}
           />
           {errors.username && (

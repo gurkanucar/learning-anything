@@ -12,8 +12,19 @@ type FormValues = {
 
 export const MyForm = () => {
   const form = useForm<FormValues>({
+    defaultValues: async () => {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/users/1"
+      );
+      const data = await response.json();
+      return {
+        username: "def",
+        email: data.email,
+      };
+    },
     mode: "onSubmit",
   });
+  
   const {
     register,
     control,
@@ -37,14 +48,6 @@ export const MyForm = () => {
             id="username"
             {...register("username", {
               required: "Username is required",
-              validate: {
-                valid1: (fieldValue) => {
-                  return (
-                    fieldValue != "admin" ||
-                    "'admin' is not acceptable username"
-                  );
-                },
-              },
             })}
           />
           {errors.username && (
