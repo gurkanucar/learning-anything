@@ -1,18 +1,27 @@
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 1.3;
   font-weight: 400;
-  background-color: #242424;
+  background-color: #1a1a1a;
   color: #e0e0e0;
+  font-size: 15px;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
 }
 
 .form-container {
-  max-width: 400px;
-  margin: 2rem auto;
+  width: 420px;
+  margin: 1rem;
   padding: 1.5rem;
-  background-color: #333333;
+  background-color: #2a2a2a;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .my-form {
@@ -24,21 +33,30 @@
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-group-dynamic {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.5rem;
+  align-items: flex-start;
 }
 
 label {
-  margin-bottom: 0.5rem;
   font-weight: 600;
   color: #e0e0e0;
+  text-align: start;
 }
 
 input {
   padding: 0.5rem;
-  border: 1px solid #555;
-  border-radius: 8px;
-  font-size: 1rem;
-  background-color: #424242;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  background-color: #333;
   color: #e0e0e0;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus {
@@ -48,22 +66,72 @@ input:focus {
 }
 
 button {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
   background-color: #4d94ff;
-  color: #242424;
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 button:hover {
   background-color: #3a7acc;
 }
 
+button:active {
+  transform: translateY(1px);
+}
+
 .error-message {
-  color: rgb(209, 0, 0);
-  text-align: left;
-  font-weight: normal;
+  color: #ff4d4d;
+  margin-top: 0.125rem;
+  text-align: start;
+}
+
+.remove-btn {
+  width: 24px;
+  height: 24px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  align-self: flex-end;
+  padding: 0;
+}
+
+.remove-btn:hover {
+  background-color: #cc0000;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-top: 0.75rem;
+}
+
+.add-tag-btn {
+  background-color: transparent;
+  border: 2px solid #4caf50
+}
+
+.add-tag-btn:hover {
+  background-color: #45a049;
+}
+
+.submit-btn {
+  background-color: #4d94ff;
+}
+
+.submit-btn:hover {
+  background-color: #3a7acc;
 }
