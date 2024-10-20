@@ -10,6 +10,7 @@
 - 006: Dynamic Array Fields
 - 007: Date and Number Inputs
 - 008: Watch Functionality
+- 009: SetField, GetField, and Disabled Features
 
 ## Table of Contents
 - [Comprehensive Guide to React Hook Form](#comprehensive-guide-to-react-hook-form)
@@ -25,6 +26,7 @@
   - [Dynamic Array Fields](#dynamic-array-fields)
   - [Date and Number Inputs](#date-and-number-inputs)
   - [Watch Functionality](#watch-functionality)
+  - [SetField, GetField, and Disabled Features](#setfield-getfield-and-disabled-features)
   - [Advanced Topics](#advanced-topics)
     - [Using DevTools](#using-devtools)
     - [Custom Validation](#custom-validation)
@@ -695,6 +697,181 @@ Key points about `watch`:
 
 Remember that excessive use of `watch` can lead to performance issues, so it's important to use it strategically and only when necessary.
 
+## SetField, GetField, and Disabled Features
+
+React Hook Form provides methods to programmatically get and set field values, as well as disable fields based on conditions. Here's an example demonstrating these features:
+
+```tsx
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
+
+import "../../index.css";
+
+let renderCount = 0;
+
+type FormValues = {
+  username: string;
+  address: string;
+};
+
+export const AdvancedForm: React.FC = () => {
+  const [shouldDisable, setShouldDisable] = useState<boolean>(false);
+
+  const form = useForm<FormValues>({
+    mode: "onSubmit",
+  });
+
+  const {
+    watch,
+    getValues,
+    setValue,
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const onSubmit = (data: FormValues) => {
+    console.log("submitted: ", data);
+  };
+
+  const handleGetValues = () => {
+    const allValues = getValues();
+    const specificValues = getValues(["username"]);
+    console.log("get values", allValues, " | specific values", specificValues);
+  };
+
+  const handleSetValues = () => {
+    setValue("username", getValues("username") + "_UPDATED", {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  };
+
+  renderCount++;
+  return (
+    <div className="form-container">
+      <h2>Render count: {renderCount / 2}</h2>
+      <form className="my-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            {...register("username", {
+              disabled: shouldDisable,
+              required: "Username is required",
+              minLength: {
+                value: 15,
+                message: "Minimum length is 15 characters",
+              },
+            })}
+          />
+          {errors.username && (
+            <span className="error-message">{errors.username.message}</span>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="address">Address</label>
+          <input
+            type="text"
+            id="address"
+            {...register("address", {
+              disabled: watch("username") !== "admin",
+              required: "Address is required",
+            })}
+          />
+          {errors.address && (
+            <span className="error-message">{errors.address.message}</span>
+          )}
+        </div>
+
+        <button type="submit">Submit</button>
+      </form>
+      <button style={{ margin: 10 }} onClick={handleGetValues} type="button">
+        Get Values
+      </button>
+      <button style={{ margin: 10 }} onClick={handleSetValues} type="button">
+        Set Values
+      </button>
+      <button
+        style={{ margin: 10 }}
+        onClick={() => setShouldDisable(!shouldDisable)}
+        type="button"
+      >
+        Set disable {!shouldDisable ? "true" : "false"}
+      </button>
+      <DevTool control={control} />
+    </div>
+  );
+};
+```
+
+Let's break down the key features:
+
+1. **GetField (getValues):**
+   ```tsx
+   const handleGetValues = () => {
+     const allValues = getValues();
+     const specificValues = getValues(["username"]);
+     console.log("get values", allValues, " | specific values", specificValues);
+   };
+   ```
+   - `getValues()` retrieves all form values.
+   - `getValues(["username"])` retrieves the value of a specific field.
+
+2. **SetField (setValue):**
+   ```tsx
+   const handleSetValues = () => {
+     setValue("username", getValues("username") + "_UPDATED", {
+       shouldValidate: true,
+       shouldDirty: true,
+       shouldTouch: true,
+     });
+   };
+   ```
+   - `setValue()` sets the value of a specific field.
+   - Options like `shouldValidate`, `shouldDirty`, and `shouldTouch` control side effects of setting the value.
+
+3. **Disabled Fields:**
+   ```tsx
+   {...register("username", {
+     disabled: shouldDisable,
+     // other options...
+   })}
+   ```
+   - The `disabled` option in `register` can be set to a boolean or a function.
+   - In this example, it's controlled by a state variable `shouldDisable`.
+
+4. **Conditional Disabling:**
+   ```tsx
+   {...register("address", {
+     disabled: watch("username") !== "admin",
+     // other options...
+   })}
+   ```
+   - The `address` field is disabled unless the `username` is "admin".
+   - This uses the `watch` function to reactively update the disabled state.
+
+5. **Toggle Disable State:**
+   ```tsx
+   <button
+     onClick={() => setShouldDisable(!shouldDisable)}
+     type="button"
+   >
+     Set disable {!shouldDisable ? "true" : "false"}
+   </button>
+   ```
+   - This button toggles the `shouldDisable` state, affecting the `username` field.
+
+These features allow for more dynamic and interactive forms:
+- `getValues` is useful for retrieving form data without submission.
+- `setValue` allows programmatic updates to form fields.
+- The `disabled` option provides a way to conditionally enable/disable fields based on form state or external factors.
+
+Remember that while these features are powerful, they should be used judiciously to maintain form simplicity and performance.
 
 ## Advanced Topics
 
