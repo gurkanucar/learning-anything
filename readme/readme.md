@@ -6,11 +6,11 @@
 
 SuperApp is a revolutionary platform that combines productivity tools, social networking, and advanced AI capabilities to streamline your digital life.
 
-<details>
-<summary>Table of Contents</summary>
+## Table of Contents
 
 - [Example readme.md file](#example-readmemd-file)
   - [🚀 SuperApp: Your All-in-One Solution](#-superapp-your-all-in-one-solution)
+  - [Table of Contents](#table-of-contents)
   - [1. Features](#1-features)
   - [2. Getting Started](#2-getting-started)
     - [2.1. Prerequisites](#21-prerequisites)
@@ -22,8 +22,10 @@ SuperApp is a revolutionary platform that combines productivity tools, social ne
   - [7. Performance](#7-performance)
   - [8. License](#8-license)
   - [9. Contact](#9-contact)
+  - [10. FAQ](#10-faq)
+      - [Question 1](#question-1)
+      - [Question 2](#question-2)
 
-</details>
 
 ## 1. Features
 
@@ -95,13 +97,13 @@ Before you begin, ensure you have the following installed:
 
 Our RESTful API allows you to integrate SuperApp's functionality into your own applications.
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/users` | GET | Retrieve user information |
-| `/api/tasks` | POST | Create a new task |
-| `/api/analytics` | GET | Fetch user analytics |
-| `/api/projects` | PUT | Update project details |
-| `/api/notifications` | DELETE | Remove a notification |
+| Endpoint             | Method | Description               |
+| -------------------- | ------ | ------------------------- |
+| `/api/users`         | GET    | Retrieve user information |
+| `/api/tasks`         | POST   | Create a new task         |
+| `/api/analytics`     | GET    | Fetch user analytics      |
+| `/api/projects`      | PUT    | Update project details    |
+| `/api/notifications` | DELETE | Remove a notification     |
 
 For detailed API documentation, visit our [API Docs](https://api.superapp.com/docs).
 
@@ -136,12 +138,12 @@ We welcome contributions from the community! Please read our [Contributing Guide
 
 SuperApp is designed for optimal performance across various devices and network conditions.
 
-| Metric | Desktop | Mobile | Target |
-|--------|---------|--------|--------|
-| Page Load Time | 1.2s | 1.8s | < 2s |
-| Time to Interactive | 2.1s | 2.7s | < 3s |
-| First Contentful Paint | 0.8s | 1.2s | < 1.5s |
-| Lighthouse Score | 95 | 90 | > 90 |
+| Metric                 | Desktop | Mobile | Target |
+| ---------------------- | ------- | ------ | ------ |
+| Page Load Time         | 1.2s    | 1.8s   | < 2s   |
+| Time to Interactive    | 2.1s    | 2.7s   | < 3s   |
+| First Contentful Paint | 0.8s    | 1.2s   | < 1.5s |
+| Lighthouse Score       | 95      | 90     | > 90   |
 
 <p align="center">
   <img src="https://via.placeholder.com/400x200?text=Performance+Chart+1" alt="Performance Chart 1" width="45%">
@@ -159,6 +161,18 @@ SuperApp Team - [@superapp](https://twitter.com/superapp) - support@superapp.com
 Project Link: [https://github.com/superapp/superapp](https://github.com/superapp/superapp)
 
 ---
+
+
+## 10. FAQ
+
+#### Question 1
+
+Answer 1
+
+#### Question 2
+
+Answer 2
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version">
