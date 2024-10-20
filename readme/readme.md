@@ -1,4 +1,6 @@
-# 🚀 SuperApp: Your All-in-One Solution
+# Example readme.md file
+
+## 🚀 SuperApp: Your All-in-One Solution
 
 ![SuperApp Logo](https://via.placeholder.com/468x100?text=SuperApp+Logo)
 
@@ -7,7 +9,8 @@ SuperApp is a revolutionary platform that combines productivity tools, social ne
 <details>
 <summary>Table of Contents</summary>
 
-- [🚀 SuperApp: Your All-in-One Solution](#-superapp-your-all-in-one-solution)
+- [Example readme.md file](#example-readmemd-file)
+  - [🚀 SuperApp: Your All-in-One Solution](#-superapp-your-all-in-one-solution)
   - [1. Features](#1-features)
   - [2. Getting Started](#2-getting-started)
     - [2.1. Prerequisites](#21-prerequisites)
