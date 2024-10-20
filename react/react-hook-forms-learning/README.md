@@ -19,6 +19,7 @@
   - [Default Values](#default-values)
   - [Nested Objects](#nested-objects)
   - [Array Fields](#array-fields)
+  - [Dynamic Array Fields](#dynamic-array-fields)
   - [Advanced Topics](#advanced-topics)
     - [Using DevTools](#using-devtools)
     - [Custom Validation](#custom-validation)
@@ -330,6 +331,129 @@ export const MyForm = () => {
 
 This example demonstrates how to handle nested objects (`socialMedia`) and array fields (`phoneNumbers`) within the same form. It also shows how to use the DevTool for debugging purposes.
 
+## Dynamic Array Fields
+
+React Hook Form also supports dynamic array fields, allowing users to add or remove fields as needed. Here's an example implementation:
+
+```tsx
+import React from "react";
+import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
+
+type FormValues = {
+  username: string;
+  socialMedia: {
+    twitter: string;
+  };
+  tags: { name: string; value: number }[];
+};
+
+export const DynamicArrayForm: React.FC = () => {
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      tags: [{ name: "", value: 0 }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    name: "tags",
+    control,
+  });
+
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
+    console.log("submitted: ", data);
+  };
+
+  return (
+    <div className="form-container">
+      <form className="my-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+        {/* Username and Twitter fields remain the same */}
+        
+        {fields.map((field, index) => (
+          <div className="form-group-dynamic" key={field.id}>
+            <div className="form-group">
+              <label htmlFor={`tag-${field.id}-name`}>Tag Name</label>
+              <input
+                type="text"
+                id={`tag-${field.id}-name`}
+                {...register(`tags.${index}.name` as const, {
+                  required: "Tag name is required",
+                })}
+              />
+              {errors.tags?.[index]?.name && (
+                <span className="error-message">
+                  {errors.tags[index]?.name?.message}
+                </span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor={`tag-${field.id}-value`}>Tag Value</label>
+              <input
+                type="number"
+                id={`tag-${field.id}-value`}
+                {...register(`tags.${index}.value` as const, {
+                  required: "Tag value is required",
+                  valueAsNumber: true,
+                  min: {
+                    value: 1,
+                    message: "Minimum value is 1",
+                  },
+                })}
+              />
+              {errors.tags?.[index]?.value && (
+                <span className="error-message">
+                  {errors.tags[index]?.value?.message}
+                </span>
+              )}
+            </div>
+
+            {fields.length > 1 && (
+              <button
+                type="button"
+                className="remove-btn"
+                onClick={() => remove(index)}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        ))}
+
+        <div className="form-actions">
+          <button
+            type="button"
+            className="add-tag-btn"
+            onClick={() => append({ name: "", value: 0 })}
+          >
+            Add Tag
+          </button>
+
+          <button type="submit" className="submit-btn">
+            Submit
+          </button>
+        </div>
+      </form>
+      <DevTool control={control} />
+    </div>
+  );
+};
+```
+
+This example demonstrates how to:
+
+1. Use `useFieldArray` to manage dynamic array fields.
+2. Implement add and remove functionality for array items.
+3. Handle validation for dynamic fields.
+4. Use the DevTool for debugging dynamic forms.
+
+
+
 ## Advanced Topics
 
 ### Using DevTools
@@ -365,4 +489,4 @@ const { register } = useForm<FormValues>();
 />
 ```
 
-For more information and advanced usage, refer to the [official React Hook Form documentation](https://react-hook-form.com/).
+[official React Hook Form documentation](https://react-hook-form.com/).
