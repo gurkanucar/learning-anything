@@ -8,6 +8,10 @@ let renderCount = 0;
 type FormValues = {
   username: string;
   email: string;
+  socialMedia: {
+    twitter: string;
+    facebook: string;
+  };
 };
 
 export const MyForm = () => {
@@ -52,14 +56,42 @@ export const MyForm = () => {
             id="email"
             {...register("email", {
               required: "Email is required",
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Please enter a valid email address",
-              },
             })}
           />
           {errors.email && (
             <span className="error-message">{errors.email.message}</span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="twitter">Twitter</label>
+          <input
+            type="text"
+            id="twitter"
+            {...register("socialMedia.twitter", {
+              required: "twitter is required",
+            })}
+          />
+          {errors.socialMedia?.twitter && (
+            <span className="error-message">
+              {errors.socialMedia.twitter.message}
+            </span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="facebook">Facebook</label>
+          <input
+            type="text"
+            id="facebook"
+            {...register("socialMedia.facebook", {
+              required: "Facebook is required",
+            })}
+          />
+          {errors.socialMedia?.facebook && (
+            <span className="error-message">
+              {errors.socialMedia.facebook.message}
+            </span>
           )}
         </div>
 

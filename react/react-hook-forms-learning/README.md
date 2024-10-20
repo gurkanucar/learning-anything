@@ -12,6 +12,7 @@ pnpm install -D @hookform/devtools
 - 001: basics (form, submission)
 - 002: validations & error messages
 - 003: default values
+- 004: nested objects
 
 
 
@@ -186,4 +187,37 @@ export const MyForm = () => {
     },
     mode: "onSubmit",
   });
+```
+
+
+## Nested Objects
+
+```bash
+type FormValues = {
+  username: string;
+  email: string;
+  socialMedia: {
+    twitter: string;
+    facebook: string;
+  };
+};
+
+.....
+
+      <div className="form-group">
+          <label htmlFor="twitter">Twitter</label>
+          <input
+            type="text"
+            id="twitter"
+            {...register("socialMedia.twitter", {
+              required: "twitter is required",
+            })}
+          />
+          {errors.socialMedia?.twitter && (
+            <span className="error-message">
+              {errors.socialMedia.twitter.message}
+            </span>
+          )}
+        </div>
+
 ```
