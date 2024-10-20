@@ -1,13 +1,13 @@
 import { useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
-import { format } from "date-fns"; // Import the format function from date-fns
+import { format } from "date-fns";
 
 import "../../index.css";
 
 let renderCount = 0;
 
 type FormValues = {
-  dateOfBirth: string; // Ensure this is a string to match the input type
+  dateOfBirth: string;
   age: number;
 };
 

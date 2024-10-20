@@ -7,6 +7,9 @@
 - 003: Default Values
 - 004: Nested Objects
 - 005: Array Fields
+- 006: Dynamic Array Fields
+- 007: Date and Number Inputs
+- 008: Watch Functionality
 
 ## Table of Contents
 - [Comprehensive Guide to React Hook Form](#comprehensive-guide-to-react-hook-form)
@@ -21,6 +24,7 @@
   - [Array Fields](#array-fields)
   - [Dynamic Array Fields](#dynamic-array-fields)
   - [Date and Number Inputs](#date-and-number-inputs)
+  - [Watch Functionality](#watch-functionality)
   - [Advanced Topics](#advanced-topics)
     - [Using DevTools](#using-devtools)
     - [Custom Validation](#custom-validation)
@@ -234,7 +238,7 @@ type FormValues = {
   socialMedia: {
     twitter: string;
   };
-  phoneNumbers: string[]; // Handles multiple phone numbers
+  phoneNumbers: string[]; 
 };
 
 export const MyForm = () => {
@@ -556,6 +560,141 @@ pnpm install date-fns
 ```
 
 This example showcases how React Hook Form can easily handle different input types and integrate with utility libraries like date-fns for more complex date handling.
+
+
+## Watch Functionality
+
+React Hook Form provides a powerful `watch` method that allows you to observe changes in form fields. This is useful for creating dynamic forms or performing actions based on field values. Here's an example demonstrating how to use the `watch` functionality:
+
+```tsx
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
+
+import "../../index.css";
+
+let renderCount = 0;
+
+type FormValues = {
+  username: string;
+  address: string;
+};
+
+export const WatchForm: React.FC = () => {
+  const form = useForm<FormValues>({
+    mode: "onSubmit",
+  });
+
+  const {
+    watch,
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const onSubmit = (data: FormValues) => {
+    console.log("submitted: ", data);
+  };
+
+  // Watch everything in the form
+  const watchForm = watch();
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      console.log("watching", value);
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [watch]);
+
+  // Watch a specific field
+  // const watchUsername = watch("username");
+
+  // useEffect(() => {
+  //   console.log("username is watching", watchUsername);
+  //   return () => {};
+  // }, [watchUsername]);
+
+  renderCount++;
+  return (
+    <div className="form-container">
+      <h2>Render count: {renderCount / 2}</h2>
+      <form className="my-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            {...register("username", {
+              required: "Username is required",
+            })}
+          />
+          {errors.username && (
+            <span className="error-message">{errors.username.message}</span>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="address">Address</label>
+          <input
+            type="text"
+            id="address"
+            {...register("address", {
+              required: "Address is required",
+            })}
+          />
+          {errors.address && (
+            <span className="error-message">{errors.address.message}</span>
+          )}
+        </div>
+
+        <button type="submit">Submit</button>
+      </form>
+      <DevTool control={control} />
+    </div>
+  );
+};
+```
+
+This example demonstrates several ways to use the `watch` functionality:
+
+1. **Watching the entire form:**
+   ```tsx
+   const watchForm = watch();
+   ```
+   This creates a snapshot of all form values, which updates on every change.
+
+2. **Using a subscription to watch all changes:**
+   ```tsx
+   useEffect(() => {
+     const subscription = watch((value) => {
+       console.log("watching", value);
+     });
+     return () => {
+       subscription.unsubscribe();
+     };
+   }, [watch]);
+   ```
+   This sets up a subscription that logs all form changes. It's important to unsubscribe in the cleanup function to prevent memory leaks.
+
+3. **Watching a specific field:**
+   ```tsx
+   const watchUsername = watch("username");
+
+   useEffect(() => {
+     console.log("username is watching", watchUsername);
+   }, [watchUsername]);
+   ```
+   This watches changes to a specific field (commented out in the example).
+
+Key points about `watch`:
+- It can be used to create dependent fields or perform side effects based on field values.
+- Watching fields can impact performance, especially in large forms, so use it judiciously.
+- The `watch` method is reactive, meaning it will cause re-renders when watched values change.
+
+Remember that excessive use of `watch` can lead to performance issues, so it's important to use it strategically and only when necessary.
+
 
 ## Advanced Topics
 

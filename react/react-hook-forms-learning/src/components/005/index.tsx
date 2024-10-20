@@ -12,7 +12,7 @@ type FormValues = {
     twitter: string;
     facebook: string;
   };
-  phoneNumbers: string[]; // Handles multiple phone numbers
+  phoneNumbers: string[]; 
 };
 
 export const MyForm = () => {
