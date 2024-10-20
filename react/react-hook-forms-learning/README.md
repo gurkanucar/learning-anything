@@ -20,6 +20,7 @@
   - [Nested Objects](#nested-objects)
   - [Array Fields](#array-fields)
   - [Dynamic Array Fields](#dynamic-array-fields)
+  - [Date and Number Inputs](#date-and-number-inputs)
   - [Advanced Topics](#advanced-topics)
     - [Using DevTools](#using-devtools)
     - [Custom Validation](#custom-validation)
@@ -452,7 +453,109 @@ This example demonstrates how to:
 3. Handle validation for dynamic fields.
 4. Use the DevTool for debugging dynamic forms.
 
+## Date and Number Inputs
 
+React Hook Form can handle various input types, including date and number inputs. Here's an example that demonstrates how to use date and number inputs, along with setting default date values using date-fns:
+
+```tsx
+import React from "react";
+import { useForm } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
+import { format } from "date-fns";
+
+import "../../index.css";
+
+let renderCount = 0;
+
+type FormValues = {
+  dateOfBirth: string;
+  age: number;
+};
+
+// Use date-fns to format the date as YYYY-MM-DD
+const getCurrentFormattedDate = () => {
+  return format(new Date(), "yyyy-MM-dd");
+};
+
+export const DateNumberForm: React.FC = () => {
+  const form = useForm<FormValues>({
+    defaultValues: {
+      dateOfBirth: getCurrentFormattedDate(), // Set the default to today's formatted date
+    },
+    mode: "onSubmit",
+  });
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const onSubmit = (data: FormValues) => {
+    console.log("submitted: ", data);
+  };
+
+  renderCount++;
+  return (
+    <div className="form-container">
+      <h2>Render count: {renderCount / 2}</h2>
+      <form className="my-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div className="form-group">
+          <label htmlFor="age">Age</label>
+          <input
+            type="number"
+            id="age"
+            {...register("age", {
+              valueAsNumber: true,
+              required: "Age is required",
+            })}
+          />
+          {errors.age && (
+            <span className="error-message">{errors.age.message}</span>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="dateOfBirth">Date of Birth</label>
+          <input
+            type="date"
+            id="dateOfBirth"
+            {...register("dateOfBirth", {
+              required: "Date of birth is required",
+            })}
+          />
+          {errors.dateOfBirth && (
+            <span className="error-message">{errors.dateOfBirth.message}</span>
+          )}
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+      <DevTool control={control} />
+    </div>
+  );
+};
+```
+
+This example demonstrates how to:
+
+1. Use `type="number"` for age input and `type="date"` for date of birth input.
+2. Set a default value for the date input using the current date formatted with date-fns.
+3. Use `valueAsNumber` for the age input to ensure it's treated as a number.
+4. Handle validation for both number and date inputs.
+5. Use the DevTool for debugging the form.
+
+Key points:
+- The `getCurrentFormattedDate` function uses date-fns to format the current date in the "YYYY-MM-DD" format required by the date input.
+- The `valueAsNumber` option in the age input's registration ensures that the value is treated as a number rather than a string.
+- The date input uses the native browser date picker, which can vary in appearance and functionality across different browsers.
+
+Remember to install the date-fns library if you haven't already:
+
+```bash
+pnpm install date-fns
+```
+
+This example showcases how React Hook Form can easily handle different input types and integrate with utility libraries like date-fns for more complex date handling.
 
 ## Advanced Topics
 
