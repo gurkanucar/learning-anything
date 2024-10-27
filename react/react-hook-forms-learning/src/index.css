@@ -85,6 +85,16 @@ button:active {
   transform: translateY(1px);
 }
 
+button:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+}
+
+
+
 .error-message {
   color: #ff4d4d;
   margin-top: 0.125rem;

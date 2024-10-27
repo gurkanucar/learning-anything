@@ -11,7 +11,8 @@
 - 007: Date and Number Inputs
 - 008: Watch Functionality
 - 009: SetField, GetField, and Disabled Features
-
+- 010: Form Reset and Form States (isLoading, isDirty, isValid)
+- 
 ## Table of Contents
 - [Comprehensive Guide to React Hook Form](#comprehensive-guide-to-react-hook-form)
   - [Examples](#examples)
@@ -27,6 +28,11 @@
   - [Date and Number Inputs](#date-and-number-inputs)
   - [Watch Functionality](#watch-functionality)
   - [SetField, GetField, and Disabled Features](#setfield-getfield-and-disabled-features)
+  - [Form Reset and Form States](#form-reset-and-form-states)
+    - [Important Form States](#important-form-states)
+    - [Form Reset Functionality](#form-reset-functionality)
+    - [Form Mode Options](#form-mode-options)
+    - [Error Handling](#error-handling)
   - [Advanced Topics](#advanced-topics)
     - [Using DevTools](#using-devtools)
     - [Custom Validation](#custom-validation)
@@ -872,6 +878,187 @@ These features allow for more dynamic and interactive forms:
 - The `disabled` option provides a way to conditionally enable/disable fields based on form state or external factors.
 
 Remember that while these features are powerful, they should be used judiciously to maintain form simplicity and performance.
+
+## Form Reset and Form States
+
+React Hook Form provides various form states and reset functionality that help manage form lifecycle and user interactions effectively. Here's an example demonstrating these features:
+
+```tsx
+import { FieldErrors, useForm } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
+import "../../index.css";
+
+type FormValues = {
+  username: string;
+  address: string;
+};
+
+export const MyForm = () => {
+  const form = useForm<FormValues>({
+    mode: "onChange", // Validate on change instead of on submit
+  });
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isDirty, isValid, isSubmitting },
+  } = form;
+
+  const onSubmit = async (data: FormValues) => {
+    console.log("submitted: ", data);
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+    window.alert("Form submitted successfully!");
+    reset(); // Reset form after successful submission
+  };
+
+  const onError = (data: FieldErrors<FormValues>) => {
+    console.log("errors", data);
+  };
+
+  const handleReset = () => {
+    reset(); // Manual form reset
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
+      {/* Form fields... */}
+      <button
+        type="submit"
+        disabled={!isValid || !isDirty || isSubmitting}
+      >
+        {isSubmitting ? "Loading..." : "Submit"}
+      </button>
+      <button
+        type="button"
+        onClick={handleReset}
+        disabled={isSubmitting}
+      >
+        Reset
+      </button>
+    </form>
+  );
+};
+```
+
+### Important Form States
+
+React Hook Form provides several form states that help track the form's status:
+
+1. **isDirty**
+   - Indicates if any field in the form has been modified
+   - Useful for enabling/disabling submit buttons or showing "unsaved changes" warnings
+   ```tsx
+   const { formState: { isDirty } } = useForm();
+   ```
+
+2. **isValid**
+   - Returns true if there are no validation errors
+   - Often used with `isDirty` to control submit button state
+   ```tsx
+   const { formState: { isValid } } = useForm();
+   ```
+
+3. **isSubmitting**
+   - Indicates if the form is currently being submitted
+   - Useful for showing loading states and preventing double submissions
+   ```tsx
+   const { formState: { isSubmitting } } = useForm();
+   ```
+
+4. **isSubmitted**
+   - Indicates if the form has been submitted
+   - Remains true even after a successful submission
+   ```tsx
+   const { formState: { isSubmitted } } = useForm();
+   ```
+
+5. **isSubmitSuccessful**
+   - Indicates if the form was submitted successfully
+   - Useful for showing success messages or redirecting
+   ```tsx
+   const { formState: { isSubmitSuccessful } } = useForm();
+   ```
+
+### Form Reset Functionality
+
+The `reset` function allows you to clear form values and states:
+
+1. **Basic Reset**
+   ```tsx
+   const { reset } = useForm();
+   reset(); // Resets all fields to their default values
+   ```
+
+2. **Reset with Values**
+   ```tsx
+   reset({
+     username: "newUsername",
+     address: "newAddress"
+   });
+   ```
+
+3. **Reset with Options**
+   ```tsx
+   reset(
+     {
+       username: "newUsername",
+     },
+     {
+       keepErrors: true, // Keep current validation errors
+       keepDirty: true, // Keep dirty/touched state
+       keepValues: false, // Don't keep current values
+       keepDefaultValues: false, // Don't keep default values
+       keepIsSubmitted: false, // Reset submission status
+       keepTouched: false, // Reset touched fields
+       keepIsValid: false, // Reset validation status
+       keepSubmitCount: false // Reset submission counter
+     }
+   );
+   ```
+
+### Form Mode Options
+
+When initializing useForm, you can specify different validation modes:
+
+```tsx
+const form = useForm({
+  mode: "onChange", // Validate on every change
+  // Other options:
+  // mode: "onBlur" - Validate when fields are blurred
+  // mode: "onSubmit" - Validate only on form submission
+  // mode: "onTouched" - Validate after first blur
+  // mode: "all" - Validate on all events
+});
+```
+
+### Error Handling
+
+The form provides two ways to handle submission:
+
+```tsx
+// Success and error handlers
+const onSubmit = (data: FormValues) => {
+  // Handle successful submission
+};
+
+const onError = (errors: FieldErrors<FormValues>) => {
+  // Handle validation errors
+};
+
+// Use both handlers in handleSubmit
+<form onSubmit={handleSubmit(onSubmit, onError)}>
+```
+
+These features allow you to create more responsive and user-friendly forms by:
+- Preventing premature submissions
+- Showing appropriate loading states
+- Handling form resets effectively
+- Managing form validation states
+- Providing clear feedback to users
+
+Remember to choose appropriate form states and reset options based on your specific use case and user experience requirements.
 
 ## Advanced Topics
 
