@@ -14,6 +14,7 @@
 - 010: Form Reset and Form States (isLoading, isDirty, isValid)
 - 012: Async validation and manually triggering fields
 - 013: Zod form validation added
+- 014: Different input type examples added
 - 
 ## Table of Contents
 
