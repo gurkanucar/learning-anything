@@ -12,6 +12,7 @@
 - 008: Watch Functionality
 - 009: SetField, GetField, and Disabled Features
 - 010: Form Reset and Form States (isLoading, isDirty, isValid)
+- 012: Async validation and manually triggering fields
 - 
 ## Table of Contents
 - [Comprehensive Guide to React Hook Form](#comprehensive-guide-to-react-hook-form)
@@ -33,6 +34,11 @@
     - [Form Reset Functionality](#form-reset-functionality)
     - [Form Mode Options](#form-mode-options)
     - [Error Handling](#error-handling)
+  - [Async Validation and Manual Validation Trigger](#async-validation-and-manual-validation-trigger)
+    - [Async Validation](#async-validation)
+    - [Manual Validation Trigger](#manual-validation-trigger)
+    - [Best Practices](#best-practices)
+    - [Using with TypeScript](#using-with-typescript)
   - [Advanced Topics](#advanced-topics)
     - [Using DevTools](#using-devtools)
     - [Custom Validation](#custom-validation)
@@ -1059,6 +1065,207 @@ These features allow you to create more responsive and user-friendly forms by:
 - Providing clear feedback to users
 
 Remember to choose appropriate form states and reset options based on your specific use case and user experience requirements.
+
+## Async Validation and Manual Validation Trigger
+
+React Hook Form supports asynchronous validation and manual validation triggering, allowing you to handle complex validation scenarios like checking username availability or validating against an API.
+
+```tsx
+import { useForm } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
+import { useEffect, useState } from "react";
+
+type FormValues = {
+  username: string;
+  address: string;
+};
+
+// Mock async validation function
+const validateUsername = async (username: string) => {
+  return new Promise<string | true>((resolve) => {
+    setTimeout(() => {
+      if (username !== "validUsername") {
+        resolve("Username is not available");
+      } else {
+        resolve(true);
+      }
+    }, 1000);
+  });
+};
+
+export const MyForm = () => {
+  const form = useForm<FormValues>({
+    mode: "onBlur", // Validate on field blur
+  });
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    trigger,
+    formState: { errors },
+  } = form;
+
+  const onSubmit = (data: FormValues) => {
+    console.log("submitted: ", data);
+  };
+
+  const handleManualValidation = () => {
+    trigger(); // Trigger validation for all fields
+    // trigger("address") // Trigger validation for a specific field
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <input
+        {...register("username", {
+          required: "Username is required",
+          minLength: {
+            value: 5,
+            message: "Minimum value is 5",
+          },
+          validate: async (value) => await validateUsername(value),
+        })}
+      />
+      {/* Rest of the form... */}
+      <button type="button" onClick={handleManualValidation}>
+        Validate Manually
+      </button>
+    </form>
+  );
+};
+```
+
+### Async Validation
+
+React Hook Form supports asynchronous validation through the `validate` option:
+
+1. **Basic Async Validation**
+   ```tsx
+   {...register("username", {
+     validate: async (value) => {
+       const result = await validateUsername(value);
+       return result === true || result;
+     }
+   })}
+   ```
+
+2. **Multiple Async Validations**
+   ```tsx
+   {...register("username", {
+     validate: {
+       availability: async (value) => await validateUsername(value),
+       format: async (value) => {
+         const isValid = await checkUsernameFormat(value);
+         return isValid || "Invalid username format";
+       }
+     }
+   })}
+   ```
+
+3. **Handling Loading States**
+   ```tsx
+   const { formState: { isValidating } } = useForm();
+   
+   // Show loading indicator while validating
+   {isValidating && <span>Checking username...</span>}
+   ```
+
+### Manual Validation Trigger
+
+The `trigger` function allows you to manually initiate validation:
+
+1. **Trigger All Fields**
+   ```tsx
+   const { trigger } = useForm();
+   
+   // Validate all fields
+   const handleValidate = () => {
+     trigger();
+   };
+   ```
+
+2. **Trigger Specific Fields**
+   ```tsx
+   // Validate single field
+   trigger("username");
+   
+   // Validate multiple fields
+   trigger(["username", "address"]);
+   ```
+
+3. **Async Trigger Usage**
+   ```tsx
+   const handleValidate = async () => {
+     const result = await trigger();
+     if (result) {
+       console.log("All fields are valid");
+     }
+   };
+   ```
+
+### Best Practices
+
+1. **Error Handling**
+   - Always return `true` for successful validation
+   - Return error message string for failed validation
+   ```tsx
+   validate: async (value) => {
+     try {
+       const result = await validateUsername(value);
+       return result || "Validation failed";
+     } catch (error) {
+       return "Error occurred during validation";
+     }
+   }
+   ```
+
+2. **Debouncing**
+   - Consider debouncing async validations for better performance
+   ```tsx
+   import { debounce } from 'lodash';
+   
+   const debouncedValidation = debounce(validateUsername, 500);
+   
+   {...register("username", {
+     validate: async (value) => await debouncedValidation(value)
+   })}
+   ```
+
+3. **Conditional Validation**
+   - Combine async validation with conditions
+   ```tsx
+   validate: async (value) => {
+     if (value.length < 5) return true; // Skip async validation
+     return await validateUsername(value);
+   }
+   ```
+
+### Using with TypeScript
+
+TypeScript provides type safety for validation functions:
+
+```tsx
+type ValidationResult = string | true | Promise<string | true>;
+
+const validateUsername = async (value: string): Promise<ValidationResult> => {
+  // Validation logic
+};
+
+{...register("username", {
+  validate: validateUsername
+})}
+```
+
+Remember:
+- Async validation runs after all sync validations pass
+- The form submission will wait for async validations to complete
+- Use appropriate loading states to improve user experience
+- Consider caching validation results for better performance
+- Use manual trigger sparingly and prefer built-in validation modes when possible
+
+These features allow you to create sophisticated validation flows while maintaining good user experience. Choose the appropriate validation strategy based on your specific requirements and performance considerations.
+
 
 ## Advanced Topics
 
