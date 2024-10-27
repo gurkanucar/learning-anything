@@ -13,6 +13,7 @@
 - 009: SetField, GetField, and Disabled Features
 - 010: Form Reset and Form States (isLoading, isDirty, isValid)
 - 012: Async validation and manually triggering fields
+- 012: Zod form validation added
 - 
 ## Table of Contents
 - [Comprehensive Guide to React Hook Form](#comprehensive-guide-to-react-hook-form)
@@ -39,6 +40,14 @@
     - [Manual Validation Trigger](#manual-validation-trigger)
     - [Best Practices](#best-practices)
     - [Using with TypeScript](#using-with-typescript)
+  - [Schema Validation with Zod](#schema-validation-with-zod)
+    - [Setup](#setup)
+    - [Basic Implementation](#basic-implementation)
+    - [Advanced Zod Validation Schemas](#advanced-zod-validation-schemas)
+    - [Custom Validation Methods](#custom-validation-methods)
+    - [Error Handling](#error-handling-1)
+    - [Best Practices](#best-practices-1)
+    - [Common Patterns](#common-patterns)
   - [Advanced Topics](#advanced-topics)
     - [Using DevTools](#using-devtools)
     - [Custom Validation](#custom-validation)
@@ -1265,6 +1274,243 @@ Remember:
 - Use manual trigger sparingly and prefer built-in validation modes when possible
 
 These features allow you to create sophisticated validation flows while maintaining good user experience. Choose the appropriate validation strategy based on your specific requirements and performance considerations.
+
+## Schema Validation with Zod
+
+React Hook Form can be integrated with Zod for robust schema validation. This provides type safety and powerful validation capabilities.
+
+### Setup
+
+First, install the required dependencies:
+
+```bash
+pnpm install zod @hookform/resolvers
+```
+
+### Basic Implementation
+
+Here's how to implement form validation using Zod:
+
+```tsx
+import { useForm } from "react-hook-form";
+import { DevTool } from "@hookform/devtools";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// Define the validation schema
+const formSchema = z.object({
+  username: z
+    .string()
+    .min(15, "Username must be at least 15 characters long")
+    .min(1, "Username is required"),
+  address: z.string().optional(),
+});
+
+// Infer TypeScript type from schema
+type FormValues = z.infer<typeof formSchema>;
+
+export const MyForm = () => {
+  const form = useForm<FormValues>({
+    mode: "onSubmit",
+    resolver: zodResolver(formSchema), // Connect Zod schema
+  });
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const onSubmit = (data: FormValues) => {
+    console.log("submitted: ", data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <div className="form-group">
+        <label htmlFor="username">Username</label>
+        <input type="text" id="username" {...register("username")} />
+        {errors.username && (
+          <span className="error-message">{errors.username.message}</span>
+        )}
+      </div>
+      <div className="form-group">
+        <label htmlFor="address">Address</label>
+        <input type="text" id="address" {...register("address")} />
+        {errors.address && (
+          <span className="error-message">{errors.address.message}</span>
+        )}
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+```
+
+### Advanced Zod Validation Schemas
+
+Here are more examples of Zod validation patterns:
+
+```tsx
+const advancedFormSchema = z.object({
+  // String validations
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must not exceed 20 characters")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+
+  // Email validation
+  email: z
+    .string()
+    .email("Invalid email address")
+    .min(1, "Email is required"),
+
+  // Number validation
+  age: z
+    .number()
+    .min(18, "Must be at least 18 years old")
+    .max(100, "Age cannot exceed 100"),
+
+  // Optional fields
+  website: z
+    .string()
+    .url("Must be a valid URL")
+    .optional(),
+
+  // Custom error messages
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
+
+  // Nested objects
+  address: z.object({
+    street: z.string().min(1, "Street is required"),
+    city: z.string().min(1, "City is required"),
+    zipCode: z.string().regex(/^\d{5}$/, "Invalid zip code"),
+  }),
+
+  // Arrays
+  phoneNumbers: z
+    .array(z.string().regex(/^\d{10}$/, "Invalid phone number"))
+    .min(1, "At least one phone number is required"),
+});
+```
+
+### Custom Validation Methods
+
+You can combine Zod with custom validation:
+
+```tsx
+const formSchema = z.object({
+  username: z
+    .string()
+    .min(1, "Username is required")
+    .refine(async (value) => {
+      // Custom async validation
+      const isAvailable = await checkUsernameAvailability(value);
+      return isAvailable;
+    }, "Username is already taken"),
+});
+```
+
+### Error Handling
+
+Zod provides detailed error information:
+
+```tsx
+const form = useForm<FormValues>({
+  resolver: zodResolver(formSchema),
+  mode: "onChange",
+});
+
+// Handling specific error types
+const { errors } = form.formState;
+if (errors.username?.type === "too_small") {
+  // Handle minimum length error
+}
+```
+
+### Best Practices
+
+1. **Type Safety**
+   ```tsx
+   // Let TypeScript infer types from schema
+   type FormValues = z.infer<typeof formSchema>;
+   
+   // Use inferred types in form
+   const form = useForm<FormValues>({
+     resolver: zodResolver(formSchema),
+   });
+   ```
+
+2. **Reusable Schemas**
+   ```tsx
+   // Base schema
+   const userBaseSchema = z.object({
+     username: z.string().min(1),
+     email: z.string().email(),
+   });
+
+   // Extended schema
+   const userFormSchema = userBaseSchema.extend({
+     password: z.string().min(8),
+   });
+   ```
+
+3. **Conditional Validation**
+   ```tsx
+   const formSchema = z.object({
+     paymentType: z.enum(["credit", "bank"]),
+     creditCardNumber: z
+       .string()
+       .regex(/^\d{16}$/)
+       .optional()
+       .refine((val, ctx) => {
+         if (ctx.parent.paymentType === "credit" && !val) {
+           return false;
+         }
+         return true;
+       }, "Credit card number is required for credit payment"),
+   });
+   ```
+
+### Common Patterns
+
+1. **Transform Values**
+   ```tsx
+   const formSchema = z.object({
+     age: z
+       .string()
+       .transform((val) => parseInt(val, 10))
+       .pipe(z.number().min(18)),
+   });
+   ```
+
+2. **Default Values**
+   ```tsx
+   const formSchema = z.object({
+     newsletter: z
+       .boolean()
+       .default(false),
+     role: z
+       .enum(["user", "admin"])
+       .default("user"),
+   });
+   ```
+
+Remember:
+- Zod provides both runtime validation and TypeScript type inference
+- Use `.optional()` for optional fields instead of making them nullable
+- Consider performance implications of complex validation rules
+- Leverage Zod's built-in error messages or provide custom ones
+- Use transformation methods to clean/format data before validation
+
+This integration provides a powerful way to validate forms while maintaining type safety and providing a great developer experience.
 
 
 ## Advanced Topics
