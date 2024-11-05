@@ -20,17 +20,14 @@ public abstract class BaseExceptionHandler {
     protected final ResponseEntity<ExceptionResponse> buildErrorResponse(Object error, HttpStatus status, WebRequest request, Map<String, String> validationErrors) {
         String path = extractPath(request);
         String traceId = MDC.get(TRACE_ID_LOG_VAR_NAME);
-        Object errorMessage = error instanceof String ? MessageUtil.getMessage((String) error) : error;
-
         var errorResponse = ExceptionResponse.buildResponse(
                 status,
-                errorMessage,
+                error,
                 path,
                 traceId,
                 validationErrors
         );
-
-        log.error(errorResponse.toString());
+        log.warn(errorResponse.toString());
         return errorResponse;
     }
 

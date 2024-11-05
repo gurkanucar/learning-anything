@@ -1,5 +1,6 @@
 package com.gucardev.utility.exception;
 
+import com.gucardev.utility.config.MessageUtil;
 import com.gucardev.utility.exception.helper.BaseExceptionHandler;
 import com.gucardev.utility.exception.model.ClientRequestException;
 import com.gucardev.utility.exception.model.CustomException;
@@ -43,7 +44,7 @@ public class GlobalBaseExceptionHandler extends BaseExceptionHandler {
     public final ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidEx(
             MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, String> errors = extractFieldErrors(ex);
-        return this.buildErrorResponse("validation.failed", HttpStatus.BAD_REQUEST, request, errors);
+        return this.buildErrorResponse(MessageUtil.getMessage("validation.failed"), HttpStatus.BAD_REQUEST, request, errors);
     }
 
 //    @ExceptionHandler(AccessDeniedException.class)
@@ -60,7 +61,7 @@ public class GlobalBaseExceptionHandler extends BaseExceptionHandler {
             String errorMessage = violation.getMessage();
             errors.put(fieldName, errorMessage);
         });
-        return this.buildErrorResponse("validation.failed", HttpStatus.BAD_REQUEST, request, errors);
+        return this.buildErrorResponse(MessageUtil.getMessage("validation.failed"), HttpStatus.BAD_REQUEST, request, errors);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -73,14 +74,15 @@ public class GlobalBaseExceptionHandler extends BaseExceptionHandler {
 
     @ExceptionHandler({Exception.class})
     public final ResponseEntity<ExceptionResponse> handleAllException(Exception ex, WebRequest request) {
-        String message = ex.getLocalizedMessage();
+        String message;
         if (isDatabaseException(ex)) {
             log.error("Database exception occurred: ", ex);
-            message = "Database error occurred. Please contact support.";
+            message = "database.error";
         } else {
             log.error("Exception occurred: ", ex);
+            message = "default.error";
         }
-        return this.buildErrorResponse(message, HttpStatus.BAD_REQUEST, request);
+        return this.buildErrorResponse(MessageUtil.getMessage(message), HttpStatus.BAD_REQUEST, request);
     }
 
     private Map<String, String> extractFieldErrors(MethodArgumentNotValidException ex) {

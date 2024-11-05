@@ -19,6 +19,7 @@ import java.util.Map;
         "error",
         "status",
         "message",
+        "traceId",
         "path",
         "time",
         "validationErrors",
