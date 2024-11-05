@@ -2,6 +2,7 @@ package com.gucardev.utility.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.gucardev.utility.config.MessageUtil;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,17 @@ import java.util.Date;
 })
 public class ApiResponse<T> {
 
-    private final boolean isError = false;
+    private final boolean isError;
     private final HttpStatus status;
     private final String message;
     private final T payload;
+    private final String time;
 
-    @Builder.Default
-    private final String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    public ApiResponse(boolean isError, HttpStatus status, String messageKey, T payload, String time) {
+        this.isError = isError;
+        this.status = status;
+        this.message = messageKey != null ? MessageUtil.getMessage(messageKey) : MessageUtil.getMessage("default.message.key");
+        this.payload = payload;
+        this.time = time != null ? time : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    }
 }

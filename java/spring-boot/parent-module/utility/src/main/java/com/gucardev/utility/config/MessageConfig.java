@@ -1,4 +1,4 @@
-package com.gucardev.utility.exception;
+package com.gucardev.utility.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
