@@ -1,8 +1,8 @@
-package com.gucardev.utility.response;
+package com.gucardev.utility.infrastructure.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.gucardev.utility.config.MessageUtil;
+import com.gucardev.utility.infrastructure.config.MessageUtil;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,7 @@
 package com.gucardev.utility;
 
-import com.gucardev.utility.exception.ExceptionMessage;
-import com.gucardev.utility.response.ApiResponse;
+import com.gucardev.utility.infrastructure.exception.ExceptionMessage;
+import com.gucardev.utility.infrastructure.response.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.gucardev.utility.exception.helper.ExceptionUtil.buildException;
+import static com.gucardev.utility.infrastructure.exception.helper.ExceptionUtil.buildException;
 
 @RestController
 @RequestMapping
@@ -31,6 +31,12 @@ public class ExampleController {
     @GetMapping("/retrieve/not-existing-user/{id}")
     public void error(@PathVariable Integer id) {
         throw buildException(ExceptionMessage.NOT_FOUND_EXCEPTION, id);
+    }
+
+
+    @GetMapping("/retrieve/not-existing-user-runtime-ex/{id}")
+    public void runtimeException(@PathVariable Integer id) {
+        throw new RuntimeException("exception: " + id);
     }
 
     @PostMapping("/validation-ex")

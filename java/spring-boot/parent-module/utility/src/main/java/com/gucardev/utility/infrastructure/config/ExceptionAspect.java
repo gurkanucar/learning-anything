@@ -1,6 +1,6 @@
-package com.gucardev.utility.config;
+package com.gucardev.utility.infrastructure.config;
 
-import com.gucardev.utility.exception.model.CustomException;
+import com.gucardev.utility.infrastructure.exception.model.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;

@@ -1,4 +1,4 @@
-package com.gucardev.utility.exception.model;
+package com.gucardev.utility.infrastructure.exception.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

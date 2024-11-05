@@ -1,4 +1,4 @@
-package com.gucardev.utility.exception.model;
+package com.gucardev.utility.infrastructure.exception.model;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

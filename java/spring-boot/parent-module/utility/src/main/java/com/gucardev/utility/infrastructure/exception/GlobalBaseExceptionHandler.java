@@ -1,10 +1,10 @@
-package com.gucardev.utility.exception;
+package com.gucardev.utility.infrastructure.exception;
 
-import com.gucardev.utility.config.MessageUtil;
-import com.gucardev.utility.exception.helper.BaseExceptionHandler;
-import com.gucardev.utility.exception.model.ClientRequestException;
-import com.gucardev.utility.exception.model.CustomException;
-import com.gucardev.utility.exception.model.ExceptionResponse;
+import com.gucardev.utility.infrastructure.config.MessageUtil;
+import com.gucardev.utility.infrastructure.exception.helper.BaseExceptionHandler;
+import com.gucardev.utility.infrastructure.exception.model.ClientRequestException;
+import com.gucardev.utility.infrastructure.exception.model.CustomException;
+import com.gucardev.utility.infrastructure.exception.model.ExceptionResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

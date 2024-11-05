@@ -1,4 +1,4 @@
-package com.gucardev.utility.config;
+package com.gucardev.utility.infrastructure.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

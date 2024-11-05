@@ -1,7 +1,6 @@
-package com.gucardev.utility.exception.helper;
+package com.gucardev.utility.infrastructure.exception.helper;
 
-import com.gucardev.utility.config.MessageUtil;
-import com.gucardev.utility.exception.model.ExceptionResponse;
+import com.gucardev.utility.infrastructure.exception.model.ExceptionResponse;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;

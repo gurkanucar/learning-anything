@@ -1,4 +1,4 @@
-package com.gucardev.utility.config;
+package com.gucardev.utility.infrastructure.config;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

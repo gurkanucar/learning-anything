@@ -1,4 +1,4 @@
-package com.gucardev.utility.config;
+package com.gucardev.utility.infrastructure.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
