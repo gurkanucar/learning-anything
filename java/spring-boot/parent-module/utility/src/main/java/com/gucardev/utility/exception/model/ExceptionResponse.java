@@ -1,19 +1,10 @@
-package com.gucardev.utility.exception;
+package com.gucardev.utility.exception.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -33,6 +24,7 @@ import java.util.Map;
         "validationErrors",
         "hasValidationErrors"
 })
+@ToString
 public class ExceptionResponse {
 
     @Builder.Default
