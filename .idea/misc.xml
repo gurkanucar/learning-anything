@@ -6,6 +6,7 @@
       <list>
         <option value="$PROJECT_DIR$/gucardev/pom.xml" />
         <option value="$PROJECT_DIR$/parent-module/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot/parent-module/utility/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
