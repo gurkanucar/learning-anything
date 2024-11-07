@@ -9,11 +9,14 @@
         <option value="$PROJECT_DIR$/java/spring-boot/parent-module/utility/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot/sqsexample/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/utility/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/sqs-example/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/java/spring-boot/gucardev/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot/sqsexample/pom.xml" />
       </set>
     </option>
   </component>

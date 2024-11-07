@@ -7,18 +7,19 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="spring-boot-examples" />
+        <module name="utility" />
+        <module name="sqs-example" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="gucardev" target="1.8" />
       <module name="parent-module" target="21" />
       <module name="sqsexample" target="21" />
-      <module name="utility" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="sqs-example" options="-parameters" />
       <module name="sqsexample" options="-parameters" />
       <module name="utility" options="-parameters" />
     </option>

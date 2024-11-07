@@ -1,12 +1,8 @@
 package com.gucardev.sqsexample;
-
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.regions.Region;
-
-import java.util.UUID;
-
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
 import software.amazon.awssdk.services.scheduler.model.*;
 
