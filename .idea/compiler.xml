@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="utility" />
         <module name="sqs-example" />
+        <module name="debezium-cdc" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -19,6 +20,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="debezium-cdc" options="-parameters" />
       <module name="sqs-example" options="-parameters" />
       <module name="sqsexample" options="-parameters" />
       <module name="utility" options="-parameters" />
