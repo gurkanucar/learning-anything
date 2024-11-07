@@ -23,7 +23,7 @@ public class ExceptionAspect {
     // ex: && !within(org.gucardev.utilities.security.JwtFilter)
     @AfterThrowing(
             pointcut = "execution(* com.gucardev.utility..*(..)) &&" +
-                    " !within(com.gucardev.utility.exception..*)",
+                    " !within(com.gucardev.utility.infrastructure.exception.*)",
             throwing = "ex"
     )
     public void handleExceptions(JoinPoint joinPoint, Exception ex) {
