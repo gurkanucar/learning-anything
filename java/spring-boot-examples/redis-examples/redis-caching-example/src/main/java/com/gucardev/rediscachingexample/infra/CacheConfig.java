@@ -10,6 +10,8 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
 
+import static com.gucardev.rediscachingexample.infra.Constants.CUSTOMER_CACHE_NAME;
+
 @Configuration
 @EnableCaching
 public class CacheConfig {
@@ -36,7 +38,7 @@ public class CacheConfig {
         return builder -> {
             var countryNamesConf = RedisCacheConfiguration.defaultCacheConfig()
                     .entryTtl(Duration.ofMinutes(cacheProperties.getCustomerConfig().getEntryTtl()));
-            builder.withCacheConfiguration(cacheProperties.getCustomerConfig().getCustomerCacheName(), countryNamesConf);
+            builder.withCacheConfiguration(CUSTOMER_CACHE_NAME, countryNamesConf);
         };
     }
 }

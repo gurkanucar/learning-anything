@@ -24,6 +24,5 @@ public class CacheProperties {
     @Setter
     public static class CustomerConfig {
         private int entryTtl;
-        private String customerCacheName;
     }
 }
