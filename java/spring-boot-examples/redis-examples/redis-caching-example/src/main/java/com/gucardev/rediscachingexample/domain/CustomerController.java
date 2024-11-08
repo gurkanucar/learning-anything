@@ -15,6 +15,11 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
+    @GetMapping("/evict-caches")
+    public ResponseEntity<Void> evictCaches() {
+        customerService.evictAllCache();
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping
     public ResponseEntity<List<Customer>> getCustomers() {

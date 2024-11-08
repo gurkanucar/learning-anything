@@ -5,6 +5,9 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+
+import java.util.Map;
+
 @Getter
 @Setter
 @Component
@@ -12,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class CacheProperties {
 
     private DefaultConfig defaultConfig;
-    private CustomerConfig customerConfig;
+    private Map<String, CustomCacheConfig> customCaches;
 
     @Getter
     @Setter
@@ -22,7 +25,7 @@ public class CacheProperties {
 
     @Getter
     @Setter
-    public static class CustomerConfig {
+    public static class CustomCacheConfig {
         private int entryTtl;
     }
 }
