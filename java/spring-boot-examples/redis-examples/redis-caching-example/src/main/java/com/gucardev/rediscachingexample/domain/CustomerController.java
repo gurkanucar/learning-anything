@@ -33,14 +33,12 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-        customerService.createCustomer(customer);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(customerService.createCustomer(customer));
     }
 
     @PutMapping
     public ResponseEntity<Customer> updateCustomer(@RequestBody Customer customer) {
-        customerService.updateCustomer(customer);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(customerService.updateCustomer(customer));
     }
 
     @DeleteMapping("/{id}")

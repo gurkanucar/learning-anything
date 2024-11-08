@@ -9,10 +9,9 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 
 import java.time.Duration;
-
-import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 
 import static com.gucardev.rediscachingexample.infra.CacheConstants.CUSTOMER_CACHE_NAME;
 
@@ -26,6 +25,12 @@ public class RedisConfig {
     @Value("${redis.port}")
     private int redisPort;
 
+    @Value("${redis.default.ttl}")
+    private int defaultTtl;
+
+    @Value("${redis.cache.customerCache.ttl}")
+    private int customerCacheTtl;
+
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(redisHost, redisPort);
@@ -34,10 +39,10 @@ public class RedisConfig {
 
     @Bean
     public RedisCacheManager cacheManager() {
-        RedisCacheConfiguration cacheConfig = myDefaultCacheConfig(Duration.ofMinutes(10)).disableCachingNullValues();
+        RedisCacheConfiguration cacheConfig = myDefaultCacheConfig(Duration.ofMinutes(defaultTtl)).disableCachingNullValues();
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)
-                .withCacheConfiguration(CUSTOMER_CACHE_NAME, myDefaultCacheConfig(Duration.ofMinutes(5)))
+                .withCacheConfiguration(CUSTOMER_CACHE_NAME, myDefaultCacheConfig(Duration.ofMinutes(customerCacheTtl)))
 //                .withCacheConfiguration("cacheName2", myDefaultCacheConfig(Duration.ofMinutes(1)))
                 .build();
     }
