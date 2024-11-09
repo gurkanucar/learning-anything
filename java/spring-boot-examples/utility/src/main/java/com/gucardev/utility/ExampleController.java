@@ -2,6 +2,8 @@ package com.gucardev.utility;
 
 import com.gucardev.utility.infrastructure.exception.ExceptionMessage;
 import com.gucardev.utility.infrastructure.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.gucardev.utility.infrastructure.exception.helper.ExceptionUtil.buildException;
 
+@Tag(name = "example controller name")
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
 public class ExampleController {
 
+    @Operation(summary = "it returns success", description = "it will return success")
     @GetMapping("/success")
     public ApiResponse<Fizz> success() {
         return ApiResponse.<Fizz>builder()
