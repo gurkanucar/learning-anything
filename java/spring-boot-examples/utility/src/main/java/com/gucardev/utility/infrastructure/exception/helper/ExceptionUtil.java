@@ -3,6 +3,7 @@ package com.gucardev.utility.infrastructure.exception.helper;
 import com.gucardev.utility.infrastructure.config.MessageUtil;
 import com.gucardev.utility.infrastructure.exception.ExceptionMessage;
 import com.gucardev.utility.infrastructure.exception.model.CustomException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,6 +31,12 @@ public class ExceptionUtil {
                 MessageUtil.getMessage(ex.getKey());
         return new CustomException(errorMessage, ex.getStatus());
     }
-
+    public static String getFilteredStackTrace(Throwable throwable) {
+        if (throwable == null) {
+            return "";
+        }
+        String[] filteredStackTrace = ExceptionUtils.getRootCauseStackTrace(throwable);
+        return String.join(System.lineSeparator(), filteredStackTrace);
+    }
 
 }

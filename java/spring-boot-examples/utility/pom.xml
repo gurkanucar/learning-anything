@@ -52,6 +52,13 @@
             <artifactId>aspectjweaver</artifactId>
             <version>1.9.21</version>
         </dependency>
+        <!-- For Maven projects -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version> <!-- Use the latest version available -->
+        </dependency>
+
         <!-- Open api / swagger -->
         <dependency>
             <groupId>org.springdoc</groupId>
