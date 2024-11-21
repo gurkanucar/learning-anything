@@ -1,5 +1,6 @@
 package com.gucardev.utility.infrastructure.config;
 
+import com.gucardev.utility.infrastructure.exception.helper.ExceptionUtil;
 import com.gucardev.utility.infrastructure.exception.model.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -38,7 +39,7 @@ public class ExceptionAspect {
         if (isCustomException(ex)) {
             log.warn(logMessage);
         } else {
-            log.error(logMessage, ex);
+            log.error(logMessage, ExceptionUtil.getFilteredStackTrace(ex));
         }
     }
 

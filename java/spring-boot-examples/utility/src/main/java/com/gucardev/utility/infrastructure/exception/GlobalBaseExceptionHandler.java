@@ -36,9 +36,11 @@ public class GlobalBaseExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler({NoResourceFoundException.class})
-    public ResponseEntity<ExceptionResponse> noResourceFoundException(CustomException exception, WebRequest request) {
-        return this.buildErrorResponse(exception.getMessage(), exception.getStatus(), request);
+    public ResponseEntity<ExceptionResponse> noResourceFoundException(NoResourceFoundException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        return this.buildErrorResponse(exception.getMessage(), status, request);
     }
+
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public final ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidEx(
