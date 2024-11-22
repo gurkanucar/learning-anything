@@ -70,6 +70,7 @@ public class Address {
       type = "string",
       pattern = "^[A-Z]$"
   )
+  @NotNull
   @Pattern(regexp = "^[A-Z]{2}$", message = "{javax.validation.Pattern.message}")
   private String countryCode;
 

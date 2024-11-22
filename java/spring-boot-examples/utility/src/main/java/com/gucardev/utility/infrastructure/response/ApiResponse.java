@@ -31,7 +31,7 @@ public class ApiResponse<T> {
     public ApiResponse(boolean isError, HttpStatus status, String messageKey, T payload, String time) {
         this.isError = isError;
         this.status = status;
-        this.message = messageKey != null ? MessageUtil.getMessage(messageKey) : MessageUtil.getMessage("default.message.key");
+        this.message = messageKey != null ? MessageUtil.getMessage(messageKey) : MessageUtil.getMessage("messages.default.success");
         this.payload = payload;
         this.time = time != null ? time : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }

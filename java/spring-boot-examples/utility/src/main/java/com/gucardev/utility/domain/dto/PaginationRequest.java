@@ -3,8 +3,9 @@ package com.gucardev.utility.domain.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,10 +28,10 @@ public class PaginationRequest {
       example = "10",
       type = "integer",
       minimum = "1",
-      maximum = "100"
+      maximum = "1000"
   )
   @Min(1)
-  @Max(100)
+  @Max(1000)
   private int size = 10;
 
   @Schema(
@@ -38,7 +39,7 @@ public class PaginationRequest {
       example = "name",
       type = "string"
   )
-  @NotBlank
+  @NotNull
   private String sortField = "id";
 
   @Schema(
@@ -47,7 +48,8 @@ public class PaginationRequest {
       type = "string",
       allowableValues = {"ASC", "DESC"}
   )
-  @Pattern(regexp = "^(ASC|DESC)$", message = "{sort.direction.pattern.exception}")
+  @NotNull
+  @Pattern(regexp = "^(ASC|DESC|asc|desc)$", message = "{sort.direction.pattern.exception}")
   private String sortDirection = "ASC";
 
   @Schema(
@@ -55,5 +57,12 @@ public class PaginationRequest {
       example = "name",
       type = "string"
   )
-  private String searchField;
+  @NotNull
+  private String searchField = "";
+
+
+  public @NotNull @Pattern(regexp = "^(ASC|DESC|asc|desc)$",
+      message = "{sort.direction.pattern.exception}") String getSortDirection() {
+    return sortDirection.toUpperCase(Locale.ROOT);
+  }
 }

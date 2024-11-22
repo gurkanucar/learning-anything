@@ -68,10 +68,9 @@ public class GlobalBaseExceptionHandler extends BaseExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public final ResponseEntity<ExceptionResponse> handleHttpMessageNotReadableException(
-            HttpMessageNotReadableException ex, WebRequest request) {
-        Throwable mostSpecificCause = ex.getMostSpecificCause();
-        String missingFieldMessage = mostSpecificCause.getMessage();
-        return this.buildErrorResponse("Required request body is missing. " + missingFieldMessage, HttpStatus.BAD_REQUEST, request);
+        HttpMessageNotReadableException ex, WebRequest request) {
+        String errorMessage = MessageUtil.getMessage("error.request.body.missing");
+        return this.buildErrorResponse(errorMessage, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler({Exception.class})
