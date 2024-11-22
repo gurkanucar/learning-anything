@@ -1,4 +1,4 @@
-package com.gucardev.utility;
+package com.gucardev.utility.domain;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

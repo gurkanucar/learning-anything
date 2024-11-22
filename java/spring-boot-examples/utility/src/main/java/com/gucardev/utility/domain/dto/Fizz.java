@@ -1,4 +1,4 @@
-package com.gucardev.utility;
+package com.gucardev.utility.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

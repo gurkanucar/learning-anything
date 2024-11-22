@@ -7,18 +7,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageUtil {
 
-    private static MessageSource messageSource;
+  private static MessageSource messageSource;
 
-    public MessageUtil(MessageSource messageSource) {
-        MessageUtil.messageSource = messageSource;
-    }
+  public MessageUtil(MessageSource messageSource) {
+    MessageUtil.messageSource = messageSource;
+  }
 
-    public static String getMessage(String key) {
-        return messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
+  public static String getMessage(String key, Object[] args) {
+    try {
+      return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
+    } catch (Exception e) {
+      return messageSource.getMessage("messages.default", null, LocaleContextHolder.getLocale());
     }
+  }
 
-    public static String getMessage(String key, Object[] args) {
-        return messageSource.getMessage(key, args, LocaleContextHolder.getLocale());
-    }
+  public static String getMessage(String key) {
+    return getMessage(key, null);
+  }
+
 }
 

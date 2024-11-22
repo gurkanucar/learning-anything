@@ -1,4 +1,4 @@
-package com.gucardev.utility;
+package com.gucardev.utility.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;

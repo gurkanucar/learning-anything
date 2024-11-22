@@ -1,19 +1,31 @@
-package com.gucardev.utility;
+package com.gucardev.utility.domain;
 
 import static com.gucardev.utility.infrastructure.exception.helper.ExceptionUtil.buildException;
 
+import com.gucardev.utility.domain.dto.Address;
+import com.gucardev.utility.domain.dto.Fizz;
+import com.gucardev.utility.domain.dto.PaginationRequest;
 import com.gucardev.utility.infrastructure.exception.ExceptionMessage;
 import com.gucardev.utility.infrastructure.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Example Controller", description = "Controller demonstrating API operations and exception handling")
 @RestController
@@ -31,6 +43,31 @@ public class ExampleController {
         .payload(new Fizz("field", 5))
         .message("successfully.data.created")
         .status(HttpStatus.OK).build();
+  }
+
+  @Operation(
+      summary = "Get paginated data",
+      description = "This endpoint returns paginated data based on the provided request parameters."
+  )
+  @GetMapping("/paginate")
+  public ApiResponse<Map<String, Object>> getPaginatedData(
+      @Valid @ParameterObject PaginationRequest paginationRequest) {
+    PageRequest pageRequest = PageRequest.of(
+        paginationRequest.getPage(),
+        paginationRequest.getSize(),
+        Sort.by(Sort.Direction.fromString(paginationRequest.getSortDirection()),
+            paginationRequest.getSortField())
+    );
+    // Mock implementation: Replace with actual service/repository logic
+    Map<String, Object> responseData = Map.of(
+        "paginationRequest", pageRequest,
+        "searchField", paginationRequest.getSearchField()
+    );
+    return ApiResponse.<Map<String, Object>>builder()
+        .payload(responseData)
+        .message("Paginated data fetched successfully.")
+        .status(HttpStatus.OK)
+        .build();
   }
 
   @Operation(

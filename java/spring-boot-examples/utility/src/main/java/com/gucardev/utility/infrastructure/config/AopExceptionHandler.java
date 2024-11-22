@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class LoggingAspect {
+public class AopExceptionHandler {
 
   private static final String PACKAGE_NAME = "com.gucardev.utility";
 
