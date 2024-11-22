@@ -31,12 +31,5 @@ public class ExceptionUtil {
                 MessageUtil.getMessage(ex.getKey());
         return new CustomException(errorMessage, ex.getStatus());
     }
-    public static String getFilteredStackTrace(Throwable throwable) {
-        if (throwable == null) {
-            return "";
-        }
-        String[] filteredStackTrace = ExceptionUtils.getRootCauseStackTrace(throwable);
-        return String.join(System.lineSeparator(), filteredStackTrace);
-    }
 
 }
