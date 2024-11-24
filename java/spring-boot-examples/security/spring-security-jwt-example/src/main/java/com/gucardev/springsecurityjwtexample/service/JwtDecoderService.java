@@ -10,12 +10,11 @@ public interface JwtDecoderService {
 
   List<String> extractRoles(String token);
 
+  String extractTokenSign(String token);
+
   <T> T extractClaim(String token, Function<Claims, T> claimsResolver);
 
   boolean isTokenExpired(String token);
 
-  String extractTokenVersion(String token);
-
   boolean isTokenValid(String token, String expectedSignature);
-
 }

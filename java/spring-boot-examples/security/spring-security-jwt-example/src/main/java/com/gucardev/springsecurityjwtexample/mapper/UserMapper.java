@@ -7,9 +7,8 @@ import com.gucardev.springsecurityjwtexample.entity.User;
 
 public class UserMapper {
 
-  public static UserDto toDto(User entity, String token) {
+  public static UserDto toDto(User entity) {
     var dto = new UserDto();
-    dto.setToken(token);
     dto.setId(entity.getId());
     dto.setUsername(entity.getUsername());
     dto.setEmail(entity.getEmail());

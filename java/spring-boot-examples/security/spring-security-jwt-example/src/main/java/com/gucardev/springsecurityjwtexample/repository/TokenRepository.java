@@ -12,4 +12,6 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
   void deleteByTokenSign(String tokenSign);
 
   Optional<Token> findByTokenSignAndUser(String tokenSign, User user);
+
+  Optional<Token> findByTokenSignAndUser_Username(String tokenSign, String username);
 }

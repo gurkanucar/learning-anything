@@ -6,8 +6,8 @@ import com.gucardev.springsecurityjwtexample.repository.TokenRepository;
 import com.gucardev.springsecurityjwtexample.service.JwtDecoderService;
 import com.gucardev.springsecurityjwtexample.service.TokenService;
 import com.gucardev.springsecurityjwtexample.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,22 +25,18 @@ public class TokenServiceImpl implements TokenService {
   private final JwtDecoderService jwtDecoderService;
   private final UserService userService;
 
-
   @Override
   public String createNewTokenSignatureForUser(User user) {
-    var sign = UUID.randomUUID().toString();
+    String tokenSign = UUID.randomUUID().toString();
 
-    // Create a new Token entity
     Token tokenEntity = new Token();
-    tokenEntity.setTokenSign(sign);
+    tokenEntity.setTokenSign(tokenSign);
     tokenEntity.setUser(user);
     tokenEntity.setExpiration(new Date(System.currentTimeMillis() + jwtExpiration));
 
-    // Save the user (tokens will cascade)
     tokenRepository.save(tokenEntity);
-    return sign;
+    return tokenSign;
   }
-
 
   @Transactional
   @Override
@@ -49,34 +45,26 @@ public class TokenServiceImpl implements TokenService {
   }
 
   @Override
-  public Optional<Token> findByTokenSignAndUsername(String tokenSign, User user) {
-    return tokenRepository.findByTokenSignAndUser(tokenSign, user);
-  }
-
-  @Override
   public void validateToken(String token) {
-    User user = userService.getByUsername(jwtDecoderService.extractUsername(token));
-    var signature =
-        findByTokenSignAndUsername(token, user).orElseThrow(
-            () -> new RuntimeException("not found!")).getTokenSign();
-    if (!jwtDecoderService.isTokenValid(token, signature)) {
-      throw new RuntimeException("invalid token");
-    }
-  }
+    String username = jwtDecoderService.extractUsername(token);
+    User user = userService.getByUsername(username);
+    String tokenSign = jwtDecoderService.extractTokenSign(token);
 
-  @Override
-  public String extractUsername(String jwt) {
-    return jwtDecoderService.extractUsername(jwt);
+    Token storedToken = tokenRepository.findByTokenSignAndUser_Username(tokenSign, username)
+        .orElseThrow(() -> new EntityNotFoundException("Token not found"));
+
+    if (!jwtDecoderService.isTokenValid(token, storedToken.getTokenSign())) {
+      throw new RuntimeException("Invalid token");
+    }
   }
 
   @Transactional
   @Override
-  public void invalidateTokenSignatureByAuthorizationHeader(String authorizationHeader) {
-    if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-      return;
+  public void invalidateTokenByAuthorizationHeader(String authorizationHeader) {
+    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+      String jwt = authorizationHeader.substring(7);
+      String tokenSign = jwtDecoderService.extractTokenSign(jwt);
+      invalidateTokenSignature(tokenSign);
     }
-    String jwt = authorizationHeader.substring(7);
-    var signature = jwtDecoderService.extractTokenVersion(jwt);
-    invalidateTokenSignature(signature);
   }
 }

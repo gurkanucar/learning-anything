@@ -12,14 +12,13 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class JwtDecoderServiceImpl implements JwtDecoderService {
 
-  private final Key signInKey;
+  private final Key signingKey;
 
   public JwtDecoderServiceImpl(@Value("${jwt-variables.secret-key}") String secretKey) {
-    this.signInKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+    this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
   }
 
   @Override
@@ -33,7 +32,7 @@ public class JwtDecoderServiceImpl implements JwtDecoderService {
   }
 
   @Override
-  public String extractTokenVersion(String token) {
+  public String extractTokenSign(String token) {
     return extractClaim(token, claims -> claims.get("tokenSign", String.class));
   }
 
@@ -55,13 +54,9 @@ public class JwtDecoderServiceImpl implements JwtDecoderService {
     return tokenSign.equals(expectedSignature) && !isTokenExpired(token);
   }
 
-  private String extractTokenSign(String token) {
-    return extractClaim(token, claims -> claims.get("tokenSign", String.class));
-  }
-
   private Claims extractAllClaims(String token) {
     return Jwts.parserBuilder()
-        .setSigningKey(signInKey)
+        .setSigningKey(signingKey)
         .build()
         .parseClaimsJws(token)
         .getBody();

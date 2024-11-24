@@ -11,5 +11,5 @@ public interface AuthService {
 
   UserDto getAuthenticatedUser();
 
-  void logout(String logoutRequest);
+  void logout(String authorizationHeader);
 }

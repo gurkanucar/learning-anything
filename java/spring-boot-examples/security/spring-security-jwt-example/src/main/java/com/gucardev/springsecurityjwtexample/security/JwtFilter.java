@@ -1,5 +1,6 @@
 package com.gucardev.springsecurityjwtexample.security;
 
+import com.gucardev.springsecurityjwtexample.service.JwtDecoderService;
 import com.gucardev.springsecurityjwtexample.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,6 +21,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
   private final UserDetailsServiceImpl userDetailsService;
   private final TokenService tokenService;
+  private final JwtDecoderService jwtDecoderService;
 
   @Override
   protected void doFilterInternal(
@@ -38,7 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
     String jwt = authorizationHeader.substring(7);
 
     try {
-      String username = tokenService.extractUsername(jwt);
+      String username = jwtDecoderService.extractUsername(jwt);
       UserDetails userDetails = userDetailsService.loadUserByUsername(username);
       tokenService.validateToken(jwt);
 //        UsernamePasswordAuthenticationToken authToken =
