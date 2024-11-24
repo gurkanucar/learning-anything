@@ -5,11 +5,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @ExcludeFromAspect
 @Component
@@ -24,14 +27,28 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
       FilterChain filterChain)
       throws ServletException, IOException {
 
-    // Pre-processing logic (runs before the request is processed by controllers)
-    log.info("Request URI: {}", request.getRequestURI());
+    // Wrap the request and response for content caching
+    ContentCachingRequestWrapper cachingRequestWrapper = new ContentCachingRequestWrapper(request);
+    ContentCachingResponseWrapper cachingResponseWrapper = new ContentCachingResponseWrapper(
+        response);
 
-    // Continue with the next filter or the actual request
-    filterChain.doFilter(request, response);
+    // Start measuring the time taken
+    long startTime = System.currentTimeMillis();
 
-    // Post-processing logic (runs after the response is generated)
-    log.info("Response Status: {}", response.getStatus());
+    try {
+      filterChain.doFilter(cachingRequestWrapper, cachingResponseWrapper);
+    } finally {
+      // Measure elapsed time
+      long elapsedTime = System.currentTimeMillis() - startTime;
+
+      // Log only if debug mode and not an ignored endpoint
+      if (log.isDebugEnabled() && !shouldNotFilter(request)) {
+        logRequestAndResponse(cachingRequestWrapper, cachingResponseWrapper, elapsedTime);
+      }
+
+      // Copy the response body back to the original response
+      cachingResponseWrapper.copyBodyToResponse();
+    }
   }
 
   @Override
@@ -44,5 +61,51 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
       }
     }
     return false;
+  }
+
+  private void logRequestAndResponse(ContentCachingRequestWrapper request,
+      ContentCachingResponseWrapper response,
+      long elapsedTime) {
+    String requestBody = new String(request.getContentAsByteArray(), StandardCharsets.UTF_8);
+    String responseBody = new String(response.getContentAsByteArray(), StandardCharsets.UTF_8);
+
+    log.debug("Request and Response Log: \n" +
+            "=== Request ===\n" +
+            "Method: {}\n" +
+            "URI: {}\n" +
+            "Query Params: {}\n" +
+            "Headers: {}\n" +
+            "Body: {}\n" +
+            "=== Response ===\n" +
+            "Status: {}\n" +
+            "Headers: {}\n" +
+            "Body: {}\n" +
+            "Time Taken: {} ms\n",
+        request.getMethod(),
+        request.getRequestURI(),
+        request.getQueryString(),
+        getRequestHeaders(request),
+        requestBody,
+        response.getStatus(),
+        getResponseHeaders(response),
+        responseBody,
+        elapsedTime
+    );
+  }
+
+  private String getRequestHeaders(HttpServletRequest request) {
+    StringBuilder headers = new StringBuilder();
+    request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+      headers.append(headerName).append(": ").append(request.getHeader(headerName)).append("; ");
+    });
+    return headers.toString();
+  }
+
+  private String getResponseHeaders(HttpServletResponse response) {
+    StringBuilder headers = new StringBuilder();
+    response.getHeaderNames().forEach(headerName -> {
+      headers.append(headerName).append(": ").append(response.getHeader(headerName)).append("; ");
+    });
+    return headers.toString();
   }
 }
