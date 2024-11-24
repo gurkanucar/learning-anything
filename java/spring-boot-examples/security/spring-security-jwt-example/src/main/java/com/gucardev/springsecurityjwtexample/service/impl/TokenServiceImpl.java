@@ -25,10 +25,22 @@ public class TokenServiceImpl implements TokenService {
   private final JwtDecoderService jwtDecoderService;
   private final UserService userService;
 
+
+  @Transactional
   @Override
   public String createNewTokenSignatureForUser(User user) {
-    String tokenSign = UUID.randomUUID().toString();
+    // Check how many tokens the user currently has
+    long tokenCount = tokenRepository.countByUser(user);
 
+    if (tokenCount >= 5) {
+      // If the user has 5 or more tokens, delete the oldest one
+      Token oldestToken = tokenRepository.findOldestTokenByUser(user).getFirst();
+      if (oldestToken != null) {
+        tokenRepository.delete(oldestToken);
+      }
+    }
+    // Create a new token
+    String tokenSign = UUID.randomUUID().toString();
     Token tokenEntity = new Token();
     tokenEntity.setTokenSign(tokenSign);
     tokenEntity.setUser(user);

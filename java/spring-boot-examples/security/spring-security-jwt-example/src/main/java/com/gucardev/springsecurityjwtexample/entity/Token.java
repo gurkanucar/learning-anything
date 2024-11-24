@@ -16,11 +16,7 @@ import lombok.Setter;
 @Table(name = "tokens")
 @Getter
 @Setter
-public class Token {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+public class Token extends BaseEntity {
 
   private String tokenSign;
 
