@@ -10,9 +10,14 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @SpringBootApplication
 public class UtilityApplication {
 
+  private static final String MAIN_PACKAGE_NAME = UtilityApplication.class.getPackageName();
+
   public static void main(String[] args) {
     SpringApplication.run(UtilityApplication.class, args);
   }
 
+  public static String getMainPackageName() {
+    return MAIN_PACKAGE_NAME;
+  }
 
 }

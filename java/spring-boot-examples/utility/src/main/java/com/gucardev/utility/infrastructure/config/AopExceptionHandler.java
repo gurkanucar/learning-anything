@@ -1,5 +1,6 @@
 package com.gucardev.utility.infrastructure.config;
 
+import com.gucardev.utility.UtilityApplication;
 import java.util.Arrays;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.aspectj.lang.JoinPoint;
@@ -16,9 +17,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class AopExceptionHandler {
 
-  private static final String PACKAGE_NAME = "com.gucardev.utility";
-
-  @Pointcut("within(com.gucardev.utility..*)")
+  @Pointcut("(within(@org.springframework.stereotype.Component *) || " +
+      "within(@org.springframework.stereotype.Service *) || " +
+      "within(@org.springframework.stereotype.Repository *) || " +
+      "within(@org.springframework.stereotype.Controller *))" +
+      " && !@within(com.gucardev.utility.infrastructure.annotation.ExcludeFromAspect)")
   public void applicationPackagePointcut() {
   }
 
@@ -69,7 +72,7 @@ public class AopExceptionHandler {
   private String getLineNumber() {
     StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
     for (StackTraceElement element : stackTrace) {
-      if (element.getClassName().contains(PACKAGE_NAME)) {
+      if (element.getClassName().contains(UtilityApplication.getMainPackageName())) {
         return String.format("%s:%d", element.getFileName(), element.getLineNumber());
       }
     }
