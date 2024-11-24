@@ -2,9 +2,7 @@ package com.gucardev.springsecurityjwtexample.service;
 
 import io.jsonwebtoken.Claims;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Function;
-import org.springframework.security.core.userdetails.UserDetails;
 
 public interface JwtDecoderService {
 
@@ -18,6 +16,6 @@ public interface JwtDecoderService {
 
   String extractTokenVersion(String token);
 
-  boolean isTokenValid(String token, UserDetails userDetails);
+  boolean isTokenValid(String token, String expectedSignature);
 
 }

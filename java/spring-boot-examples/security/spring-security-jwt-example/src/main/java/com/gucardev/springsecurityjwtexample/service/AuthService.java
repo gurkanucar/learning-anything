@@ -7,9 +7,9 @@ import com.gucardev.springsecurityjwtexample.dto.UserDto;
 
 public interface AuthService {
 
-    TokenDto login(LoginRequest loginRequest);
+  TokenDto login(LoginRequest loginRequest);
 
-    UserDto getAuthenticatedUser();
+  UserDto getAuthenticatedUser();
 
-    void logout(String logoutRequest);
+  void logout(String logoutRequest);
 }

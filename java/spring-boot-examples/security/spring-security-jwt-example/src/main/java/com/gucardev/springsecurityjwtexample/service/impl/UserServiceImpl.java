@@ -4,21 +4,15 @@ package com.gucardev.springsecurityjwtexample.service.impl;
 import static com.gucardev.springsecurityjwtexample.mapper.UserMapper.toDto;
 
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
-import com.gucardev.springsecurityjwtexample.entity.Token;
 import com.gucardev.springsecurityjwtexample.entity.User;
-import com.gucardev.springsecurityjwtexample.repository.TokenRepository;
 import com.gucardev.springsecurityjwtexample.repository.UserRepository;
 import com.gucardev.springsecurityjwtexample.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j

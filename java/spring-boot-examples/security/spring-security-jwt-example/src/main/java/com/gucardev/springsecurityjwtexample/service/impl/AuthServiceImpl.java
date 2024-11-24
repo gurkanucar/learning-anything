@@ -52,13 +52,7 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public void logout(String authorizationHeader) {
-    if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-      return;
-    }
-    String jwt = authorizationHeader.substring(7);
-    var sign = jwtDecoderService.extractTokenVersion(jwt);
-    // update token sign on logout
-    tokenService.invalidateTokenSignature(sign);
+    tokenService.invalidateTokenSignatureByAuthorizationHeader(authorizationHeader);
   }
 
 }

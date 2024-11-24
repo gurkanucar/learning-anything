@@ -3,7 +3,9 @@ package com.gucardev.springsecurityjwtexample.service.impl;
 import com.gucardev.springsecurityjwtexample.entity.Token;
 import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.repository.TokenRepository;
+import com.gucardev.springsecurityjwtexample.service.JwtDecoderService;
 import com.gucardev.springsecurityjwtexample.service.TokenService;
+import com.gucardev.springsecurityjwtexample.service.UserService;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +22,8 @@ public class TokenServiceImpl implements TokenService {
   private long jwtExpiration;
 
   private final TokenRepository tokenRepository;
+  private final JwtDecoderService jwtDecoderService;
+  private final UserService userService;
 
 
   @Override
@@ -46,6 +50,33 @@ public class TokenServiceImpl implements TokenService {
 
   @Override
   public Optional<Token> findByTokenSignAndUsername(String tokenSign, User user) {
-   return tokenRepository.findByTokenSignAndUser(tokenSign, user);
+    return tokenRepository.findByTokenSignAndUser(tokenSign, user);
+  }
+
+  @Override
+  public void validateToken(String token) {
+    User user = userService.getByUsername(jwtDecoderService.extractUsername(token));
+    var signature =
+        findByTokenSignAndUsername(token, user).orElseThrow(
+            () -> new RuntimeException("not found!")).getTokenSign();
+    if (!jwtDecoderService.isTokenValid(token, signature)) {
+      throw new RuntimeException("invalid token");
+    }
+  }
+
+  @Override
+  public String extractUsername(String jwt) {
+    return jwtDecoderService.extractUsername(jwt);
+  }
+
+  @Transactional
+  @Override
+  public void invalidateTokenSignatureByAuthorizationHeader(String authorizationHeader) {
+    if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+      return;
+    }
+    String jwt = authorizationHeader.substring(7);
+    var signature = jwtDecoderService.extractTokenVersion(jwt);
+    invalidateTokenSignature(signature);
   }
 }

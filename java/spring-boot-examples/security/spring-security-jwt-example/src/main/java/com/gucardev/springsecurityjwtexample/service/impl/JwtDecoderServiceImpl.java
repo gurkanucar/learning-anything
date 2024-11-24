@@ -1,11 +1,6 @@
 package com.gucardev.springsecurityjwtexample.service.impl;
 
-import com.gucardev.springsecurityjwtexample.entity.Token;
-import com.gucardev.springsecurityjwtexample.entity.User;
-import com.gucardev.springsecurityjwtexample.repository.TokenRepository;
-import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
 import com.gucardev.springsecurityjwtexample.service.JwtDecoderService;
-import com.gucardev.springsecurityjwtexample.service.TokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -13,11 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
@@ -25,12 +17,9 @@ import org.springframework.stereotype.Service;
 public class JwtDecoderServiceImpl implements JwtDecoderService {
 
   private final Key signInKey;
-  private final TokenService tokenService;
 
-  public JwtDecoderServiceImpl(@Value("${jwt-variables.secret-key}") String secretKey,
-      TokenService tokenService) {
+  public JwtDecoderServiceImpl(@Value("${jwt-variables.secret-key}") String secretKey) {
     this.signInKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
-    this.tokenService = tokenService;
   }
 
   @Override
@@ -61,13 +50,9 @@ public class JwtDecoderServiceImpl implements JwtDecoderService {
   }
 
   @Override
-  public boolean isTokenValid(String token, UserDetails userDetails) {
+  public boolean isTokenValid(String token, String expectedSignature) {
     String tokenSign = extractTokenSign(token);
-    User user = ((CustomUserDetails) userDetails).getUser();
-
-    // Check if the tokenSign exists and is valid
-    Optional<Token> tokenEntityOpt = tokenService.findByTokenSignAndUsername(tokenSign, user);
-    return tokenEntityOpt.isPresent() && !isTokenExpired(token);
+    return tokenSign.equals(expectedSignature) && !isTokenExpired(token);
   }
 
   private String extractTokenSign(String token) {

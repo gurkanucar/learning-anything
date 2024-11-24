@@ -12,4 +12,9 @@ public interface TokenService {
 
   Optional<Token> findByTokenSignAndUsername(String tokenSign, User user);
 
+  void validateToken(String token);
+
+  String extractUsername(String jwt);
+
+  void invalidateTokenSignatureByAuthorizationHeader(String authorizationHeader);
 }
