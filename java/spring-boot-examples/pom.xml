@@ -12,5 +12,6 @@
         <module>sqs-example</module>
         <module>debezium-cdc</module>
         <module>redis-examples</module>
+      <module>security</module>
     </modules>
 </project>

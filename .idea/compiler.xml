@@ -7,11 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="utility" />
         <module name="redis-examples" />
-        <module name="redis-caching-example" />
-        <module name="sqs-example" />
+        <module name="security" />
         <module name="debezium-cdc" />
+        <module name="utility" />
+        <module name="redis-caching-example" />
+        <module name="spring-security-jwt-example" />
+        <module name="sqs-example" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -24,6 +26,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="debezium-cdc" options="-parameters" />
       <module name="redis-caching-example" options="-parameters" />
+      <module name="spring-security-jwt-example" options="-parameters" />
       <module name="sqs-example" options="-parameters" />
       <module name="sqsexample" options="-parameters" />
       <module name="utility" options="-parameters" />
