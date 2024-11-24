@@ -3,12 +3,14 @@ package com.gucardev.springsecurityjwtexample.service.impl;
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
+import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.mapper.UserMapper;
 import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
 import com.gucardev.springsecurityjwtexample.service.AuthService;
 import com.gucardev.springsecurityjwtexample.service.JwtEncoderService;
 import com.gucardev.springsecurityjwtexample.service.TokenService;
 import com.gucardev.springsecurityjwtexample.service.UserService;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,10 +31,16 @@ public class AuthServiceImpl implements AuthService {
   public TokenDto login(LoginRequest loginRequest) {
     Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
-            loginRequest.getUsername(), loginRequest.getPassword()
-        )
+            loginRequest.getUsername(),
+            loginRequest.getPassword())
     );
-    String token = jwtEncoderService.generateToken(authentication);
+    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    User user = userDetails.getUser();
+    String tokenSign = tokenService.createNewTokenSignatureForUser(user);
+    String token = jwtEncoderService.generateToken(user.getUsername(),
+        user.getRoles().stream().map(Enum::name)
+            .collect(Collectors.toList()),
+        tokenSign);
     UserDto userDto = userService.getDtoByUsername(loginRequest.getUsername());
     return new TokenDto(token, userDto);
   }

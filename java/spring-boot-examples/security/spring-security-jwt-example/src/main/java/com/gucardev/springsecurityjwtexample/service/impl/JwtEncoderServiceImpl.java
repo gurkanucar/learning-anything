@@ -11,6 +11,7 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,19 +36,11 @@ public class JwtEncoderServiceImpl implements JwtEncoderService {
   }
 
   @Override
-  public String generateToken(Authentication authentication) {
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    User user = userDetails.getUser();
-
-    String tokenSign = tokenService.createNewTokenSignatureForUser(user);
-
+  public String generateToken(String username, List<String> roles, String tokenSign) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("roles", userDetails.getAuthorities().stream()
-        .map(authority -> authority.getAuthority())
-        .collect(Collectors.toList()));
+    claims.put("roles", roles);
     claims.put("tokenSign", tokenSign);
-
-    return buildToken(claims, user.getUsername());
+    return buildToken(claims, username);
   }
 
   private String buildToken(Map<String, Object> claims, String subject) {
