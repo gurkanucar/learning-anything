@@ -1,6 +1,5 @@
 package com.gucardev.springsecurityjwtexample.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gucardev.springsecurityjwtexample.service.JwtDecoderService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -8,8 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,24 +55,16 @@ public class JwtFilter extends OncePerRequestFilter {
       authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
       SecurityContextHolder.getContext().setAuthentication(authToken);
 
-
-    } catch (JwtException e) {
-      sendErrorResponse(response, e.getMessage(), HttpServletResponse.SC_UNAUTHORIZED);
-      return;
     } catch (Exception e) {
-      sendErrorResponse(response, "Authentication failed", HttpServletResponse.SC_UNAUTHORIZED);
+      sendErrorResponse(response);
       return;
     }
-
     filterChain.doFilter(request, response);
   }
 
-  private void sendErrorResponse(HttpServletResponse response, String message, int status)
-      throws IOException {
-    response.setStatus(status);
+  private void sendErrorResponse(HttpServletResponse response) {
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     response.setContentType("application/json");
-    Map<String, String> errorResponse = Collections.singletonMap("error", message);
-    new ObjectMapper().writeValue(response.getWriter(), errorResponse);
   }
 }
 

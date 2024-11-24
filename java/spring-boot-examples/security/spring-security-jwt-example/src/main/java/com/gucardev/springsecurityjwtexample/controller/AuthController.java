@@ -1,7 +1,6 @@
 package com.gucardev.springsecurityjwtexample.controller;
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
-import com.gucardev.springsecurityjwtexample.dto.LogoutRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
 import com.gucardev.springsecurityjwtexample.service.AuthService;

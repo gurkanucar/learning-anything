@@ -5,7 +5,6 @@ import static com.gucardev.springsecurityjwtexample.mapper.UserMapper.toDto;
 
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
 import com.gucardev.springsecurityjwtexample.entity.User;
-import com.gucardev.springsecurityjwtexample.mapper.UserMapper;
 import com.gucardev.springsecurityjwtexample.repository.UserRepository;
 import com.gucardev.springsecurityjwtexample.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
