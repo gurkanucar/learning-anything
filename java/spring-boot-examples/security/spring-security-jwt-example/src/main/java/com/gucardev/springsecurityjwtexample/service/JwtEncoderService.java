@@ -5,6 +5,6 @@ import org.springframework.security.core.Authentication;
 
 public interface JwtEncoderService {
 
-    String generateToken(Authentication authentication, UUID tokenSign);
+    String generateToken(Authentication authentication);
 
 }

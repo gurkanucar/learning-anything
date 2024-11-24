@@ -42,8 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
       String username = jwtDecoderService.extractUsername(jwt);
       UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-      if (!jwtDecoderService.isTokenValid(jwt,
-          ((CustomUserDetails) userDetails).getUser().getTokenSign())) {
+      if (!jwtDecoderService.isTokenValid(jwt, userDetails)) {
         throw new JwtException("Invalid JWT");
       }
 //        UsernamePasswordAuthenticationToken authToken =

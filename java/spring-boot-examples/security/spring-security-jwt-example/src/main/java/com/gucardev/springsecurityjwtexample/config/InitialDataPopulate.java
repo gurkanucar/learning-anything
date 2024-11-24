@@ -22,15 +22,21 @@ public class InitialDataPopulate implements CommandLineRunner {
     user.setPassword("pass");
     user.setRoles(Set.of(Role.ADMIN, Role.USER));
     user.setIsEnabled(true);
-    user = userService.createUser(user);
-
+    try {
+      userService.getByUsername("admin");
+    } catch (Exception e) {
+      userService.createUser(user);
+    }
     var user2 = new User();
     user2.setUsername("user");
     user2.setPassword("pass");
     user2.setRoles(Set.of(Role.USER));
     user2.setIsEnabled(true);
-    user2 = userService.createUser(user2);
-
+    try {
+      userService.getByUsername("user");
+    } catch (Exception e) {
+      userService.createUser(user2);
+    }
   }
 
 }

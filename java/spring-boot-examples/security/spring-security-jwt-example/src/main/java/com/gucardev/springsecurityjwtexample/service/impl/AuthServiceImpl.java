@@ -33,12 +33,9 @@ public class AuthServiceImpl implements AuthService {
     var authObj = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
             loginRequest.getUsername(), loginRequest.getPassword()));
-
-    // update token sign on login
-    var sign = userService.updateTokenSign(loginRequest.getUsername());
-
+    var token = tokenService.generateToken(authObj);
     var user = userService.getDtoByUsername(loginRequest.getUsername());
-    return new TokenDto(tokenService.generateToken(authObj, sign), user);
+    return new TokenDto(token, user);
   }
 
   @Override
@@ -48,8 +45,7 @@ public class AuthServiceImpl implements AuthService {
     jwtAuthentication = (CustomUsernamePasswordAuthenticationToken) authentication;
     var user = userService.getByUsername(jwtAuthentication.getName());
     String jwtToken = jwtAuthentication.getToken();
-    user.setToken(jwtToken);
-    return toDto(user);
+    return toDto(user, jwtToken);
   }
 
   @Override
@@ -58,9 +54,9 @@ public class AuthServiceImpl implements AuthService {
       return;
     }
     String jwt = authorizationHeader.substring(7);
-    var username = jwtDecoderService.extractUsername(jwt);
+    var sign = jwtDecoderService.extractTokenVersion(jwt);
     // update token sign on logout
-    userService.updateTokenSign(username);
+    userService.invalidateToken(sign);
   }
 
 }

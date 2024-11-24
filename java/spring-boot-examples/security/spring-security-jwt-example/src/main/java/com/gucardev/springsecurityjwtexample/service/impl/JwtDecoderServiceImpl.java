@@ -1,5 +1,9 @@
 package com.gucardev.springsecurityjwtexample.service.impl;
 
+import com.gucardev.springsecurityjwtexample.entity.Token;
+import com.gucardev.springsecurityjwtexample.entity.User;
+import com.gucardev.springsecurityjwtexample.repository.TokenRepository;
+import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
 import com.gucardev.springsecurityjwtexample.service.JwtDecoderService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -8,9 +12,11 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
@@ -18,9 +24,12 @@ import org.springframework.stereotype.Service;
 public class JwtDecoderServiceImpl implements JwtDecoderService {
 
     private final Key signInKey;
+    private final TokenRepository tokenRepository;
 
-    public JwtDecoderServiceImpl(@Value("${jwt-variables.secret-key}") String secretKey) {
+    public JwtDecoderServiceImpl(@Value("${jwt-variables.secret-key}") String secretKey,
+        TokenRepository tokenRepository) {
         this.signInKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+      this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -34,9 +43,8 @@ public class JwtDecoderServiceImpl implements JwtDecoderService {
     }
 
     @Override
-    public UUID extractTokenVersion(String token) {
-        String tokenSign = extractClaim(token, claims -> claims.get("tokenSign", String.class));
-        return UUID.fromString(tokenSign);
+    public String extractTokenVersion(String token) {
+       return extractClaim(token, claims -> claims.get("tokenSign", String.class));
     }
 
     @Override
@@ -52,8 +60,17 @@ public class JwtDecoderServiceImpl implements JwtDecoderService {
     }
 
     @Override
-    public boolean isTokenValid(String token, UUID tokenSign) {
-        return extractTokenVersion(token).equals(tokenSign) && !isTokenExpired(token);
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        String tokenSign = extractTokenSign(token);
+        User user = ((CustomUserDetails) userDetails).getUser();
+
+        // Check if the tokenSign exists and is valid
+        Optional<Token> tokenEntityOpt = tokenRepository.findByTokenSignAndUser(tokenSign, user);
+        return tokenEntityOpt.isPresent() && !isTokenExpired(token);
+    }
+
+    private String extractTokenSign(String token) {
+        return extractClaim(token, claims -> claims.get("tokenSign", String.class));
     }
 
     private Claims extractAllClaims(String token) {

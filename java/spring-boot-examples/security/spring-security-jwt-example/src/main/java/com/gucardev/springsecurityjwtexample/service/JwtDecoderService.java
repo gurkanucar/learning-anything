@@ -4,19 +4,20 @@ import io.jsonwebtoken.Claims;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface JwtDecoderService {
 
-    String extractUsername(String token);
+  String extractUsername(String token);
 
-    List<String> extractRoles(String token);
+  List<String> extractRoles(String token);
 
-    <T> T extractClaim(String token, Function<Claims, T> claimsResolver);
+  <T> T extractClaim(String token, Function<Claims, T> claimsResolver);
 
-    boolean isTokenExpired(String token);
+  boolean isTokenExpired(String token);
 
-    UUID extractTokenVersion(String token);
+  String extractTokenVersion(String token);
 
-    boolean isTokenValid(String token, UUID tokenSign);
+  boolean isTokenValid(String token, UserDetails userDetails);
 
 }

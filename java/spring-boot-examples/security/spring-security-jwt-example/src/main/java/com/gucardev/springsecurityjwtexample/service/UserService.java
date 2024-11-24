@@ -13,10 +13,9 @@ public interface UserService {
 
     UserDto getDtoByUsername(String username);
 
-    UUID updateTokenSign(String username);
+    String updateTokenSign(String username);
 
     User createUser(User user);
 
-    User validateAndReturnService(String username, String password);
-
+    void invalidateToken(String sign);
 }
