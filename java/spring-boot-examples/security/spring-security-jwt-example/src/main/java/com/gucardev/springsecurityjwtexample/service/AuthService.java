@@ -2,7 +2,6 @@ package com.gucardev.springsecurityjwtexample.service;
 
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
-import com.gucardev.springsecurityjwtexample.dto.LogoutRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
 
@@ -12,5 +11,5 @@ public interface AuthService {
 
     UserDto getAuthenticatedUser();
 
-    void logout(LogoutRequest logoutRequest);
+    void logout(String logoutRequest);
 }

@@ -2,7 +2,6 @@ package com.gucardev.springsecurityjwtexample.security;
 
 import com.gucardev.springsecurityjwtexample.entity.User;
 import java.util.Collection;
-import java.util.List;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +14,6 @@ public class CustomUserDetails implements UserDetails {
   public CustomUserDetails(User user) {
     this.user = user;
   }
-
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {

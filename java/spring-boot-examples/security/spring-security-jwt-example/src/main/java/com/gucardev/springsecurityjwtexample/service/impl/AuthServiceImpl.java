@@ -3,7 +3,6 @@ package com.gucardev.springsecurityjwtexample.service.impl;
 import static com.gucardev.springsecurityjwtexample.mapper.UserMapper.toDto;
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
-import com.gucardev.springsecurityjwtexample.dto.LogoutRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
 import com.gucardev.springsecurityjwtexample.security.CustomUsernamePasswordAuthenticationToken;
@@ -54,8 +53,12 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public void logout(LogoutRequest logoutRequest) {
-    var username = jwtDecoderService.extractUsername(logoutRequest.getToken());
+  public void logout(String authorizationHeader) {
+    if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+      return;
+    }
+    String jwt = authorizationHeader.substring(7);
+    var username = jwtDecoderService.extractUsername(jwt);
     // update token sign on logout
     userService.updateTokenSign(username);
   }
