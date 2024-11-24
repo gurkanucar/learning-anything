@@ -27,9 +27,6 @@ public class UserServiceImpl implements UserService {
 
   private final UserRepository repository;
   private final PasswordEncoder passwordEncoder;
-  private final TokenRepository tokenRepository;
-  @Value("${jwt-variables.expiration-time}")
-  private long jwtExpiration;
 
   @Override
   public Optional<User> getById(Long id) {
@@ -47,7 +44,6 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDto getDtoByUsername(String username) {
-
     // todo
     return toDto(getByUsername(username), null);
   }
@@ -56,27 +52,6 @@ public class UserServiceImpl implements UserService {
   public User createUser(User user) {
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     return repository.save(user);
-  }
-
-  @Override
-  public String updateTokenSign(String username) {
-    User user = getByUsername(username);
-    var sign = UUID.randomUUID().toString();
-
-    // Create a new Token entity
-    Token tokenEntity = new Token();
-    tokenEntity.setTokenSign(sign);
-    tokenEntity.setUser(user);
-    tokenEntity.setExpiration(new Date(System.currentTimeMillis() + jwtExpiration));
-    tokenRepository.save(tokenEntity);
-    repository.save(user);
-    return sign;
-  }
-
-  @Transactional
-  @Override
-  public void invalidateToken(String sign) {
-    tokenRepository.deleteByTokenSign(sign);
   }
 
 }

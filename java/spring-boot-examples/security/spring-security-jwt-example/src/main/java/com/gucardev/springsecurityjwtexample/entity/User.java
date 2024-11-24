@@ -23,25 +23,25 @@ import lombok.Setter;
 @Setter
 public class User extends BaseEntity {
 
-    private String name;
+  private String name;
 
-    @Column(nullable = false)
-    private String username;
+  @Column(nullable = false)
+  private String username;
 
-    @Column(nullable = false)
-    private String password;
+  @Column(nullable = false)
+  private String password;
 
-    private String email;
+  private String email;
 
-    private Boolean isEnabled;
+  private Boolean isEnabled;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private Set<Role> roles = new HashSet<>();
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role")
+  private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Token> tokens = new HashSet<>();
+  @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, orphanRemoval = true)
+  private Set<Token> tokens = new HashSet<>();
 
 }

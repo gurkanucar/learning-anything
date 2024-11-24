@@ -3,6 +3,7 @@ package com.gucardev.springsecurityjwtexample.service.impl;
 import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
 import com.gucardev.springsecurityjwtexample.service.JwtEncoderService;
+import com.gucardev.springsecurityjwtexample.service.TokenService;
 import com.gucardev.springsecurityjwtexample.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -24,15 +25,17 @@ public class JwtEncoderServiceImpl implements JwtEncoderService {
   private final Key signInKey;
   private final long jwtExpiration;
   private final UserService userService;
+  private final TokenService  tokenService;
 
   public JwtEncoderServiceImpl(
       @Value("${jwt-variables.secret-key}") String secretKey,
       @Value("${jwt-variables.expiration-time}") long jwtExpiration,
-      UserService userService
+      UserService userService, TokenService tokenService
   ) {
     this.signInKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     this.jwtExpiration = jwtExpiration;
     this.userService = userService;
+    this.tokenService = tokenService;
   }
 
   @Override
@@ -41,7 +44,7 @@ public class JwtEncoderServiceImpl implements JwtEncoderService {
     User user = userDetails.getUser();
 
     // Generate a unique tokenSign (e.g., UUID)
-    String tokenSign = userService.updateTokenSign(user.getUsername());
+    String tokenSign = tokenService.createNewTokenSignatureForUser(user);
 
     // Include tokenSign in JWT claims
     Map<String, Object> claims = new HashMap<>();

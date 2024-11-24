@@ -7,15 +7,12 @@ import java.util.UUID;
 
 public interface UserService {
 
-    Optional<User> getById(Long id);
+  Optional<User> getById(Long id);
 
-    User getByUsername(String username);
+  User getByUsername(String username);
 
-    UserDto getDtoByUsername(String username);
+  UserDto getDtoByUsername(String username);
 
-    String updateTokenSign(String username);
+  User createUser(User user);
 
-    User createUser(User user);
-
-    void invalidateToken(String sign);
 }

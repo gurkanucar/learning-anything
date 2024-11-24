@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TokenRepository extends JpaRepository<Token, Long> {
 
-  Optional<Token> findByTokenSignAndUser(String tokenSign, User user);
-  Optional<Token> findByTokenSignAndUserName(String tokenSign, String user);
-
   void deleteByTokenSign(String tokenSign);
+
+  Optional<Token> findByTokenSignAndUser(String tokenSign, User user);
 }
