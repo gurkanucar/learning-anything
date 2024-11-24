@@ -6,13 +6,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
-
-import java.nio.charset.StandardCharsets;
 
 @ExcludeFromAspect
 @Component
@@ -68,9 +67,11 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
       long elapsedTime) {
     String requestBody = new String(request.getContentAsByteArray(), StandardCharsets.UTF_8);
     String responseBody = new String(response.getContentAsByteArray(), StandardCharsets.UTF_8);
+    String clientIp = getClientIpAddress(request);
 
     log.debug("Request and Response Log: \n" +
             "=== Request ===\n" +
+            "Client IP: {}\n" +
             "Method: {}\n" +
             "URI: {}\n" +
             "Query Params: {}\n" +
@@ -81,6 +82,7 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
             "Headers: {}\n" +
             "Body: {}\n" +
             "Time Taken: {} ms\n",
+        clientIp,
         request.getMethod(),
         request.getRequestURI(),
         request.getQueryString(),
@@ -91,6 +93,20 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
         responseBody,
         elapsedTime
     );
+  }
+
+  private String getClientIpAddress(HttpServletRequest request) {
+    String ip = request.getHeader("X-Forwarded-For");
+    if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("Proxy-Client-IP");
+    }
+    if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("WL-Proxy-Client-IP");
+    }
+    if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getRemoteAddr();
+    }
+    return ip;
   }
 
   private String getRequestHeaders(HttpServletRequest request) {
