@@ -12,7 +12,7 @@ public class UserMapper {
     dto.setId(entity.getId());
     dto.setUsername(entity.getUsername());
     dto.setEmail(entity.getEmail());
-    dto.setRole(new RoleDto(entity.getRole().name()));
+    dto.setRoles(entity.getRoles().stream().map(x -> new RoleDto(x.name())).toList());
     return dto;
   }
 

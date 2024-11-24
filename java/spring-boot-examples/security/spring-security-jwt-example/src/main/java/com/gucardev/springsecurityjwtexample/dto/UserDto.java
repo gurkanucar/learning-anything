@@ -3,6 +3,8 @@ package com.gucardev.springsecurityjwtexample.dto;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +17,7 @@ public class UserDto extends BaseDto {
 
   private String username;
   private String email;
-  private RoleDto role;
+  private List<RoleDto> roles = new ArrayList<>();
   private String token;
   private boolean isEnabled;
 
@@ -24,7 +26,6 @@ public class UserDto extends BaseDto {
   @Getter
   @Setter
   public static class RoleDto {
-
     private String name;
   }
 }

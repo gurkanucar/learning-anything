@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,41 +19,35 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtEncoderServiceImpl implements JwtEncoderService {
 
-    @Value("${jwt-variables.secret-key}")
-    private String secretKey;
+    private final Key signInKey;
+    private final long jwtExpiration;
 
-    @Value("${jwt-variables.expiration-time}")
-    private long jwtExpiration;
+    public JwtEncoderServiceImpl(
+        @Value("${jwt-variables.secret-key}") String secretKey,
+        @Value("${jwt-variables.expiration-time}") long jwtExpiration) {
+        this.signInKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+        this.jwtExpiration = jwtExpiration;
+    }
 
+    @Override
     public String generateToken(Authentication authentication, UUID tokenSign) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toArray());
-        claims.put("tokenSign", tokenSign);
-        return generateToken(claims, authentication.getName());
+        claims.put("roles", authentication.getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList()));
+        claims.put("tokenSign", tokenSign.toString());
+        return buildToken(claims, authentication.getName(), jwtExpiration);
     }
 
-    private String generateToken(Map<String, Object> extraClaims, String username) {
-        return buildToken(extraClaims, username, jwtExpiration);
+    private String buildToken(Map<String, Object> claims, String username, long expiration) {
+        return Jwts.builder()
+            .setClaims(claims)
+            .setSubject(username)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + expiration))
+            .signWith(signInKey, SignatureAlgorithm.HS256)
+            .compact();
     }
-
-    private String buildToken(
-            Map<String, Object> extraClaims,
-            String username,
-            long expiration
-    ) {
-        return Jwts
-                .builder()
-                .setClaims(extraClaims)
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
 }
+

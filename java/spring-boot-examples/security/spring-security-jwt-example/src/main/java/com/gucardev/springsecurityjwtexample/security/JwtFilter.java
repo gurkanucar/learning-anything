@@ -8,12 +8,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.Map;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,55 +21,61 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
-    private final JwtDecoderService jwtDecoderService;
-    private final UserDetailsServiceImpl userDetailsService;
 
-    @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+  private final JwtDecoderService jwtDecoderService;
+  private final UserDetailsServiceImpl userDetailsService;
 
-        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header == null || !header.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      FilterChain filterChain)
+      throws ServletException, IOException {
 
-        final String jwt = header.substring(7);
+    String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        try {
-            String username = jwtDecoderService.extractUsername(jwt);
-            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+    if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+      filterChain.doFilter(request, response);
+      return;
+    }
 
-            if (!jwtDecoderService.isTokenValid(jwt, userDetails.getUser().getTokenSign())) {
-                throw new JwtException("Invalid JWT");
-            }
+    String jwt = authorizationHeader.substring(7);
 
+    try {
+      String username = jwtDecoderService.extractUsername(jwt);
+      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+      if (!jwtDecoderService.isTokenValid(jwt,
+          ((CustomUserDetails) userDetails).getUser().getTokenSign())) {
+        throw new JwtException("Invalid JWT");
+      }
 //        UsernamePasswordAuthenticationToken authToken =
 //                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-            CustomUsernamePasswordAuthenticationToken authToken =
-                    new CustomUsernamePasswordAuthenticationToken(userDetails, userDetails.getAuthorities(), jwt);
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+      CustomUsernamePasswordAuthenticationToken authToken =
+          new CustomUsernamePasswordAuthenticationToken(userDetails,
+              userDetails.getAuthorities(), jwt);
+      authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+      SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        } catch (Exception e) {
-            sendError(response, e);
-            return;
-        }
 
-        filterChain.doFilter(request, response);
+    } catch (JwtException e) {
+      sendErrorResponse(response, e.getMessage(), HttpServletResponse.SC_UNAUTHORIZED);
+      return;
+    } catch (Exception e) {
+      sendErrorResponse(response, "Authentication failed", HttpServletResponse.SC_UNAUTHORIZED);
+      return;
     }
 
-    private void sendError(HttpServletResponse response, Exception e) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        ObjectMapper mapper = new ObjectMapper();
-        out.println(mapper.writeValueAsString(Map.of("error", e.getMessage())));
-        out.flush();
-    }
+    filterChain.doFilter(request, response);
+  }
+
+  private void sendErrorResponse(HttpServletResponse response, String message, int status)
+      throws IOException {
+    response.setStatus(status);
+    response.setContentType("application/json");
+    Map<String, String> errorResponse = Collections.singletonMap("error", message);
+    new ObjectMapper().writeValue(response.getWriter(), errorResponse);
+  }
 }
 
