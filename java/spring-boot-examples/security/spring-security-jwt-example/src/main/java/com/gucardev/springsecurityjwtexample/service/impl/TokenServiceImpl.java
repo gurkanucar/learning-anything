@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
 
-  @Value("${jwt-variables.expiration-time}")
-  private long jwtExpiration;
+  @Value("${jwt-variables.refresh-token-expiration-time}")
+  private long refreshTokenExpirationTime;
 
   private final TokenRepository tokenRepository;
   private final JwtDecoderService jwtDecoderService;
@@ -47,10 +47,23 @@ public class TokenServiceImpl implements TokenService {
   public TokenDto createNewTokenWithRefreshToken(String refreshToken) {
     var token = tokenRepository.findByRefreshToken(refreshToken)
         .orElseThrow(() -> new EntityNotFoundException("Token not found"));
+
+    // Check if the refresh token is expired
+    if (token.getExpiration().before(new Date())) {
+      // Delete the expired refresh token
+      tokenRepository.delete(token);
+      // Throw an exception indicating that the token has expired
+      throw new RuntimeException("Refresh token is expired");
+    }
+
+    // Create a new token for the associated user
     var newCreatedToken = createNewTokenForUser(token.getUser());
+    // Delete the old refresh token
     tokenRepository.deleteByRefreshToken(refreshToken);
+
     return newCreatedToken;
   }
+
 
   @Transactional
   @Override
@@ -61,7 +74,7 @@ public class TokenServiceImpl implements TokenService {
   @Override
   public String validateTokenAndReturnUsername(String token) {
     String username = jwtDecoderService.extractUsername(token);
-    // check user is exist by username
+    // check user is existed by username
     userService.getByUsername(username);
     String tokenSign = jwtDecoderService.extractTokenSign(token);
 
@@ -92,7 +105,7 @@ public class TokenServiceImpl implements TokenService {
     tokenEntity.setTokenSign(tokenSign);
     tokenEntity.setRefreshToken(refreshToken);
     tokenEntity.setUser(user);
-    tokenEntity.setExpiration(new Date(System.currentTimeMillis() + jwtExpiration));
+    tokenEntity.setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationTime));
 
     return tokenRepository.save(tokenEntity);
   }
