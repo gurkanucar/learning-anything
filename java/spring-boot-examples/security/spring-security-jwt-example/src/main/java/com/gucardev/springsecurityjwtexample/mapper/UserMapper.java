@@ -11,6 +11,7 @@ public class UserMapper {
     var dto = new UserDto();
     dto.setId(entity.getId());
     dto.setUsername(entity.getUsername());
+    dto.setIsEnabled(entity.getIsEnabled());
     dto.setEmail(entity.getEmail());
     dto.setRoles(entity.getRoles().stream().map(x -> new RoleDto(x.name())).toList());
     return dto;

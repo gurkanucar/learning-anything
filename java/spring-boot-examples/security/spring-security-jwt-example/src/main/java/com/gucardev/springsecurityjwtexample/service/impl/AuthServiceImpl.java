@@ -1,6 +1,7 @@
 package com.gucardev.springsecurityjwtexample.service.impl;
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
+import com.gucardev.springsecurityjwtexample.dto.OtpValidateRequest;
 import com.gucardev.springsecurityjwtexample.dto.RefreshTokenRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
@@ -32,7 +33,11 @@ public class AuthServiceImpl implements AuthService {
     );
     CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     User user = userDetails.getUser();
-    return tokenService.createNewTokenForUser(user);
+    var token = tokenService.createNewTokenForUser(user);
+    if (Boolean.TRUE.equals(user.getOtpEnabled())) {
+      tokenService.createOtp(token.getTokenSign());
+    }
+    return token;
   }
 
   @Override
@@ -53,5 +58,10 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public TokenDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
     return tokenService.createNewTokenWithRefreshToken(refreshTokenRequest.getRefreshToken());
+  }
+
+  @Override
+  public boolean validateOtp(OtpValidateRequest otpValidateRequest) {
+    return tokenService.isOtpValid(otpValidateRequest);
   }
 }

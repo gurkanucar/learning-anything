@@ -21,8 +21,13 @@ public class Token extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-  private Date expiration;
+  private Date refreshTokenExpiration;
 
   private String refreshToken;
 
+  private Date otpExpiration;
+
+  private Integer otpCode;
+
+  private Boolean otpValidated = false;
 }

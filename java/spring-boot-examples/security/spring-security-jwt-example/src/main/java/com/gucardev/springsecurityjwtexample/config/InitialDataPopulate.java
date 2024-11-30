@@ -20,6 +20,7 @@ public class InitialDataPopulate implements CommandLineRunner {
     var user = new User();
     user.setUsername("admin");
     user.setPassword("pass");
+    user.setOtpEnabled(true);
     user.setRoles(Set.of(Role.ADMIN, Role.USER));
     user.setIsEnabled(true);
     try {
@@ -30,6 +31,7 @@ public class InitialDataPopulate implements CommandLineRunner {
     var user2 = new User();
     user2.setUsername("user");
     user2.setPassword("pass");
+    user.setOtpEnabled(false);
     user2.setRoles(Set.of(Role.USER));
     user2.setIsEnabled(true);
     try {

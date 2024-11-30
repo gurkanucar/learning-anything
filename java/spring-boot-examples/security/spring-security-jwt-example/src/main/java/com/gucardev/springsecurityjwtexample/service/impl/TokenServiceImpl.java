@@ -1,5 +1,6 @@
 package com.gucardev.springsecurityjwtexample.service.impl;
 
+import com.gucardev.springsecurityjwtexample.dto.OtpValidateRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.entity.Token;
 import com.gucardev.springsecurityjwtexample.entity.User;
@@ -13,10 +14,12 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
@@ -38,29 +41,53 @@ public class TokenServiceImpl implements TokenService {
         user.getRoles().stream().map(Enum::name)
             .collect(Collectors.toList()),
         tokenEntity.getTokenSign());
-    return new TokenDto(token, tokenEntity.getRefreshToken(),
+    return new TokenDto(tokenEntity.getTokenSign(), user.getOtpEnabled(), token,
+        tokenEntity.getRefreshToken(),
         userService.getDtoByUsername(user.getUsername()));
   }
+
+  @Transactional
+  public Integer createOtp(String tokenSign) {
+    var token = tokenRepository.findByTokenSign(tokenSign)
+        .orElseThrow(() -> new EntityNotFoundException("Token not found"));
+    // Generate a random 4-digit OTP
+    int otpCode = (int) (Math.random() * 9000) + 1000; // Random number between 1000-9999
+    // Set OTP code and expiration time (e.g., 5 minutes from now)
+    token.setOtpCode(otpCode);
+    token.setOtpExpiration(new Date(System.currentTimeMillis() + 60 * 1000)); // 1 minutes
+    token.setOtpValidated(false);
+    tokenRepository.save(token);
+    log.info("otp: {}, created for user {}", otpCode, token.getUser().getUsername());
+    return otpCode;
+  }
+
+  @Transactional
+  public boolean isOtpValid(OtpValidateRequest otpValidateRequest) {
+    var token = tokenRepository.findByTokenSign(otpValidateRequest.getTokenSign())
+        .orElseThrow(() -> new EntityNotFoundException("Token not found"));
+    if (token.getOtpExpiration().before(new Date())) {
+      throw new RuntimeException("OTP is expired");
+    }
+    if (!token.getOtpCode().equals(otpValidateRequest.getOtpCode())) {
+      throw new RuntimeException("Invalid OTP code");
+    }
+    token.setOtpValidated(true);
+    tokenRepository.save(token);
+    return true;
+  }
+
 
   @Transactional
   @Override
   public TokenDto createNewTokenWithRefreshToken(String refreshToken) {
     var token = tokenRepository.findByRefreshToken(refreshToken)
         .orElseThrow(() -> new EntityNotFoundException("Token not found"));
-
-    // Check if the refresh token is expired
-    if (token.getExpiration().before(new Date())) {
-      // Delete the expired refresh token
+    if (token.getRefreshTokenExpiration().before(new Date())) {
       tokenRepository.delete(token);
-      // Throw an exception indicating that the token has expired
       throw new RuntimeException("Refresh token is expired");
     }
-
-    // Create a new token for the associated user
     var newCreatedToken = createNewTokenForUser(token.getUser());
-    // Delete the old refresh token
     tokenRepository.deleteByRefreshToken(refreshToken);
-
     return newCreatedToken;
   }
 
@@ -74,18 +101,14 @@ public class TokenServiceImpl implements TokenService {
   @Override
   public String validateTokenAndReturnUsername(String token) {
     String username = jwtDecoderService.extractUsername(token);
-    // check user is existed by username
-    userService.getByUsername(username);
+    var user = userService.getByUsername(username);
     String tokenSign = jwtDecoderService.extractTokenSign(token);
-
-    Token storedToken = tokenRepository.findByTokenSignAndUser_Username(tokenSign, username)
-        .orElseThrow(() -> new EntityNotFoundException("Token not found"));
-
-    if (!jwtDecoderService.isTokenValid(token, storedToken.getTokenSign())) {
-      throw new RuntimeException("Invalid token");
-    }
+    Token storedToken = getStoredToken(tokenSign);
+    validateOtpIfEnabled(user, storedToken);
+    validateTokenSignature(token, storedToken);
     return username;
   }
+
 
   public Token createNewTokenSignatureForUser(User user) {
     // Check how many tokens the user currently has
@@ -105,8 +128,8 @@ public class TokenServiceImpl implements TokenService {
     tokenEntity.setTokenSign(tokenSign);
     tokenEntity.setRefreshToken(refreshToken);
     tokenEntity.setUser(user);
-    tokenEntity.setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationTime));
-
+    tokenEntity.setRefreshTokenExpiration(
+        new Date(System.currentTimeMillis() + refreshTokenExpirationTime));
     return tokenRepository.save(tokenEntity);
   }
 
@@ -119,4 +142,23 @@ public class TokenServiceImpl implements TokenService {
       invalidateTokenSignature(tokenSign);
     }
   }
+
+  private Token getStoredToken(String tokenSign) {
+    return tokenRepository.findByTokenSign(tokenSign)
+        .orElseThrow(() -> new EntityNotFoundException("Token not found"));
+  }
+
+  private void validateOtpIfEnabled(User user, Token storedToken) {
+    if (Boolean.TRUE.equals(user.getOtpEnabled()) &&
+        Boolean.FALSE.equals(storedToken.getOtpValidated())) {
+      throw new RuntimeException("Invalid OTP");
+    }
+  }
+
+  private void validateTokenSignature(String token, Token storedToken) {
+    if (!jwtDecoderService.isTokenValid(token, storedToken.getTokenSign())) {
+      throw new RuntimeException("Invalid token");
+    }
+  }
+
 }

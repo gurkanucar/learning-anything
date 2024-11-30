@@ -1,5 +1,6 @@
 package com.gucardev.springsecurityjwtexample.service;
 
+import com.gucardev.springsecurityjwtexample.dto.OtpValidateRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.entity.User;
 
@@ -15,4 +16,8 @@ public interface TokenService {
   String validateTokenAndReturnUsername(String token);
 
   void invalidateTokenByAuthorizationHeader(String authorizationHeader);
+
+  Integer createOtp(String tokenSign);
+
+  boolean isOtpValid(OtpValidateRequest otpValidateRequest);
 }

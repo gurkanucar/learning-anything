@@ -19,7 +19,7 @@ public class UserDto extends BaseDto {
   private String email;
   private List<RoleDto> roles = new ArrayList<>();
   private String token;
-  private boolean isEnabled;
+  private Boolean isEnabled;
 
   @NoArgsConstructor
   @AllArgsConstructor

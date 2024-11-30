@@ -1,6 +1,7 @@
 package com.gucardev.springsecurityjwtexample.controller;
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
+import com.gucardev.springsecurityjwtexample.dto.OtpValidateRequest;
 import com.gucardev.springsecurityjwtexample.dto.RefreshTokenRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
@@ -28,6 +29,11 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<TokenDto> login(@Valid @RequestBody LoginRequest loginRequest) {
     return ResponseEntity.ok().body(authService.login(loginRequest));
+  }
+
+  @PostMapping("/validate-otp")
+  public ResponseEntity<Boolean> validateOtp(@Valid @RequestBody OtpValidateRequest otpValidateRequest) {
+    return ResponseEntity.ok().body(authService.validateOtp(otpValidateRequest));
   }
 
   @PostMapping("/refresh-token")

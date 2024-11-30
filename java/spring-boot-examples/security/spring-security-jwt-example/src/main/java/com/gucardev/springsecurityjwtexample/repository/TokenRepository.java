@@ -14,8 +14,6 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
 
   void deleteByTokenSign(String tokenSign);
 
-  Optional<Token> findByTokenSignAndUser_Username(String tokenSign, String username);
-
   int countByUser(User user);
 
   @Query("SELECT t FROM Token t WHERE t.user = :user ORDER BY t.createdDateTime ASC")
@@ -23,5 +21,7 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
 
   Optional<Token> findByRefreshToken(String refreshToken);
 
-  long deleteByRefreshToken(String refreshToken);
+  void deleteByRefreshToken(String refreshToken);
+
+  Optional<Token> findByTokenSign(String tokenSign);
 }
