@@ -57,7 +57,6 @@ public class TokenServiceImpl implements TokenService {
     token.setOtpExpiration(new Date(System.currentTimeMillis() + 60 * 1000)); // 1 minutes
     token.setOtpValidated(false);
     tokenRepository.save(token);
-    log.info("otp: {}, created for user {}", otpCode, token.getUser().getUsername());
     return otpCode;
   }
 

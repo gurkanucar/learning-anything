@@ -11,12 +11,14 @@ import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
 import com.gucardev.springsecurityjwtexample.service.AuthService;
 import com.gucardev.springsecurityjwtexample.service.TokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -35,7 +37,8 @@ public class AuthServiceImpl implements AuthService {
     User user = userDetails.getUser();
     var token = tokenService.createNewTokenForUser(user);
     if (Boolean.TRUE.equals(user.getOtpEnabled())) {
-      tokenService.createOtp(token.getTokenSign());
+      var otpCode = tokenService.createOtp(token.getTokenSign());
+      log.info("otp: {}, created for user {}", otpCode, loginRequest.getUsername());
     }
     return token;
   }
