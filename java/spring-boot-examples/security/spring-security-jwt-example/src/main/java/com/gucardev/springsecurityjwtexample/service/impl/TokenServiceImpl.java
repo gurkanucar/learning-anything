@@ -59,7 +59,8 @@ public class TokenServiceImpl implements TokenService {
   @Override
   public void validateToken(String token) {
     String username = jwtDecoderService.extractUsername(token);
-    User user = userService.getByUsername(username);
+    // check user is exist by username
+    userService.getByUsername(username);
     String tokenSign = jwtDecoderService.extractTokenSign(token);
 
     Token storedToken = tokenRepository.findByTokenSignAndUser_Username(tokenSign, username)
