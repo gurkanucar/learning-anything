@@ -2,8 +2,10 @@ package com.gucardev.springsecurityjwtexample.service;
 
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
+import com.gucardev.springsecurityjwtexample.dto.RefreshTokenRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
+import jakarta.validation.Valid;
 
 public interface AuthService {
 
@@ -12,4 +14,6 @@ public interface AuthService {
   UserDto getAuthenticatedUser();
 
   void logout(String authorizationHeader);
+
+  TokenDto refreshToken(@Valid RefreshTokenRequest refreshTokenRequest);
 }

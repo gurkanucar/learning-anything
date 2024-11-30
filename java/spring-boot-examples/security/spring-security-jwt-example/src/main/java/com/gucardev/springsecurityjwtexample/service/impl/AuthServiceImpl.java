@@ -1,16 +1,14 @@
 package com.gucardev.springsecurityjwtexample.service.impl;
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
+import com.gucardev.springsecurityjwtexample.dto.RefreshTokenRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
 import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.mapper.UserMapper;
 import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
 import com.gucardev.springsecurityjwtexample.service.AuthService;
-import com.gucardev.springsecurityjwtexample.service.JwtEncoderService;
 import com.gucardev.springsecurityjwtexample.service.TokenService;
-import com.gucardev.springsecurityjwtexample.service.UserService;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,9 +20,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-  private final JwtEncoderService jwtEncoderService;
   private final AuthenticationManager authenticationManager;
-  private final UserService userService;
   private final TokenService tokenService;
 
   @Override
@@ -36,13 +32,7 @@ public class AuthServiceImpl implements AuthService {
     );
     CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     User user = userDetails.getUser();
-    String tokenSign = tokenService.createNewTokenSignatureForUser(user);
-    String token = jwtEncoderService.generateToken(user.getUsername(),
-        user.getRoles().stream().map(Enum::name)
-            .collect(Collectors.toList()),
-        tokenSign);
-    UserDto userDto = userService.getDtoByUsername(loginRequest.getUsername());
-    return new TokenDto(token, userDto);
+    return tokenService.createNewTokenForUser(user);
   }
 
   @Override
@@ -58,5 +48,10 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public void logout(String authorizationHeader) {
     tokenService.invalidateTokenByAuthorizationHeader(authorizationHeader);
+  }
+
+  @Override
+  public TokenDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
+    return tokenService.createNewTokenWithRefreshToken(refreshTokenRequest.getRefreshToken());
   }
 }

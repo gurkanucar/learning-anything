@@ -1,6 +1,7 @@
 package com.gucardev.springsecurityjwtexample.controller;
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
+import com.gucardev.springsecurityjwtexample.dto.RefreshTokenRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
 import com.gucardev.springsecurityjwtexample.service.AuthService;
@@ -27,6 +28,11 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<TokenDto> login(@Valid @RequestBody LoginRequest loginRequest) {
     return ResponseEntity.ok().body(authService.login(loginRequest));
+  }
+
+  @PostMapping("/refresh-token")
+  public ResponseEntity<TokenDto> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+    return ResponseEntity.ok().body(authService.refreshToken(refreshTokenRequest));
   }
 
   @GetMapping("/get-myself")

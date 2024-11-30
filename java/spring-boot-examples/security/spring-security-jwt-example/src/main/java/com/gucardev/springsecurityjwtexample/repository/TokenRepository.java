@@ -21,4 +21,7 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
   @Query("SELECT t FROM Token t WHERE t.user = :user ORDER BY t.createdDateTime ASC")
   List<Token> findOldestTokenByUser(@Param("user") User user);
 
+  Optional<Token> findByRefreshToken(String refreshToken);
+
+  long deleteByRefreshToken(String refreshToken);
 }
