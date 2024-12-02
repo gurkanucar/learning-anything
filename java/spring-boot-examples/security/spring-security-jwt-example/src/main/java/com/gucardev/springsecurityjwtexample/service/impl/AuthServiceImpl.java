@@ -28,19 +28,25 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public TokenDto login(LoginRequest loginRequest) {
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            loginRequest.getUsername(),
-            loginRequest.getPassword())
-    );
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    User user = userDetails.getUser();
-    var token = tokenService.createNewTokenForUser(user);
-    if (Boolean.TRUE.equals(user.getOtpEnabled())) {
-      var otpCode = tokenService.createOtp(token.getTokenSign());
-      log.info("otp: {}, created for user {}", otpCode, loginRequest.getUsername());
+    try {
+      Authentication authentication = authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(
+              loginRequest.getUsername(),
+              loginRequest.getPassword())
+      );
+      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+      User user = userDetails.getUser();
+      var token = tokenService.createNewTokenForUser(user);
+
+      if (Boolean.TRUE.equals(user.getOtpEnabled())) {
+        var otpCode = tokenService.createOtp(token.getTokenSign());
+        log.info("otp: {}, created for user {}", otpCode, loginRequest.getUsername());
+      }
+      return token;
+    } catch (Exception e) {
+      log.error("Error occurred during login for user: {}", loginRequest.getUsername(), e);
+      throw new RuntimeException("Error occurred during login");
     }
-    return token;
   }
 
   @Override
