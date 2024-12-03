@@ -17,7 +17,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AopExceptionHandler {
 
-  @Pointcut("(within(@org.springframework.stereotype.Component *) || " +
+  @Pointcut("within(com.gucardev.utility..*) && " +
+      "(within(@org.springframework.stereotype.Component *) || " +
       "within(@org.springframework.stereotype.Service *) || " +
       "within(@org.springframework.stereotype.Repository *) || " +
       "within(@org.springframework.stereotype.Controller *))" +
