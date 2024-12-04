@@ -1,4 +1,4 @@
-package com.gucardev.dbconfigparameters;
+package com.gucardev.dbconfigparameters.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

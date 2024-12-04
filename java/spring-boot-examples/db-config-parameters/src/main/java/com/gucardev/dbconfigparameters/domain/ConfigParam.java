@@ -1,4 +1,4 @@
-package com.gucardev.dbconfigparameters;
+package com.gucardev.dbconfigparameters.domain;
 
 import java.math.BigDecimal;
 
