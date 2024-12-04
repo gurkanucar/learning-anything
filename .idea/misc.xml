@@ -13,6 +13,7 @@
         <option value="$PROJECT_DIR$/java/spring-boot-examples/sqs-example/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/redis-examples/redis-caching-example/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/security/spring-security-jwt-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/db-config-parameters/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

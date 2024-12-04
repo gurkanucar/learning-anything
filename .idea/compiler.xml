@@ -10,6 +10,7 @@
         <module name="redis-examples" />
         <module name="security" />
         <module name="debezium-cdc" />
+        <module name="db-config-parameters" />
         <module name="utility" />
         <module name="redis-caching-example" />
         <module name="spring-security-jwt-example" />
@@ -24,6 +25,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="db-config-parameters" options="-parameters" />
       <module name="debezium-cdc" options="-parameters" />
       <module name="redis-caching-example" options="-parameters" />
       <module name="spring-security-jwt-example" options="-parameters" />
