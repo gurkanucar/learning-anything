@@ -23,7 +23,6 @@ public class Employee {
   private String lastName;
   private BigDecimal monthlySalary;
   private LocalDate birthDate;
-  private Boolean isStudent;
   @Formula("concat(first_name, ' ', last_name)")
   private String fullName;
   @Formula("monthly_salary * 12")
@@ -32,7 +31,7 @@ public class Employee {
   private Integer age;
   @Formula("case " +
       "when (year(current_date) - year(birth_date)) >= 18 "
-      + "and is_student = false then true " +
+      + "then true " +
       "else false end")
   private Boolean isEligibleForDriverLicense;
 }
