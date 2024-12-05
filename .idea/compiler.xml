@@ -10,6 +10,7 @@
         <module name="redis-examples" />
         <module name="security" />
         <module name="debezium-cdc" />
+        <module name="formula-calculated-fields" />
         <module name="db-config-parameters" />
         <module name="utility" />
         <module name="redis-caching-example" />
@@ -27,6 +28,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="db-config-parameters" options="-parameters" />
       <module name="debezium-cdc" options="-parameters" />
+      <module name="formula-calculated-fields" options="-parameters" />
       <module name="redis-caching-example" options="-parameters" />
       <module name="spring-security-jwt-example" options="-parameters" />
       <module name="sqs-example" options="-parameters" />
