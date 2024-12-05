@@ -26,7 +26,7 @@ public class Employee {
   @Formula("concat(first_name, ' ', last_name)")
   private String fullName;
   @Formula("monthly_salary * 12")
-  private Double yearlySalary;
+  private BigDecimal yearlySalary;
   @Formula("year(current_date) - year(birth_date)")
   private Integer age;
   @Formula("case " +

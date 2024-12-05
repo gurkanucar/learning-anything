@@ -19,7 +19,7 @@ public class InitialDataPopulate implements CommandLineRunner {
     employee1.setFirstName("John");
     employee1.setLastName("Doe");
     employee1.setMonthlySalary(BigDecimal.valueOf(17002));
-    employee1.setBirthDate(LocalDate.of(2003, 4, 15));
+    employee1.setBirthDate(LocalDate.of(2008, 4, 15));
     employeeService.saveEmployee(employee1);
 
     var employee2 = new Employee();
