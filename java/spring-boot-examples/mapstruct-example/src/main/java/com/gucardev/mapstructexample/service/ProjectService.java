@@ -44,11 +44,11 @@ public class ProjectService {
     departmentRepository.delete(existing);
   }
 
-  private Optional<Project> getProjectByIdOptional(Long id) {
+  public Optional<Project> getProjectByIdOptional(Long id) {
     return departmentRepository.findById(id);
   }
 
-  private Project getProjectById(Long id) {
+  public Project getProjectById(Long id) {
     return getProjectByIdOptional(id)
         .orElseThrow(() -> new EntityNotFoundException("Project not found"));
   }

@@ -1,8 +1,10 @@
 package com.gucardev.mapstructexample.service;
 
 import com.gucardev.mapstructexample.dto.DepartmentDto;
+import com.gucardev.mapstructexample.dto.EmployeeDto;
 import com.gucardev.mapstructexample.dto.request.DepartmentRequest;
 import com.gucardev.mapstructexample.entity.Department;
+import com.gucardev.mapstructexample.entity.Employee;
 import com.gucardev.mapstructexample.mapper.DepartmentMapper;
 import com.gucardev.mapstructexample.repository.DepartmentRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,6 +19,7 @@ public class DepartmentService {
 
   private final DepartmentRepository departmentRepository;
   private final DepartmentMapper departmentMapper;
+  private final EmployeeService employeeService;
 
   public List<DepartmentDto> getAllDepartments() {
     return departmentRepository.findAll()
@@ -44,11 +47,11 @@ public class DepartmentService {
     departmentRepository.delete(existing);
   }
 
-  private Optional<Department> getDepartmentByIdOptional(Long id) {
+  public Optional<Department> getDepartmentByIdOptional(Long id) {
     return departmentRepository.findById(id);
   }
 
-  private Department getDepartmentById(Long id) {
+  public Department getDepartmentById(Long id) {
     return getDepartmentByIdOptional(id)
         .orElseThrow(() -> new EntityNotFoundException("Department not found"));
   }
@@ -62,5 +65,46 @@ public class DepartmentService {
         .map(departmentMapper::toDto)
         .orElseThrow(() -> new EntityNotFoundException("Department not found"));
   }
+
+  public DepartmentDto addEmployeeToDepartment(Long departmentId, Long employeeId) {
+    Department department = getDepartmentById(departmentId);
+    Employee employee = employeeService.getEmployeeById(employeeId);
+
+    // Check if employee already assigned to a department
+    // If employees can only belong to one department, just check if it's the same department
+    if (employee.getDepartment() != null && employee.getDepartment().getId().equals(departmentId)) {
+      // Employee already in this department
+      return departmentMapper.toDto(department);
+    }
+
+    // If not assigned or assigned to another department
+    employee.setDepartment(department);
+    // No need to modify department.getEmployees() directly if mappedBy is on Employee side and it's a two-way relationship.
+    // Depending on your owning side, you may need to ensure both sides are in sync:
+    department.getEmployees().add(employee);
+
+    departmentRepository.save(department);
+    return departmentMapper.toDto(department);
+  }
+
+
+  public DepartmentDto removeEmployeeFromDepartment(Long departmentId, Long employeeId) {
+    Department department = getDepartmentById(departmentId);
+    Employee employee = employeeService.getEmployeeById(employeeId);
+
+    // Check if this employee is indeed in this department
+    if (employee.getDepartment() == null || !employee.getDepartment().getId().equals(departmentId)) {
+      throw new EntityNotFoundException("Employee not found in this department");
+    }
+
+    // Disassociate
+    employee.setDepartment(null);
+    // If you keep a bidirectional relationship, also remove from department side:
+    department.getEmployees().remove(employee);
+
+    departmentRepository.save(department);
+    return departmentMapper.toDto(department);
+  }
+
 
 }

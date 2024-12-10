@@ -4,11 +4,13 @@ import com.gucardev.mapstructexample.dto.DepartmentDto;
 import com.gucardev.mapstructexample.dto.EmployeeDto;
 import com.gucardev.mapstructexample.dto.ProjectDto;
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 public class EmployeeRequest {
   private Long id;
   private String firstName;
