@@ -1,7 +1,5 @@
 package com.gucardev.mapstructexample.dto.request;
 
-import com.gucardev.mapstructexample.dto.EmployeeDto;
-import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

@@ -10,10 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
@@ -22,6 +20,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Setter
 @Entity
 public class Department {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

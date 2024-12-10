@@ -16,6 +16,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Setter
 @Entity
 public class Project {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

@@ -6,12 +6,10 @@ import com.gucardev.mapstructexample.entity.Project;
 import com.gucardev.mapstructexample.repository.DepartmentRepository;
 import com.gucardev.mapstructexample.repository.EmployeeRepository;
 import com.gucardev.mapstructexample.repository.ProjectRepository;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.HashSet;
 
 @Component
 @RequiredArgsConstructor

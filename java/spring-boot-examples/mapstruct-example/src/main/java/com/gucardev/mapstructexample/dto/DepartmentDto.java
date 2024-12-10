@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(of = "id")
 public class DepartmentDto {
+
   private Long id;
   private String name;
   private EmployeeDto headOfDepartment;

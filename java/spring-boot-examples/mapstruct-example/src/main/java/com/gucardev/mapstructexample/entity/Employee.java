@@ -20,6 +20,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Setter
 @Entity
 public class Employee {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

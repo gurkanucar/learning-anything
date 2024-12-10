@@ -2,7 +2,6 @@ package com.gucardev.mapstructexample.service;
 
 import com.gucardev.mapstructexample.dto.DepartmentDto;
 import com.gucardev.mapstructexample.dto.DepartmentWithDetailsDto;
-import com.gucardev.mapstructexample.dto.EmployeeDto;
 import com.gucardev.mapstructexample.dto.request.DepartmentRequest;
 import com.gucardev.mapstructexample.entity.Department;
 import com.gucardev.mapstructexample.entity.Employee;
@@ -10,7 +9,6 @@ import com.gucardev.mapstructexample.mapper.DepartmentMapper;
 import com.gucardev.mapstructexample.repository.DepartmentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
