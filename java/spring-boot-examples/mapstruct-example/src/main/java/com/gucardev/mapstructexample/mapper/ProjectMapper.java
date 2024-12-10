@@ -24,6 +24,11 @@ public interface ProjectMapper {
   @Mapping(target = "assignedEmployees", ignore = true)
   ProjectDto toDto(Project entity);
 
+
+  @Named("mapProjectsWithoutEmployees")
+  @Mapping(target = "assignedEmployees", ignore = true)
+  ProjectDto toDtoWithoutEmployees(Project project);
+
   Project toEntity(ProjectRequest request);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -15,5 +15,7 @@ public class EmployeeDto {
   private String lastName;
   private String fullName;
   private DepartmentDto department;
+  private Long departmentId;
+  private Long headOfDepartmentId;
   private Set<ProjectDto> projects;
 }

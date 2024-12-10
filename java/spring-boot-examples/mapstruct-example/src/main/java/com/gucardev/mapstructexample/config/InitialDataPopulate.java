@@ -1,6 +1,5 @@
 package com.gucardev.mapstructexample.config;
 
-
 import com.gucardev.mapstructexample.entity.Department;
 import com.gucardev.mapstructexample.entity.Employee;
 import com.gucardev.mapstructexample.entity.Project;
@@ -64,36 +63,48 @@ public class InitialDataPopulate implements CommandLineRunner {
     empAdam.setHireDate(LocalDate.of(2019, 11, 23));
     empAdam.setDepartment(hrDepartment);
 
+    Employee empSusan = new Employee();
+    empSusan.setFirstName("Susan");
+    empSusan.setLastName("Brown");
+    empSusan.setHireDate(LocalDate.of(2018, 5, 15));
+    empSusan.setDepartment(hrDepartment);
+
     // Assign projects to employees
-    // Assuming many-to-many relationship: both sides should be updated
     empJohn.getProjects().add(projectA);
     empJane.getProjects().add(projectA);
     empJane.getProjects().add(projectB);
     empAdam.getProjects().add(projectB);
+    empSusan.getProjects().add(projectB);
 
     // Add employees to departments
     itDepartment.getEmployees().add(empJohn);
     itDepartment.getEmployees().add(empJane);
     hrDepartment.getEmployees().add(empAdam);
+    hrDepartment.getEmployees().add(empSusan);
 
-    // Save employees (this will also persist relationships)
+    // Assign Heads of Departments
+    itDepartment.setHeadOfDepartment(empJohn);
+    hrDepartment.setHeadOfDepartment(empSusan);
+
+    // Save employees
     employeeRepository.save(empJohn);
     employeeRepository.save(empJane);
     employeeRepository.save(empAdam);
+    employeeRepository.save(empSusan);
 
     // Update projects with assigned employees
     projectA.getAssignedEmployees().add(empJohn);
     projectA.getAssignedEmployees().add(empJane);
     projectB.getAssignedEmployees().add(empJane);
     projectB.getAssignedEmployees().add(empAdam);
+    projectB.getAssignedEmployees().add(empSusan);
 
     projectRepository.save(projectA);
     projectRepository.save(projectB);
 
-    // Update departments with assigned employees
+    // Update departments with employees and heads
     departmentRepository.save(itDepartment);
     departmentRepository.save(hrDepartment);
 
-    System.out.println("Initial data population completed.");
   }
 }

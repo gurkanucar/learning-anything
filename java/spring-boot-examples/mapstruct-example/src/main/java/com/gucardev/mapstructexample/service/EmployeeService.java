@@ -23,21 +23,21 @@ public class EmployeeService {
   public List<EmployeeDto> getAllEmployees() {
     return employeeRepository.findAll()
         .stream()
-        .map(employeeMapper::toDto)
+        .map(employeeMapper::toSummaryDto)
         .toList();
   }
 
   public EmployeeDto createEmployee(EmployeeRequest employeeRequest) {
     var entity = employeeMapper.toEntity(employeeRequest);
     var saved = employeeRepository.save(entity);
-    return employeeMapper.toDto(saved);
+    return employeeMapper.toFullDto(saved);
   }
 
   public EmployeeDto updateEmployee(Long id, EmployeeRequest employeeRequest) {
     var existing = getEmployeeById(id);
     employeeMapper.partialUpdate(employeeRequest, existing);
     var updated = employeeRepository.save(existing);
-    return employeeMapper.toDto(updated);
+    return employeeMapper.toFullDto(updated);
   }
 
   public void deleteEmployee(Long id) {
@@ -55,12 +55,12 @@ public class EmployeeService {
   }
 
   public Optional<EmployeeDto> getEmployeeByIdDtoOptional(Long id) {
-    return getEmployeeByIdOptional(id).map(employeeMapper::toDto);
+    return getEmployeeByIdOptional(id).map(employeeMapper::toFullDto);
   }
 
   public EmployeeDto getEmployeeByIdDto(Long id) {
     return employeeRepository.findById(id)
-        .map(employeeMapper::toDto)
+        .map(employeeMapper::toFullDto)
         .orElseThrow(() -> new EntityNotFoundException("Employee not found"));
   }
 
@@ -77,7 +77,7 @@ public class EmployeeService {
       employeeRepository.save(employee);
     }
 
-    return employeeMapper.toDto(employee);
+    return employeeMapper.toFullDto(employee);
   }
 
   // Remove a project from an employee
@@ -95,12 +95,12 @@ public class EmployeeService {
 
     employeeRepository.save(employee);
 
-    return employeeMapper.toDto(employee);
+    return employeeMapper.toFullDto(employee);
   }
 
   public List<EmployeeDto> getAllEmployeesByDepartmentId(Long departmentId) {
     return employeeRepository.findByDepartment_Id(departmentId).stream()
-        .map(employeeMapper::toDto)
+        .map(employeeMapper::toSummaryDto)
         .toList();
   }
 
