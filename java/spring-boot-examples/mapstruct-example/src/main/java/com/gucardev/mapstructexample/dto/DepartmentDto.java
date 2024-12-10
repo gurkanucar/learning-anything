@@ -12,6 +12,7 @@ public class DepartmentDto {
   private Long id;
   private String name;
   private EmployeeDto headOfDepartment;
+  private Long headOfDepartmentId;
   private List<EmployeeDto> employees;
 }
 

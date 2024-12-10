@@ -2,6 +2,7 @@ package com.gucardev.mapstructexample.controller;
 
 
 import com.gucardev.mapstructexample.dto.DepartmentDto;
+import com.gucardev.mapstructexample.dto.DepartmentWithDetailsDto;
 import com.gucardev.mapstructexample.dto.request.DepartmentRequest;
 import com.gucardev.mapstructexample.service.DepartmentService;
 import java.util.List;
@@ -22,7 +23,7 @@ public class DepartmentController {
   }
 
   @GetMapping("/{id}")
-  public DepartmentDto getDepartmentById(@PathVariable Long id) {
+  public DepartmentWithDetailsDto getDepartmentById(@PathVariable Long id) {
     return departmentService.getDepartmentByIdDto(id);
   }
 
