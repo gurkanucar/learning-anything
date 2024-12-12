@@ -64,6 +64,7 @@ pnpm dlx shadcn@latest init
 pnpm dlx shadcn@latest add button
 pnpm dlx shadcn@latest add switch
 pnpm dlx shadcn@latest add card
-
+pnpm dlx shadcn@latest add form
+pnpm dlx shadcn@latest add --all
 
 ```
