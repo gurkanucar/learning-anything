@@ -1,0 +1,23 @@
+{
+  "login": "Login",
+  "login_placeholder": "Enter your credentials to login to your account",
+  "username": "Username",
+  "username_placeholder": "Enter username",
+  "username_required": "Username is required",
+  "username_must_be": "Username must be at least 4 characters",
+  "password": "Password",
+  "password_placeholder": "Enter Password",
+  "password_required": "Password is required",
+  "password_must_be": "Password must be at least 4 characters",
+  "dashboard": "Dashboard",
+  "user": "User",
+  "role": "Role",
+  "admin": "admin",
+  "russian": "Russian",
+  "english": "English",
+  "turkish": "Turkish",
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System",
+  "hello": "Hello World!"
+}

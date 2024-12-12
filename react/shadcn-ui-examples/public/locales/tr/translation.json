@@ -1,0 +1,23 @@
+{
+  "login": "Giriş Yap",
+  "login_placeholder": "Hesap bilgilerinizi giriniz",
+  "username": "Kullanıcı Adı",
+  "username_placeholder": "Kullanıcı Adı giriniz",
+  "username_required": "Kullanıcı Adı Zorunludur",
+  "username_must_be": "Kullanıcı Adı 4 karakterden fazla olmalıdır",
+  "password": "Şifre",
+  "password_placeholder": "Şifre giriniz",
+  "password_required": "Şifre zorunludur",
+  "password_must_be": "Şifre 4 karakterden fazla olmalıdır",
+  "dashboard": "Kontrol Paneli",
+  "user": "Kullanıcı",
+  "role": "Roller",
+  "admin": "Yönetici",
+  "russian": "Rusça",
+  "english": "İngilizce",
+  "turkish": "Türkçe",
+  "light": "Açık",
+  "dark": "Koyu",
+  "system": "Sistem",
+  "hello": "Hello World!"
+}

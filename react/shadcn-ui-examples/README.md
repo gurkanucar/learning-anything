@@ -67,4 +67,17 @@ pnpm dlx shadcn@latest add card
 pnpm dlx shadcn@latest add form
 pnpm dlx shadcn@latest add --all
 
+
+# lodash
+pnpm i lodash
+
+#router
+pnpm i react-router
+
+# zustand state management
+pnpm i zustand
+
+#language change
+pnpm i react-i18next
+
 ```
