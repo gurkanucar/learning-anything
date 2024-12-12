@@ -36,24 +36,24 @@ const LanguageSelector: React.FC = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="flex items-center gap-2 p-2 bg-white shadow-sm border border-gray-300 rounded-md hover:bg-gray-100 transition">
+        <Button className="flex items-center gap-2 p-2 bg-neutral-100 dark:bg-neutral-800 shadow-sm border border-neutral-300 dark:border-neutral-700 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-700 transition">
           <img
             src={currentLocalization?.flag}
             alt={currentLocalization?.locale}
             className="h-6 w-8 rounded-sm object-cover"
             draggable={false}
           />
-          <span className="font-medium text-gray-700">
-            {t(currentLocalization?.locale || "")}
+          <span className="font-medium text-neutral-900 dark:text-neutral-100">
+            {currentLocalization?.locale.toUpperCase()}
           </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-white shadow-md rounded-md border border-gray-200">
+      <DropdownMenuContent className="bg-neutral-100 dark:bg-neutral-800 shadow-md rounded-md border border-neutral-300 dark:border-neutral-700">
         {localizations.map((loc) => (
           <DropdownMenuItem
             key={loc.locale}
             onClick={() => toggleLanguage(loc.locale)}
-            className="flex items-center gap-2 p-2 hover:bg-gray-100 transition cursor-pointer rounded-md"
+            className="flex items-center gap-2 p-2 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition cursor-pointer rounded-md"
           >
             <img
               src={loc.flag}
@@ -61,7 +61,9 @@ const LanguageSelector: React.FC = () => {
               className="h-6 w-8 rounded-sm object-cover"
               draggable={false}
             />
-            <span className="font-medium text-gray-700">{t(loc.locale)}</span>
+            <span className="font-medium text-neutral-900 dark:text-neutral-100">
+              {loc.locale.toUpperCase()}
+            </span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

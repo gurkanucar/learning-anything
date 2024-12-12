@@ -4,11 +4,12 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardHeader
+  CardHeader,
 } from "./components/ui/card";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "./hooks";
 import LanguageSelector from "./components/custom/LanguageSelector";
+import ThemeSelector from "./components/custom/ThemeSelector";
 
 function App() {
   const { t } = useTranslate();
@@ -23,6 +24,7 @@ function App() {
         </CardHeader>
         <CardContent className="flex gap-5">
           <LanguageSelector />
+          <ThemeSelector />
         </CardContent>
       </Card>
       <CardDemo />

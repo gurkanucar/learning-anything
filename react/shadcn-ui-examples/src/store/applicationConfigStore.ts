@@ -7,11 +7,12 @@ interface IAppConfStore {
   language: string;
   toggleLanguage: (l: string) => void;
   toggleThemeMode: (m: string) => void;
+  initializeTheme: () => void; // New function to initialize the theme
 }
 
 export const useApplicationConfigStore = create<IAppConfStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       themeMode: "LIGHT",
       language: "en",
 
@@ -22,9 +23,32 @@ export const useApplicationConfigStore = create<IAppConfStore>()(
         });
       },
       toggleThemeMode: (value: string) => {
+        if (value === "SYSTEM") {
+          const systemPrefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
+          document.documentElement.classList.toggle("dark", systemPrefersDark);
+        } else {
+          document.documentElement.classList.toggle("dark", value === "DARK");
+        }
+
         set({
           themeMode: value,
         });
+      },
+      initializeTheme: () => {
+        const storedTheme = get().themeMode;
+        if (storedTheme === "SYSTEM") {
+          const systemPrefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
+          document.documentElement.classList.toggle("dark", systemPrefersDark);
+        } else {
+          document.documentElement.classList.toggle(
+            "dark",
+            storedTheme === "DARK"
+          );
+        }
       },
     }),
     {
