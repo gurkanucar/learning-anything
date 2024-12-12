@@ -19,5 +19,13 @@
   "light": "Light",
   "dark": "Dark",
   "system": "System",
-  "hello": "Hello World!"
+  "hello": "Hello World!",
+  "email_invalid": "Invalid email address",
+  "password_min": "Password must be at least 6 characters",
+  "password_alphanumeric": "Password must contain letters and numbers",
+  "form_submission_error": "Error submitting the form",
+  "forgot_password": "Forgot Password?",
+  "login_with_google": "Login with Google",
+  "no_account": "Don't have an account?",
+  "sign_up": "Sign Up"
 }

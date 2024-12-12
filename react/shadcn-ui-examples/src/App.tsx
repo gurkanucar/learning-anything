@@ -11,10 +11,11 @@ import { useTranslate } from "./hooks";
 import LanguageSelector from "./components/custom/LanguageSelector";
 import ThemeSelector from "./components/custom/ThemeSelector";
 import LoginPage from "./pages/login/LoginPage";
-
+import { Toaster } from "@/components/ui/sonner";
+import { useApplicationConfigStore } from "./store/applicationConfigStore";
 function App() {
   const { t } = useTranslate();
-
+  const { themeMode } = useApplicationConfigStore();
   return (
     <div className="flex justify-center items-center flex-col gap-5">
       <Card className={cn("w-[380px]")}>
@@ -30,6 +31,7 @@ function App() {
       </Card>
       <LoginPage />
       <CardDemo />
+      <Toaster richColors theme={themeMode} />
     </div>
   );
 }

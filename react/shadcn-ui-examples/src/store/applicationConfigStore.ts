@@ -2,18 +2,21 @@ import i18n from "@/i18n";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export type ThemeMode = "light" | "dark" | "system";
+
+
 interface IAppConfStore {
-  themeMode: string;
+  themeMode: ThemeMode;
   language: string;
   toggleLanguage: (l: string) => void;
-  toggleThemeMode: (m: string) => void;
+  toggleThemeMode: (m: ThemeMode) => void;
   initializeTheme: () => void; // New function to initialize the theme
 }
 
 export const useApplicationConfigStore = create<IAppConfStore>()(
   persist(
     (set, get) => ({
-      themeMode: "LIGHT",
+      themeMode: "light",
       language: "en",
 
       toggleLanguage: (value: string) => {
@@ -22,23 +25,21 @@ export const useApplicationConfigStore = create<IAppConfStore>()(
           language: value,
         });
       },
-      toggleThemeMode: (value: string) => {
-        if (value === "SYSTEM") {
+      toggleThemeMode: (value: ThemeMode) => {
+        if (value === "system") {
           const systemPrefersDark = window.matchMedia(
             "(prefers-color-scheme: dark)"
           ).matches;
           document.documentElement.classList.toggle("dark", systemPrefersDark);
         } else {
-          document.documentElement.classList.toggle("dark", value === "DARK");
+          document.documentElement.classList.toggle("dark", value === "dark");
         }
 
-        set({
-          themeMode: value,
-        });
+        set({ themeMode: value });
       },
       initializeTheme: () => {
         const storedTheme = get().themeMode;
-        if (storedTheme === "SYSTEM") {
+        if (storedTheme === "system") {
           const systemPrefersDark = window.matchMedia(
             "(prefers-color-scheme: dark)"
           ).matches;
@@ -46,7 +47,7 @@ export const useApplicationConfigStore = create<IAppConfStore>()(
         } else {
           document.documentElement.classList.toggle(
             "dark",
-            storedTheme === "DARK"
+            storedTheme === "dark"
           );
         }
       },

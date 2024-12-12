@@ -19,5 +19,13 @@
   "light": "Açık",
   "dark": "Koyu",
   "system": "Sistem",
-  "hello": "Merhaba Dunya!"
+  "hello": "Merhaba Dunya!",
+  "email_invalid": "Geçersiz e-posta adresi",
+  "password_min": "Şifre en az 6 karakter olmalıdır",
+  "password_alphanumeric": "Şifre harf ve rakam içermelidir",
+  "form_submission_error": "Form gönderilirken hata oluştu",
+  "forgot_password": "Şifremi Unuttum?",
+  "login_with_google": "Google ile Giriş Yap",
+  "no_account": "Hesabınız yok mu?",
+  "sign_up": "Kayıt Ol"
 }
