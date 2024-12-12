@@ -4,8 +4,7 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardHeader,
-  CardTitle,
+  CardHeader
 } from "./components/ui/card";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "./hooks";

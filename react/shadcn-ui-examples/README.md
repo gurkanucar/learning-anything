@@ -78,6 +78,13 @@ pnpm i react-router
 pnpm i zustand
 
 #language change
-pnpm i react-i18next
+pnpm i react-i18next i18next-browser-languagedetector i18next-http-backend
+
+# axios
+pnpm i axios
+
+# js cookie
+pnpm i js-cookie
+
 
 ```
