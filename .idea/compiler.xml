@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="redis-examples" />
+        <module name="security" />
+        <module name="mapstruct-example" />
+        <module name="debezium-cdc" />
+        <module name="formula-calculated-fields" />
+        <module name="db-config-parameters" />
+        <module name="utility" />
+        <module name="redis-caching-example" />
+        <module name="spring-security-jwt-example" />
+        <module name="sqs-example" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="gucardev" target="1.8" />
+      <module name="parent-module" target="21" />
+      <module name="sqsexample" target="21" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="db-config-parameters" options="-parameters" />
+      <module name="debezium-cdc" options="-parameters" />
+      <module name="formula-calculated-fields" options="-parameters" />
+      <module name="mapstruct-example" options="-parameters" />
+      <module name="redis-caching-example" options="-parameters" />
+      <module name="spring-security-jwt-example" options="-parameters" />
+      <module name="sqs-example" options="-parameters" />
+      <module name="sqsexample" options="-parameters" />
+      <module name="utility" options="-parameters" />
+    </option>
+  </component>
+</project>

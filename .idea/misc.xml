@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/gucardev/pom.xml" />
+        <option value="$PROJECT_DIR$/parent-module/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot/parent-module/utility/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot/sqsexample/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/utility/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/sqs-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/redis-examples/redis-caching-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/security/spring-security-jwt-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/db-config-parameters/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/formula-calculated-fields/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/mapstruct-example/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/java/spring-boot/gucardev/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot/sqsexample/pom.xml" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="corretto-21" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
