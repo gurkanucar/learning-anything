@@ -54,6 +54,7 @@ export default defineConfig({
   },
 })
 
+pnpm i lucide-react
 
 # run cli shadcn
 
@@ -61,7 +62,8 @@ pnpm dlx shadcn@latest init
 
 # to add component
 pnpm dlx shadcn@latest add button
-
+pnpm dlx shadcn@latest add switch
+pnpm dlx shadcn@latest add card
 
 
 ```
