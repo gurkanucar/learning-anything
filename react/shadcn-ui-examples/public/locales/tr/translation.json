@@ -14,10 +14,10 @@
   "role": "Roller",
   "admin": "Yönetici",
   "russian": "Rusça",
-  "english": "İngilizce",
-  "turkish": "Türkçe",
+  "en": "İngilizce",
+  "tr": "Türkçe",
   "light": "Açık",
   "dark": "Koyu",
   "system": "Sistem",
-  "hello": "Hello World!"
+  "hello": "Merhaba Dunya!"
 }

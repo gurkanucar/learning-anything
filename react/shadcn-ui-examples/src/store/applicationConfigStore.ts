@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -15,6 +16,7 @@ export const useApplicationConfigStore = create<IAppConfStore>()(
       language: "en",
 
       toggleLanguage: (value: string) => {
+        i18n.changeLanguage(value); // Update i18next language
         set({
           language: value,
         });
@@ -26,7 +28,7 @@ export const useApplicationConfigStore = create<IAppConfStore>()(
       },
     }),
     {
-      name: "applicationConfig",
+      name: "applicationConfig", // Persist the state under this key
     }
   )
 );
