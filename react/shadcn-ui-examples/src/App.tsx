@@ -10,12 +10,13 @@ import { cn } from "@/lib/utils";
 import { useTranslate } from "./hooks";
 import LanguageSelector from "./components/custom/LanguageSelector";
 import ThemeSelector from "./components/custom/ThemeSelector";
+import LoginPage from "./pages/login/LoginPage";
 
 function App() {
   const { t } = useTranslate();
 
   return (
-    <div className="flex justify-center items-center h-screen flex-col gap-5">
+    <div className="flex justify-center items-center flex-col gap-5">
       <Card className={cn("w-[380px]")}>
         <CardHeader>
           <CardDescription>
@@ -27,6 +28,7 @@ function App() {
           <ThemeSelector />
         </CardContent>
       </Card>
+      <LoginPage />
       <CardDemo />
     </div>
   );
