@@ -17,7 +17,7 @@ const themes: { value: ThemeMode; label: string; icon: React.ReactElement }[] =
   [
     { value: "light", label: "Light", icon: <Sun /> },
     { value: "dark", label: "Dark", icon: <Moon /> },
-    { value: "system", label: "System", icon: <Monitor /> },
+    // { value: "system", label: "System", icon: <Monitor /> },
   ];
 
 const ThemeSelector: React.FC = () => {
@@ -33,7 +33,7 @@ const ThemeSelector: React.FC = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="flex items-center gap-2 p-2 bg-neutral-100 dark:bg-neutral-800 shadow-sm border border-neutral-300 dark:border-neutral-700 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-700 transition">
+        <Button className="flex bg-transparent items-center gap-2 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition">
           {/* Ensure the icon is always a ReactElement */}
           {React.cloneElement(currentTheme?.icon || <Sun />, {
             className: "h-5 w-5",

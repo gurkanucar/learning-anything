@@ -36,7 +36,7 @@ const LanguageSelector: React.FC = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="flex items-center gap-2 p-2 bg-neutral-100 dark:bg-neutral-800 shadow-sm border border-neutral-300 dark:border-neutral-700 rounded-md hover:bg-neutral-200 dark:hover:bg-neutral-700 transition">
+        <Button className="flex bg-transparent items-center gap-2 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition">
           <img
             src={currentLocalization?.flag}
             alt={currentLocalization?.locale}

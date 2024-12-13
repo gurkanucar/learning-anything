@@ -27,5 +27,9 @@
   "forgot_password": "Şifremi Unuttum?",
   "login_with_google": "Google ile Giriş Yap",
   "no_account": "Hesabınız yok mu?",
-  "sign_up": "Kayıt Ol"
+  "sign_up": "Kayıt Ol",
+  "navbar_home":"Anasayfa",
+  "navbar_profile":"Profil",
+  "navbar_settings":"Ayarlar",
+  "navbar_signOut":"Çıkış Yap"
 }
