@@ -83,6 +83,10 @@ const TableExample5: React.FC = () => {
   // Local input states for column filters
   const [localColumnFilters, setLocalColumnFilters] = useState<Record<string, string>>({});
 
+  // External additional filters
+  const [statusType, setStatusType] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   // Current open filter menu column ID
   const [filterMenuOpen, setFilterMenuOpen] = useState<string | null>(null);
 
@@ -121,7 +125,7 @@ const TableExample5: React.FC = () => {
     queryParams.append('searchParam', globalSearch);
   }
 
-  // Append filters
+  // Append column filters
   for (const col of columns) {
     if (col.filterable && typeof col.accessor === 'string') {
       const filterVal = columnFilters[col.accessor];
@@ -129,6 +133,17 @@ const TableExample5: React.FC = () => {
         queryParams.append(col.accessor, filterVal);
       }
     }
+  }
+
+  // Append external filters
+  if (statusType) {
+    queryParams.append('statusType', statusType);
+  }
+  if (startDate) {
+    queryParams.append('startDate', startDate);
+  }
+  if (endDate) {
+    queryParams.append('endDate', endDate);
   }
 
   // Fetch data
@@ -142,7 +157,7 @@ const TableExample5: React.FC = () => {
       setTotalPages(json.totalPages);
     };
     fetchData();
-  }, [page, pageSize, sortBy, sortOrder, globalSearch, columnFilters]);
+  }, [page, pageSize, sortBy, sortOrder, globalSearch, columnFilters, statusType, startDate, endDate]);
 
   // Debounce application of global search to actual state
   const applyGlobalSearch = useCallback(
@@ -169,7 +184,6 @@ const TableExample5: React.FC = () => {
   }, [localColumnFilters, applyColumnFilters]);
 
   // Convert custom columns to TanStack Columns
-  const columnHelper = createColumnHelper<User>();
   const tableColumns = useMemo<ColumnDef<User, any>[]>(() => {
     return columns.map((col) => ({
       id: typeof col.accessor === 'string' ? col.accessor : (col.accessor as string),
@@ -215,14 +229,34 @@ const TableExample5: React.FC = () => {
 
   return (
     <div style={{ position: 'relative' }}>
-      {/* Global Search */}
-      <div style={{ marginBottom: '1rem' }}>
+      {/* External Filters and Global Search */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+        {/* Global Search */}
         <input
           type="text"
           placeholder="Global search..."
           value={localGlobalSearch}
           onChange={(e) => setLocalGlobalSearch(e.target.value)}
         />
+
+        {/* Additional Filters */}
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <select value={statusType} onChange={(e) => setStatusType(e.target.value)}>
+            <option value="">Status Type Field</option>
+            <option value="ACTIVE">Active</option>
+            <option value="PASSIVE">Passive</option>
+          </select>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
       </div>
 
       <table style={{ position: 'relative' }}>
