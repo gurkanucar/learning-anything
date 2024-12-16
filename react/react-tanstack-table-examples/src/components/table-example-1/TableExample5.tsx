@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import {
   createColumnHelper,
   flexRender,
@@ -9,7 +9,8 @@ import {
   ColumnDef,
   useReactTable,
 } from '@tanstack/react-table';
-import _, {debounce} from 'lodash';
+import { debounce } from 'lodash';
+import { Search, X } from 'lucide-react';
 
 type User = {
   id: number;
@@ -67,14 +68,43 @@ const TableExample5: React.FC = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  // Sorting state compatible with TanStack Table
+  // Sorting state
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  // Global search (for example: searchParam)
+  // Actual global search state (used for fetching data)
   const [globalSearch, setGlobalSearch] = useState('');
 
-  // Column filters (for simplicity store in a record keyed by accessor)
+  // Local input state for global search (immediately reflects user input)
+  const [localGlobalSearch, setLocalGlobalSearch] = useState('');
+
+  // Actual column filters state (used for fetching data)
   const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+
+  // Local input states for column filters
+  const [localColumnFilters, setLocalColumnFilters] = useState<Record<string, string>>({});
+
+  // Current open filter menu column ID
+  const [filterMenuOpen, setFilterMenuOpen] = useState<string | null>(null);
+
+  // Ref for the currently open filter menu
+  const filterMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        filterMenuOpen &&
+        filterMenuRef.current &&
+        !filterMenuRef.current.contains(event.target as Node)
+      ) {
+        setFilterMenuOpen(null);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [filterMenuOpen]);
 
   // Derive sortBy and sortOrder from sorting state
   const sortBy = sorting.length > 0 ? sorting[0].id : undefined;
@@ -87,12 +117,11 @@ const TableExample5: React.FC = () => {
 
   if (sortBy) queryParams.append('sortBy', sortBy);
   if (sortOrder) queryParams.append('sortOrder', sortOrder);
-
   if (globalSearch) {
     queryParams.append('searchParam', globalSearch);
   }
 
-  // Append filters (Only append filters for filterable columns)
+  // Append filters
   for (const col of columns) {
     if (col.filterable && typeof col.accessor === 'string') {
       const filterVal = columnFilters[col.accessor];
@@ -102,7 +131,7 @@ const TableExample5: React.FC = () => {
     }
   }
 
-  // Fetch data from API
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       const url = `${apiUrl}?${queryParams.toString()}`;
@@ -115,24 +144,32 @@ const TableExample5: React.FC = () => {
     fetchData();
   }, [page, pageSize, sortBy, sortOrder, globalSearch, columnFilters]);
 
-  // Debounced handlers for search and filters
-  const debouncedGlobalSearch = useCallback(
-    debounce((value: string) => {
-      setGlobalSearch(value);
+  // Debounce application of global search to actual state
+  const applyGlobalSearch = useCallback(
+    debounce((val: string) => {
+      setGlobalSearch(val);
     }, 300),
     []
   );
 
-  const debouncedColumnFilter = useCallback(
-    debounce((column: string, value: string) => {
-      setColumnFilters((prev) => ({ ...prev, [column]: value }));
+  useEffect(() => {
+    applyGlobalSearch(localGlobalSearch);
+  }, [localGlobalSearch, applyGlobalSearch]);
+
+  // Debounce application of column filters to actual state
+  const applyColumnFilters = useCallback(
+    debounce((filters: Record<string, string>) => {
+      setColumnFilters(filters);
     }, 300),
     []
   );
 
-  // Convert our custom MyColumn definitions to TanStack Table ColumnDef
+  useEffect(() => {
+    applyColumnFilters(localColumnFilters);
+  }, [localColumnFilters, applyColumnFilters]);
+
+  // Convert custom columns to TanStack Columns
   const columnHelper = createColumnHelper<User>();
-
   const tableColumns = useMemo<ColumnDef<User, any>[]>(() => {
     return columns.map((col) => ({
       id: typeof col.accessor === 'string' ? col.accessor : (col.accessor as string),
@@ -163,51 +200,118 @@ const TableExample5: React.FC = () => {
     pageCount: totalPages,
   });
 
+  const handleFilterIconClick = (e: React.MouseEvent, columnId: string) => {
+    e.stopPropagation();
+    setFilterMenuOpen((prev) => (prev === columnId ? null : columnId));
+  };
+
+  const handleFilterChange = (columnId: string, value: string) => {
+    setLocalColumnFilters((prev) => ({ ...prev, [columnId]: value }));
+  };
+
+  const clearFilter = (columnId: string) => {
+    setLocalColumnFilters((prev) => ({ ...prev, [columnId]: '' }));
+  };
+
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
       {/* Global Search */}
       <div style={{ marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Global search..."
-          onChange={(e) => debouncedGlobalSearch(e.target.value)}
+          value={localGlobalSearch}
+          onChange={(e) => setLocalGlobalSearch(e.target.value)}
         />
       </div>
 
-      {/* Column filters for filterable columns */}
-      <div style={{ marginBottom: '1rem' }}>
-        {columns.map((col) => {
-          if (col.filterable && typeof col.accessor === 'string') {
-            return (
-              <div key={col.accessor} style={{ display: 'inline-block', marginRight: '1rem' }}>
-                <label>{col.header}: </label>
-                <input
-                  type="text"
-                  onChange={(e) => debouncedColumnFilter(col.accessor as string, e.target.value)}
-                />
-              </div>
-            );
-          }
-          return null;
-        })}
-      </div>
-
-      <table>
+      <table style={{ position: 'relative' }}>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 const canSort = header.column.getCanSort();
                 const sortDir = header.column.getIsSorted();
+                const colDef = columns.find((c) => c.accessor === header.column.id);
+                const isFilterable = colDef?.filterable;
+                const currentFilterValue = localColumnFilters[header.column.id] || '';
+
                 return (
-                  <th
-                    key={header.id}
-                    onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
-                    style={{ cursor: canSort ? 'pointer' : 'auto' }}
-                  >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                    {sortDir === 'asc' && ' 🔼'}
-                    {sortDir === 'desc' && ' 🔽'}
+                  <th key={header.id} style={{ position: 'relative', padding: '0.5rem' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      {/* Click text to sort */}
+                      <span
+                        style={{ cursor: canSort ? 'pointer' : 'default' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (canSort) {
+                            header.column.toggleSorting();
+                          }
+                        }}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {sortDir === 'asc' && ' 🔼'}
+                        {sortDir === 'desc' && ' 🔽'}
+                      </span>
+
+                      {isFilterable && (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          {/* Search icon to open menu */}
+                          <span
+                            style={{ cursor: 'pointer' }}
+                            onClick={(e) => handleFilterIconClick(e, header.column.id)}
+                          >
+                            <Search size={16} />
+                          </span>
+
+                          {/* Clear icon if input not empty */}
+                          {currentFilterValue && (
+                            <span
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => {
+                                clearFilter(header.column.id);
+                              }}
+                            >
+                              <X size={16} />
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {filterMenuOpen === header.column.id && (
+                      <div
+                        ref={filterMenuRef}
+                        style={{
+                          position: 'absolute',
+                          background: '#fff',
+                          border: '1px solid #ccc',
+                          padding: '0.5rem',
+                          top: '100%',
+                          left: 0,
+                          zIndex: 10,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <input
+                          type="text"
+                          value={currentFilterValue}
+                          onChange={(e) => handleFilterChange(header.column.id, e.target.value)}
+                          style={{ padding: '4px' }}
+                        />
+                        {currentFilterValue && (
+                          <button
+                            onClick={() => {
+                              clearFilter(header.column.id);
+                            }}
+                          >
+                            <X size={16} />
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </th>
                 );
               })}
@@ -224,7 +328,9 @@ const TableExample5: React.FC = () => {
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => {
                 return (
-                  <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                  <td key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
                 );
               })}
             </tr>
@@ -246,7 +352,10 @@ const TableExample5: React.FC = () => {
             {page + 1} of {totalPages}
           </strong>{' '}
         </span>
-        <button onClick={() => setPage((old) => Math.min(old + 1, totalPages - 1))} disabled={page === totalPages - 1}>
+        <button
+          onClick={() => setPage((old) => Math.min(old + 1, totalPages - 1))}
+          disabled={page === totalPages - 1}
+        >
           {'>'}
         </button>
         <button onClick={() => setPage(totalPages - 1)} disabled={page === totalPages - 1}>
