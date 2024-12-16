@@ -8,6 +8,7 @@ import com.gucardev.mapstructexample.service.DepartmentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,9 +55,10 @@ public class DepartmentController {
   }
 
   @PostMapping("/{departmentId}/employees/{employeeId}")
-  public DepartmentDto addEmployeeToDepartment(@PathVariable Long departmentId,
+  public ResponseEntity<Object> addEmployeeToDepartment(@PathVariable Long departmentId,
       @PathVariable Long employeeId) {
-    return departmentService.addEmployeeToDepartment(departmentId, employeeId);
+    departmentService.addEmployeeToDepartment(departmentId, employeeId);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @DeleteMapping("/{departmentId}/employees/{employeeId}")

@@ -33,6 +33,11 @@ public class EmployeeService {
     return employeeMapper.toFullDto(saved);
   }
 
+  public void saveEmployeeEntity( Employee employee) {
+    employeeRepository.save(employee);
+  }
+
+
   public EmployeeDto updateEmployee(Long id, EmployeeRequest employeeRequest) {
     var existing = getEmployeeById(id);
     employeeMapper.partialUpdate(employeeRequest, existing);

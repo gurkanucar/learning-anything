@@ -1,5 +1,6 @@
 package com.gucardev.mapstructexample.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class DepartmentDto {
   private String name;
   private EmployeeDto headOfDepartment;
   private Long headOfDepartmentId;
-  private List<EmployeeDto> employees;
+  private List<EmployeeDto> employees = new ArrayList<>();
 }
 
 

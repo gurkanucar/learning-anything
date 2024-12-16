@@ -19,11 +19,7 @@ import org.hibernate.proxy.HibernateProxy;
 @Getter
 @Setter
 @Entity
-public class Employee {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+public class Employee extends BaseEntity {
 
   private String firstName;
   private String lastName;
