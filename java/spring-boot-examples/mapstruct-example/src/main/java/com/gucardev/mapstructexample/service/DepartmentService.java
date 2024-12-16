@@ -43,6 +43,12 @@ public class DepartmentService {
     var existing = getDepartmentById(id);
     departmentMapper.partialUpdate(departmentRequest,
         existing); // MapStruct handles partial updates
+    if (departmentRequest.getHeadOfDepartmentId() != null) {
+      existing.setHeadOfDepartment(employeeService.getEmployeeById(
+          departmentRequest.getHeadOfDepartmentId()));
+    } else {
+      existing.setHeadOfDepartment(null);
+    }
     var updated = departmentRepository.save(existing);
     return departmentMapper.toSummaryDto(updated);
   }

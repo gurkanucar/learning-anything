@@ -28,10 +28,12 @@ public interface DepartmentMapper {
   @AfterMapping
   default void handleAfterMapping(
       @MappingTarget DepartmentWithDetailsDto departmentWithDetailsDto) {
-    var firstName = departmentWithDetailsDto.getHeadOfDepartment().getFirstName();
-    var lastName = departmentWithDetailsDto.getHeadOfDepartment().getLastName();
-    departmentWithDetailsDto.getHeadOfDepartment()
-        .setFullName(firstName + " " + lastName);
+    if (departmentWithDetailsDto.getHeadOfDepartment() != null) {
+      var firstName = departmentWithDetailsDto.getHeadOfDepartment().getFirstName();
+      var lastName = departmentWithDetailsDto.getHeadOfDepartment().getLastName();
+      departmentWithDetailsDto.getHeadOfDepartment()
+          .setFullName(firstName + " " + lastName);
+    }
     departmentWithDetailsDto.getEmployees().forEach(employee -> {
       var employeeFirstName = employee.getFirstName();
       var employeeLastName = employee.getLastName();
@@ -39,8 +41,10 @@ public interface DepartmentMapper {
     });
   }
 
+  @Mapping(source = "headOfDepartmentId", target = "headOfDepartment.id")
   Department toEntity(DepartmentRequest request);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  @Mapping(target = "headOfDepartment", ignore = true)
   Department partialUpdate(DepartmentRequest request, @MappingTarget Department entity);
 }
