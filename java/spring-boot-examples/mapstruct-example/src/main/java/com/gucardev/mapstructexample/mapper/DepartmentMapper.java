@@ -45,6 +45,5 @@ public interface DepartmentMapper {
   Department toEntity(DepartmentRequest request);
 
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-  @Mapping(target = "headOfDepartment", ignore = true)
-  Department partialUpdate(DepartmentRequest request, @MappingTarget Department entity);
+  void partialUpdate(DepartmentRequest request, @MappingTarget Department entity);
 }

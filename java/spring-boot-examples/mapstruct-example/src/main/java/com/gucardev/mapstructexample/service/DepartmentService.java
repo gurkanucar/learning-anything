@@ -58,23 +58,21 @@ public class DepartmentService {
     departmentRepository.delete(existing);
   }
 
-  public DepartmentDto addEmployeeToDepartment(Long departmentId, Long employeeId) {
+  public void addEmployeeToDepartment(Long departmentId, Long employeeId) {
     Department department = getDepartmentById(departmentId);
     Employee employee = employeeService.getEmployeeById(employeeId);
-
-    // Check if employee already assigned to a department
+    // If the employee is already in this department, return early
     if (employee.getDepartment() != null && employee.getDepartment().getId().equals(departmentId)) {
-      // Employee already in this department
-      return departmentMapper.toSummaryDto(department);
+      return;
     }
-
-    // Assign employee to department
+    // Assign employee to the department
     employee.setDepartment(department);
-    department.getEmployees().add(employee);
-
-    departmentRepository.save(department);
-    return departmentMapper.toSummaryDto(department);
+    // Save only the employee since it's the owning side of the relationship
+    employeeService.saveEmployeeEntity(employee);
+    // Return department summary without reloading the entire collection if possible
+    departmentMapper.toSummaryDto(department);
   }
+
 
   public DepartmentDto removeEmployeeFromDepartment(Long departmentId, Long employeeId) {
     Department department = getDepartmentById(departmentId);
