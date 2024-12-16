@@ -67,7 +67,7 @@ public class EmployeeSpecification {
 
       if (request.getStatusType() != null) {
         predicates.add(criteriaBuilder.like(
-            root.get("statusType").as(String.class),
+            criteriaBuilder.lower(root.get("statusType").as(String.class)),
             "%" + request.getStatusType().toString().toLowerCase() + "%"
         ));
       }
