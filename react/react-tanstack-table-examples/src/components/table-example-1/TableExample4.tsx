@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 import {
   ColumnDef,
@@ -12,7 +12,7 @@ import {
   ColumnFiltersState,
 } from "@tanstack/react-table";
 import { ChevronUp, ChevronDown, Search } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -72,10 +72,9 @@ function DataTable<TData extends { id: number }>({
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  // State for managing the filter popover
+  // State for managing which column's filter popover is open
   const [openFilterForColumn, setOpenFilterForColumn] = useState<string | null>(null);
-  const [currentFilterValue, setCurrentFilterValue] = useState("");
-  
+
   const columnHelper = createColumnHelper<TData>();
 
   const toggleRowSelection = (id: number) => {
@@ -149,25 +148,21 @@ function DataTable<TData extends { id: number }>({
     if (openFilterForColumn === columnId) {
       setOpenFilterForColumn(null);
     } else {
-      const existingValue = getColumnFilterValue(columnId) || "";
-      setCurrentFilterValue(existingValue);
       setOpenFilterForColumn(columnId);
     }
   }
 
   // Save the filter value for the column
-  function saveFilter(columnId: string) {
-    const val = currentFilterValue.trim();
+  function saveFilter(columnId: string, value: string) {
     setOpenFilterForColumn(null);
     setColumnFilters((old) => {
-      // Remove existing filter if any
       const withoutCurrent = old.filter((f) => f.id !== columnId);
+      const val = value.trim();
       if (val) {
         return [...withoutCurrent, { id: columnId, value: val }];
       }
       return withoutCurrent;
     });
-    // After updating filters, refetch data
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     fetchData();
   }
@@ -219,18 +214,17 @@ function DataTable<TData extends { id: number }>({
           header: ({ column }) => {
             const columnId = column.id;
             const hasFilter = getColumnFilterValue(columnId) !== undefined;
+
             return (
               <div className="flex flex-col gap-2 relative">
                 <div
                   className={`${col.sortable ? "cursor-pointer" : ""} flex items-center gap-2`}
                   onClick={(e) => {
-                    // Only sort if click not on the filter icons
                     if ((e.target as HTMLElement).closest(".filter-icon")) return;
                     col.sortable && toggleSort(column.id);
                   }}
                 >
                   {col.header} {col.sortable && getSortIcon(column.id, sorting)}
-
                   {col.filterable && (
                     <div className="filter-icon flex items-center gap-1">
                       <Search
@@ -239,46 +233,21 @@ function DataTable<TData extends { id: number }>({
                         style={{ cursor: "pointer" }}
                       />
                       {hasFilter && (
-                        <Button
-                          variant="ghost"
-                          size="xs"
-                          onClick={() => quickClearFilter(columnId)}
-                        >
+                        <Button variant="ghost" size="xs" onClick={() => quickClearFilter(columnId)}>
                           ✕
                         </Button>
                       )}
                     </div>
                   )}
                 </div>
-                {openFilterForColumn === columnId && (
-                  <div
-                    className="absolute z-10 mt-2 p-2 border bg-white rounded shadow"
-                    style={{ top: "100%", left: 0 }}
-                  >
-                    <div className="flex flex-col gap-2">
-                      <Input
-                        value={currentFilterValue}
-                        onChange={(e) => setCurrentFilterValue(e.target.value)}
-                        placeholder={`Filter ${col.header}`}
-                      />
-                      <div className="flex gap-2 justify-end">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => clearFilter(columnId)}
-                        >
-                          Clear
-                        </Button>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => saveFilter(columnId)}
-                        >
-                          Save
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+                {openFilterForColumn === columnId && col.filterable && (
+                  <FilterPopover
+                    key={columnId}
+                    columnId={columnId}
+                    initialValue={getColumnFilterValue(columnId) || ""}
+                    onSave={(val) => saveFilter(columnId, val)}
+                    onClear={() => clearFilter(columnId)}
+                  />
                 )}
               </div>
             );
@@ -309,7 +278,7 @@ function DataTable<TData extends { id: number }>({
     pageCount: Math.ceil(totalRows / pagination.pageSize),
   });
 
-  const { register, handleSubmit, reset } = useForm<FormValues>({
+  const methods = useForm<FormValues>({
     defaultValues: {
       globalSearchTerm: "",
     },
@@ -336,7 +305,6 @@ function DataTable<TData extends { id: number }>({
         console.error("Error deleting items:", err);
       }
     } else {
-      // Just clear the selection after action
       setSelectedRows([]);
     }
   }
@@ -347,36 +315,34 @@ function DataTable<TData extends { id: number }>({
         <CardTitle>Data Table</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Global Search Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mb-4">
-          <div className="space-y-2">
-            <div className="flex gap-4 items-end">
-              <div className="flex-1">
-                <Label htmlFor="globalSearchTerm">Global Search</Label>
-                <Input
-                  id="globalSearchTerm"
-                  {...register("globalSearchTerm")}
-                />
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4 mb-4">
+            <div className="space-y-2">
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <Label htmlFor="globalSearchTerm">Global Search</Label>
+                  <Input id="globalSearchTerm" {...methods.register("globalSearchTerm")} />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit">Search</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    methods.reset();
+                    setGlobalFilter("");
+                    setColumnFilters([]);
+                    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+                    fetchData();
+                  }}
+                >
+                  Clear
+                </Button>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button type="submit">Search</Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  reset();
-                  setGlobalFilter("");
-                  setColumnFilters([]);
-                  setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-                  fetchData();
-                }}
-              >
-                Clear
-              </Button>
-            </div>
-          </div>
-        </form>
+          </form>
+        </FormProvider>
 
         <div className="mb-4 flex items-center gap-2">
           <p className="text-sm text-muted-foreground">
@@ -420,10 +386,7 @@ function DataTable<TData extends { id: number }>({
                       <TableHead key={header.id}>
                         {header.isPlaceholder
                           ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                          : flexRender(header.column.columnDef.header, header.getContext())}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -434,10 +397,7 @@ function DataTable<TData extends { id: number }>({
                   <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -491,8 +451,7 @@ function DataTable<TData extends { id: number }>({
             </Button>
             <div className="flex items-center gap-1">
               <div className="text-sm font-medium">
-                Page {table.getState().pagination.pageIndex + 1} of{" "}
-                {table.getPageCount()}
+                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
               </div>
             </div>
             <div className="text-sm font-medium">Total: {totalRows}</div>
@@ -509,6 +468,51 @@ function getSortIcon(id: string, sorting: SortingState) {
   return currentSort.desc ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />;
 }
 
+// FilterPopover component using react-hook-form for the filter input
+type FilterPopoverProps = {
+  columnId: string;
+  initialValue: string;
+  onSave: (value: string) => void;
+  onClear: () => void;
+};
+
+function FilterPopover({ columnId, initialValue, onSave, onClear }: FilterPopoverProps) {
+  const methods = useForm<{ filterValue: string }>({
+    defaultValues: { filterValue: initialValue },
+  });
+
+  const { register, handleSubmit } = methods;
+
+  const handleSave = (data: { filterValue: string }) => {
+    onSave(data.filterValue);
+  };
+
+  return (
+    <div
+      className="absolute z-10 mt-2 p-2 border bg-white rounded shadow"
+      style={{ top: "100%", left: 0 }}
+    >
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(handleSave)} className="flex flex-col gap-2">
+          <Input
+            {...register("filterValue")}
+            placeholder="Filter value"
+            autoFocus
+          />
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" size="sm" type="button" onClick={onClear}>
+              Clear
+            </Button>
+            <Button variant="default" size="sm" type="submit">
+              Save
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
+    </div>
+  );
+}
+
 export const MyDataTableExample: React.FC = () => {
   const columns: MyColumn<User>[] = [
     { header: "ID", accessor: "id", sortable: true, filterable: true },
@@ -522,25 +526,13 @@ export const MyDataTableExample: React.FC = () => {
       accessor: "actions",
       renderCell: (_, row) => (
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => alert(`Viewing user: ${row.id}`)}
-          >
+          <Button variant="outline" size="sm" onClick={() => alert(`Viewing user: ${row.id}`)}>
             View
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => alert(`Editing user: ${row.id}`)}
-          >
+          <Button variant="outline" size="sm" onClick={() => alert(`Editing user: ${row.id}`)}>
             Edit
           </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => alert(`Deleting user: ${row.id}`)}
-          >
+          <Button variant="destructive" size="sm" onClick={() => alert(`Deleting user: ${row.id}`)}>
             Delete
           </Button>
         </div>
