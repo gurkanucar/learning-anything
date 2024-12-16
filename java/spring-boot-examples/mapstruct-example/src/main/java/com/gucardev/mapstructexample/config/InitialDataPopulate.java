@@ -1,5 +1,6 @@
 package com.gucardev.mapstructexample.config;
 
+import com.github.javafaker.Faker;
 import com.gucardev.mapstructexample.entity.Department;
 import com.gucardev.mapstructexample.entity.Employee;
 import com.gucardev.mapstructexample.entity.Project;
@@ -8,9 +9,17 @@ import com.gucardev.mapstructexample.repository.DepartmentRepository;
 import com.gucardev.mapstructexample.repository.EmployeeRepository;
 import com.gucardev.mapstructexample.repository.ProjectRepository;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -19,105 +28,131 @@ public class InitialDataPopulate implements CommandLineRunner {
   private final DepartmentRepository departmentRepository;
   private final EmployeeRepository employeeRepository;
   private final ProjectRepository projectRepository;
+  private final Faker faker = new Faker();
 
+  @Transactional
   @Override
   public void run(String... args) throws Exception {
+    // Create departments
+    List<Department> departments = createDepartments();
 
-    // Create some projects
-    Project projectA = new Project();
-    projectA.setProjectName("Project A");
+    // Create projects
+    List<Project> projects = createProjects();
 
-    Project projectB = new Project();
-    projectB.setProjectName("Project B");
+    // Create employees and associate them with departments and projects
+    createEmployeesWithAssociations(departments, projects);
 
-    projectRepository.save(projectA);
-    projectRepository.save(projectB);
+    // Set department heads
+    assignDepartmentHeads(departments);
 
-    // Create Departments
-    Department itDepartment = new Department();
-    itDepartment.setName("IT Department");
+    // Save everything
+    saveToDB(departments, projects);
+  }
 
-    Department hrDepartment = new Department();
-    hrDepartment.setName("HR Department");
+  private List<Department> createDepartments() {
+    String[] departmentNames = {
+        "IT", "HR", "Finance", "Marketing", "Sales",
+        "Engineering", "Research", "Operations", "Legal", "Customer Support"
+    };
 
-    departmentRepository.save(itDepartment);
-    departmentRepository.save(hrDepartment);
+    List<Department> departments = new ArrayList<>();
+    for (String name : departmentNames) {
+      Department dept = new Department();
+      dept.setName(name + " Department");
+      dept.setEmployees(new ArrayList<>());
+      departments.add(dept);
+    }
+    return departments;
+  }
 
-    // Create Employees
-    Employee empJohn = new Employee();
-    empJohn.setFirstName("John");
-    empJohn.setLastName("Doe");
-    empJohn.setEmail("j@mail.com");
-    empJohn.setAge(25);
-    empJohn.setStatusType(StatusType.ACTIVE);
-    empJohn.setHireDate(LocalDate.of(2020, 1, 10));
-    empJohn.setDepartment(itDepartment);
+  private List<Project> createProjects() {
+    String[] projectPrefixes = {"Project", "Initiative", "Program", "Implementation"};
+    String[] projectThemes = {"Digital", "Cloud", "Mobile", "AI", "Analytics", "Security"};
 
-    Employee empJane = new Employee();
-    empJane.setFirstName("Jane");
-    empJane.setLastName("Smith");
-    empJane.setEmail("smithj@mail.com");
-    empJane.setAge(42);
-    empJane.setStatusType(StatusType.PASSIVE);
-    empJane.setHireDate(LocalDate.of(2021, 3, 5));
-    empJane.setDepartment(itDepartment);
+    List<Project> projects = new ArrayList<>();
+    for (String prefix : projectPrefixes) {
+      for (String theme : projectThemes) {
+        Project project = new Project();
+        project.setProjectName(prefix + " " + theme);
+        project.setAssignedEmployees(new HashSet<>());
+        projects.add(project);
+      }
+    }
+    return projects;
+  }
 
-    Employee empAdam = new Employee();
-    empAdam.setFirstName("Adam");
-    empAdam.setLastName("Johnson");
-    empAdam.setLastName("Smith");
-    empAdam.setEmail("adam@mail.com");
-    empAdam.setAge(32);
-    empAdam.setStatusType(StatusType.ACTIVE);
-    empAdam.setHireDate(LocalDate.of(2019, 11, 23));
-    empAdam.setDepartment(hrDepartment);
+  private void createEmployeesWithAssociations(List<Department> departments,
+      List<Project> projects) {
+    // Create 1000 employees
+    for (int i = 0; i < 200; i++) {
+      Employee emp = createRandomEmployee();
 
-    Employee empSusan = new Employee();
-    empSusan.setFirstName("Susan");
-    empSusan.setLastName("Brown");
-    empSusan.setLastName("Smith");
-    empSusan.setEmail("brsmith@mail.com");
-    empSusan.setAge(37);
-    empSusan.setStatusType(StatusType.ACTIVE);
-    empSusan.setHireDate(LocalDate.of(2018, 5, 15));
-    empSusan.setDepartment(hrDepartment);
+      // Assign to random department
+      Department randomDept = departments.get(faker.number().numberBetween(0, departments.size()));
+      emp.setDepartment(randomDept);
+      randomDept.getEmployees().add(emp);
 
-    // Assign projects to employees
-    empJohn.getProjects().add(projectA);
-    empJane.getProjects().add(projectA);
-    empJane.getProjects().add(projectB);
-    empAdam.getProjects().add(projectB);
-    empSusan.getProjects().add(projectB);
+      // Assign 1-3 random projects
+      int numProjects = faker.number().numberBetween(1, 4);
+      Set<Project> employeeProjects = new HashSet<>();
+      for (int j = 0; j < numProjects; j++) {
+        Project randomProject = projects.get(faker.number().numberBetween(0, projects.size()));
+        employeeProjects.add(randomProject);
+        randomProject.getAssignedEmployees().add(emp);
+      }
+      emp.setProjects(employeeProjects);
+    }
+  }
 
-    // Add employees to departments
-    itDepartment.getEmployees().add(empJohn);
-    itDepartment.getEmployees().add(empJane);
-    hrDepartment.getEmployees().add(empAdam);
-    hrDepartment.getEmployees().add(empSusan);
+  private Employee createRandomEmployee() {
+    Employee emp = new Employee();
 
-    // Assign Heads of Departments
-    itDepartment.setHeadOfDepartment(empJohn);
-    hrDepartment.setHeadOfDepartment(empSusan);
+    // Generate name and email
+    String firstName = faker.name().firstName();
+    String lastName = faker.name().lastName();
+    emp.setFirstName(firstName);
+    emp.setLastName(lastName);
+    emp.setEmail(generateEmail(firstName, lastName));
 
-    // Save employees
-    employeeRepository.save(empJohn);
-    employeeRepository.save(empJane);
-    employeeRepository.save(empAdam);
-    employeeRepository.save(empSusan);
+    // Generate age between 22 and 65
+    emp.setAge(faker.number().numberBetween(22, 66));
 
-    // Update projects with assigned employees
-    projectA.getAssignedEmployees().add(empJohn);
-    projectA.getAssignedEmployees().add(empJane);
-    projectB.getAssignedEmployees().add(empJane);
-    projectB.getAssignedEmployees().add(empAdam);
-    projectB.getAssignedEmployees().add(empSusan);
+    // Random status
+    emp.setStatusType(faker.random().nextBoolean() ? StatusType.ACTIVE : StatusType.PASSIVE);
 
-    projectRepository.save(projectA);
-    projectRepository.save(projectB);
+    // Generate hire date within last 10 years
+    Date hireDate = faker.date().past(3650, TimeUnit.DAYS);
+    emp.setHireDate(LocalDate.ofInstant(hireDate.toInstant(), ZoneId.systemDefault()));
 
-    // Update departments with employees and heads
-    departmentRepository.save(itDepartment);
-    departmentRepository.save(hrDepartment);
+    return emp;
+  }
 
+  private String generateEmail(String firstName, String lastName) {
+    String[] domains = {"company.com", "corp.net", "enterprise.org"};
+    String domain = domains[faker.number().numberBetween(0, domains.length)];
+    return firstName.toLowerCase().charAt(0) +
+        lastName.toLowerCase().replaceAll("[^a-zA-Z0-9]", "") +
+        faker.number().numberBetween(1, 999) +
+        "@" + domain;
+  }
+
+  private void assignDepartmentHeads(List<Department> departments) {
+    for (Department dept : departments) {
+      if (!dept.getEmployees().isEmpty()) {
+        // Pick random employee from department as head
+        List<Employee> deptEmployees = new ArrayList<>(dept.getEmployees());
+        Employee headOfDept = deptEmployees.get(
+            faker.number().numberBetween(0, deptEmployees.size()));
+        dept.setHeadOfDepartment(headOfDept);
+      }
+    }
+  }
+
+  private void saveToDB(List<Department> departments, List<Project> projects) {
+    // Save all departments (which will cascade save employees)
+    departmentRepository.saveAll(departments);
+
+    // Save all projects
+    projectRepository.saveAll(projects);
   }
 }
