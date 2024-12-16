@@ -59,7 +59,6 @@ function DataTable<TData extends { id: number }>(props: DataTableProps<TData>) {
   const columnHelper = createColumnHelper<TData>();
 
   const columnDefs: ColumnDef<TData, any>[] = myColumns.map((col) =>
-    
     columnHelper.accessor((row) => row[col.accessor], {
       id: String(col.accessor),
       header: ({ column }) => (
