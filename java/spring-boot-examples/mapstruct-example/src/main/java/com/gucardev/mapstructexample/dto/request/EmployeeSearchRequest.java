@@ -20,7 +20,7 @@ public class EmployeeSearchRequest {
   private StatusType statusType;
   private Long departmentId;
   private Integer page = 0;
-  private Integer size = 10;
-  private String sortField = "id";
-  private Sort.Direction sortDirection = Sort.Direction.ASC;
+  private Integer pageSize = 10;
+  private String sortBy = "id";
+  private Sort.Direction sortOrder = Sort.Direction.ASC;
 }

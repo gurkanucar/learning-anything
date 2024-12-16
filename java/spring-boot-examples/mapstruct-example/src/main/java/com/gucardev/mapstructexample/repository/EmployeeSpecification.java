@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
-
-// EmployeeSpecification.java
 public class EmployeeSpecification {
 
   public static Specification<Employee> createSpecification(EmployeeSearchRequest request) {
@@ -49,7 +47,10 @@ public class EmployeeSpecification {
       }
 
       if (request.getAge() != null) {
-        predicates.add(criteriaBuilder.equal(root.get("age"), request.getAge()));
+        predicates.add(criteriaBuilder.like(
+            root.get("age").as(String.class),
+            "%" + request.getAge().toString() + "%"
+        ));
       }
 
       if (request.getHireDateStart() != null) {
@@ -65,12 +66,17 @@ public class EmployeeSpecification {
       }
 
       if (request.getStatusType() != null) {
-        predicates.add(criteriaBuilder.equal(root.get("statusType"), request.getStatusType()));
+        predicates.add(criteriaBuilder.like(
+            root.get("statusType").as(String.class),
+            "%" + request.getStatusType().toString().toLowerCase() + "%"
+        ));
       }
 
       if (request.getDepartmentId() != null) {
-        predicates.add(criteriaBuilder.equal(root.get("department").get("id"),
-            request.getDepartmentId()));
+        predicates.add(criteriaBuilder.like(
+            root.get("department").get("id").as(String.class),
+            "%" + request.getDepartmentId().toString() + "%"
+        ));
       }
 
       return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

@@ -29,8 +29,8 @@ public class EmployeeService {
   public Page<EmployeeDto> searchEmployees(EmployeeSearchRequest request) {
     Pageable pageable = PageRequest.of(
         request.getPage(),
-        request.getSize(),
-        Sort.by(request.getSortDirection(), request.getSortField())
+        request.getPageSize(),
+        Sort.by(request.getSortOrder(), request.getSortBy())
     );
 
     Page<Employee> employeePage = employeeRepository.findAll(
