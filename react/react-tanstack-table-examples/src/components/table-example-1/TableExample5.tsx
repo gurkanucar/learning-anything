@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   createColumnHelper,
   flexRender,
@@ -9,6 +9,7 @@ import {
   ColumnDef,
   useReactTable,
 } from '@tanstack/react-table';
+import _, {debounce} from 'lodash';
 
 type User = {
   id: number;
@@ -49,21 +50,9 @@ const columns: MyColumn<User>[] = [
     accessor: 'actions',
     renderCell: (_, row) => (
       <div className="flex gap-2">
-        <button
-          onClick={() => alert(`Viewing user: ${row.id}`)}
-        >
-          View
-        </button>
-        <button
-          onClick={() => alert(`Editing user: ${row.id}`)}
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => alert(`Deleting user: ${row.id}`)}
-        >
-          Delete
-        </button>
+        <button onClick={() => alert(`Viewing user: ${row.id}`)}>View</button>
+        <button onClick={() => alert(`Editing user: ${row.id}`)}>Edit</button>
+        <button onClick={() => alert(`Deleting user: ${row.id}`)}>Delete</button>
       </div>
     ),
   },
@@ -73,14 +62,14 @@ const TableExample5: React.FC = () => {
   const [data, setData] = useState<User[]>([]);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  
+
   // Pagination state
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
   // Sorting state compatible with TanStack Table
   const [sorting, setSorting] = useState<SortingState>([]);
-  
+
   // Global search (for example: searchParam)
   const [globalSearch, setGlobalSearch] = useState('');
 
@@ -88,7 +77,6 @@ const TableExample5: React.FC = () => {
   const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
 
   // Derive sortBy and sortOrder from sorting state
-  // TanStack Table sorting state e.g. [{id: 'firstName', desc: false}]
   const sortBy = sorting.length > 0 ? sorting[0].id : undefined;
   const sortOrder = sorting.length > 0 ? (sorting[0].desc ? 'DESC' : 'ASC') : undefined;
 
@@ -109,8 +97,6 @@ const TableExample5: React.FC = () => {
     if (col.filterable && typeof col.accessor === 'string') {
       const filterVal = columnFilters[col.accessor];
       if (filterVal) {
-        // You can use the accessor name directly as the query param
-        // or transform as needed.
         queryParams.append(col.accessor, filterVal);
       }
     }
@@ -129,21 +115,34 @@ const TableExample5: React.FC = () => {
     fetchData();
   }, [page, pageSize, sortBy, sortOrder, globalSearch, columnFilters]);
 
+  // Debounced handlers for search and filters
+  const debouncedGlobalSearch = useCallback(
+    debounce((value: string) => {
+      setGlobalSearch(value);
+    }, 300),
+    []
+  );
+
+  const debouncedColumnFilter = useCallback(
+    debounce((column: string, value: string) => {
+      setColumnFilters((prev) => ({ ...prev, [column]: value }));
+    }, 300),
+    []
+  );
+
   // Convert our custom MyColumn definitions to TanStack Table ColumnDef
   const columnHelper = createColumnHelper<User>();
 
   const tableColumns = useMemo<ColumnDef<User, any>[]>(() => {
-    return columns.map((col) => {
-      return {
-        id: typeof col.accessor === 'string' ? col.accessor : (col.accessor as string),
-        header: col.header,
-        accessorKey: typeof col.accessor === 'string' ? col.accessor : undefined,
-        cell: col.renderCell
-          ? ({ getValue, row }) => col.renderCell!(getValue(), row.original)
-          : ({ getValue }) => getValue(),
-        enableSorting: col.sortable ?? false,
-      };
-    });
+    return columns.map((col) => ({
+      id: typeof col.accessor === 'string' ? col.accessor : (col.accessor as string),
+      header: col.header,
+      accessorKey: typeof col.accessor === 'string' ? col.accessor : undefined,
+      cell: col.renderCell
+        ? ({ getValue, row }) => col.renderCell!(getValue(), row.original)
+        : ({ getValue }) => getValue(),
+      enableSorting: col.sortable ?? false,
+    }));
   }, [columns]);
 
   const table = useReactTable({
@@ -171,8 +170,7 @@ const TableExample5: React.FC = () => {
         <input
           type="text"
           placeholder="Global search..."
-          value={globalSearch}
-          onChange={(e) => setGlobalSearch(e.target.value)}
+          onChange={(e) => debouncedGlobalSearch(e.target.value)}
         />
       </div>
 
@@ -185,10 +183,7 @@ const TableExample5: React.FC = () => {
                 <label>{col.header}: </label>
                 <input
                   type="text"
-                  value={columnFilters[col.accessor] || ''}
-                  onChange={(e) =>
-                    setColumnFilters((prev) => ({ ...prev, [col.accessor]: e.target.value }))
-                  }
+                  onChange={(e) => debouncedColumnFilter(col.accessor as string, e.target.value)}
                 />
               </div>
             );
