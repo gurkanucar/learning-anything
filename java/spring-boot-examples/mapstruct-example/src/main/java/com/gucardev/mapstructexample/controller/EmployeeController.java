@@ -3,10 +3,13 @@ package com.gucardev.mapstructexample.controller;
 
 import com.gucardev.mapstructexample.dto.EmployeeDto;
 import com.gucardev.mapstructexample.dto.request.EmployeeRequest;
+import com.gucardev.mapstructexample.dto.request.EmployeeSearchRequest;
 import com.gucardev.mapstructexample.service.EmployeeService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/employees")
 @RequiredArgsConstructor
@@ -25,10 +29,9 @@ public class EmployeeController {
   private final EmployeeService employeeService;
 
   @GetMapping
-  public List<EmployeeDto> getAllEmployees() {
-    return employeeService.getAllEmployees();
+  public Page<EmployeeDto> searchEmployees(EmployeeSearchRequest searchRequest) {
+    return employeeService.searchEmployees(searchRequest);
   }
-
   @GetMapping("department/{departmentId}")
   public List<EmployeeDto> getAllEmployees(@PathVariable Long departmentId) {
     return employeeService.getAllEmployeesByDepartmentId(departmentId);

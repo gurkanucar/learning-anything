@@ -3,6 +3,7 @@ package com.gucardev.mapstructexample.config;
 import com.gucardev.mapstructexample.entity.Department;
 import com.gucardev.mapstructexample.entity.Employee;
 import com.gucardev.mapstructexample.entity.Project;
+import com.gucardev.mapstructexample.enumeration.StatusType;
 import com.gucardev.mapstructexample.repository.DepartmentRepository;
 import com.gucardev.mapstructexample.repository.EmployeeRepository;
 import com.gucardev.mapstructexample.repository.ProjectRepository;
@@ -46,24 +47,36 @@ public class InitialDataPopulate implements CommandLineRunner {
     Employee empJohn = new Employee();
     empJohn.setFirstName("John");
     empJohn.setLastName("Doe");
+    empJohn.setEmail("j@mail.com");
+    empJohn.setAge(25);
+    empJohn.setStatusType(StatusType.ACTIVE);
     empJohn.setHireDate(LocalDate.of(2020, 1, 10));
     empJohn.setDepartment(itDepartment);
 
     Employee empJane = new Employee();
     empJane.setFirstName("Jane");
     empJane.setLastName("Smith");
+    empJane.setEmail("smithj@mail.com");
+    empJane.setAge(42);
+    empJane.setStatusType(StatusType.PASSIVE);
     empJane.setHireDate(LocalDate.of(2021, 3, 5));
     empJane.setDepartment(itDepartment);
 
     Employee empAdam = new Employee();
     empAdam.setFirstName("Adam");
     empAdam.setLastName("Johnson");
+    empAdam.setLastName("Smith");
+    empAdam.setEmail("adam@mail.com");
+    empAdam.setAge(32);
     empAdam.setHireDate(LocalDate.of(2019, 11, 23));
     empAdam.setDepartment(hrDepartment);
 
     Employee empSusan = new Employee();
     empSusan.setFirstName("Susan");
     empSusan.setLastName("Brown");
+    empSusan.setLastName("Smith");
+    empSusan.setEmail("brsmith@mail.com");
+    empSusan.setAge(37);
     empSusan.setHireDate(LocalDate.of(2018, 5, 15));
     empSusan.setDepartment(hrDepartment);
 
