@@ -7,6 +7,7 @@ import {
   SortingState,
   createColumnHelper,
   flexRender,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 import { Eye, Edit, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { User } from "@/data";
@@ -18,6 +19,10 @@ type TableExample3Props = {
 export const TableExample3: React.FC<TableExample3Props> = ({ data }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
 
   const columnHelper = createColumnHelper<User>();
 
@@ -165,10 +170,14 @@ export const TableExample3: React.FC<TableExample3Props> = ({ data }) => {
   const table = useReactTable({
     data,
     columns,
-    state: { sorting },
+    state: { sorting, pagination },
     onSortingChange: setSorting,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: false, // We rely on built-in pagination
+    pageCount: Math.ceil(data.length / pagination.pageSize),
   });
 
   return (
@@ -194,31 +203,32 @@ export const TableExample3: React.FC<TableExample3Props> = ({ data }) => {
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} style={{ borderBottom: "1px solid #eee" }}>
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} style={{ padding: "0.5rem" }}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {table
+            .getRowModel()
+            .rows.map((row) => (
+              <tr key={row.id} style={{ borderBottom: "1px solid #eee" }}>
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} style={{ padding: "0.5rem" }}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
         </tbody>
       </table>
 
-      <div style={{ marginTop: "1rem" }}>
+      {/* Pagination Controls */}
+      <div style={{ marginTop: "1rem", display: "flex", gap: "1rem", alignItems: "center" }}>
         <p>{selectedRows.length} row(s) selected</p>
         <button
           onClick={() => handleAction("View")}
           disabled={selectedRows.length === 0}
-          style={{ marginRight: "0.5rem" }}
         >
           View
         </button>
         <button
           onClick={() => handleAction("Edit")}
           disabled={selectedRows.length === 0}
-          style={{ marginRight: "0.5rem" }}
         >
           Edit
         </button>
@@ -228,6 +238,38 @@ export const TableExample3: React.FC<TableExample3Props> = ({ data }) => {
         >
           Delete
         </button>
+      </div>
+
+      <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <span>Rows per page:</span>
+        <select
+          value={pagination.pageSize}
+          onChange={(e) =>
+            setPagination((prev) => ({
+              ...prev,
+              pageSize: Number(e.target.value),
+              pageIndex: 0,
+            }))
+          }
+        >
+          {[5, 10, 20].map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
+
+        <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+          Previous
+        </button>
+        <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+          Next
+        </button>
+
+        <span>
+          Page <strong>{table.getState().pagination.pageIndex + 1}</strong> of{" "}
+          {table.getPageCount()}
+        </span>
       </div>
     </div>
   );
