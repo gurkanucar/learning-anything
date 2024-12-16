@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -73,24 +74,21 @@ public class DepartmentService {
     departmentMapper.toSummaryDto(department);
   }
 
-
-  public DepartmentDto removeEmployeeFromDepartment(Long departmentId, Long employeeId) {
+  @Transactional
+  public void removeEmployeeFromDepartment(Long departmentId, Long employeeId) {
     Department department = getDepartmentById(departmentId);
     Employee employee = employeeService.getEmployeeById(employeeId);
-
-    // Check if employee is part of the department
+    // If the employee does NOT belong to this department, then nothing to remove.
     if (employee.getDepartment() == null || !employee.getDepartment().getId()
         .equals(departmentId)) {
-      throw new EntityNotFoundException("Employee not found in this department");
+      return;
     }
-
-    // Remove employee from department
+    // Otherwise, the employee is currently in this department and should be removed.
     employee.setDepartment(null);
+    employeeService.saveEmployeeEntity(employee);
     department.getEmployees().remove(employee);
-
-    departmentRepository.save(department);
-    return departmentMapper.toSummaryDto(department);
   }
+
 
   // Helper methods
   public Department getDepartmentById(Long id) {

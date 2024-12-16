@@ -62,9 +62,10 @@ public class DepartmentController {
   }
 
   @DeleteMapping("/{departmentId}/employees/{employeeId}")
-  public DepartmentDto removeEmployeeFromDepartment(@PathVariable Long departmentId,
+  public ResponseEntity<Object> removeEmployeeFromDepartment(@PathVariable Long departmentId,
       @PathVariable Long employeeId) {
-    return departmentService.removeEmployeeFromDepartment(departmentId, employeeId);
+    departmentService.removeEmployeeFromDepartment(departmentId, employeeId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
 }

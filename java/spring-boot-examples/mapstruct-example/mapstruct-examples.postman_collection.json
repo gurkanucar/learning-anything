@@ -153,6 +153,39 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "remove employee from department",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/departments/:departmentId/employees/:employeeId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"departments",
+								":departmentId",
+								"employees",
+								":employeeId"
+							],
+							"variable": [
+								{
+									"key": "departmentId",
+									"value": "3"
+								},
+								{
+									"key": "employeeId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
