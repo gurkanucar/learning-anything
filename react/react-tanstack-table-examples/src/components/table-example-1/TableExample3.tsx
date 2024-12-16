@@ -19,7 +19,7 @@ type User = {
   lastName: string;
   email: string;
   age: number;
-  status: string;
+  statusType: string;
 };
 
 /** Type for each column configuration */
@@ -62,6 +62,24 @@ function DataTable<TData extends { id: number }>(props: DataTableProps<TData>) {
   // Selection state
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
+  // Global search states
+  const [globalSearchTerm, setGlobalSearchTerm] = useState("");
+  const [globalFilter, setGlobalFilter] = useState("");
+
+  // Debounce global search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      // After debounce time elapses, set the globalFilter
+      setGlobalFilter(globalSearchTerm);
+      // Reset to first page when global filter changes
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [globalSearchTerm]);
+
   // Helper for building column definitions
   const columnHelper = createColumnHelper<TData>();
 
@@ -103,7 +121,7 @@ function DataTable<TData extends { id: number }>(props: DataTableProps<TData>) {
 
     // Prepare query params
     const params: any = {
-      page: pagination.pageIndex, // assuming API is 0-based or 1-based, adjust as needed
+      page: pagination.pageIndex, // Adjust if API is not zero-based
       pageSize: pagination.pageSize,
     };
 
@@ -119,6 +137,11 @@ function DataTable<TData extends { id: number }>(props: DataTableProps<TData>) {
       params[`${f.id}`] = f.value;
     });
 
+    // Global Filter
+    if (globalFilter) {
+      params.searchParam = globalFilter;
+    }
+
     try {
       const response = await axios.get(apiUrl, { params });
       // Assume the response structure: { content: TData[], totalElements: number }
@@ -132,7 +155,7 @@ function DataTable<TData extends { id: number }>(props: DataTableProps<TData>) {
     } finally {
       setIsLoading(false);
     }
-  }, [apiUrl, pagination, sorting, columnFilters]);
+  }, [apiUrl, pagination, sorting, columnFilters, globalFilter]);
 
   useEffect(() => {
     fetchData();
@@ -239,6 +262,17 @@ function DataTable<TData extends { id: number }>(props: DataTableProps<TData>) {
 
   return (
     <div>
+      {/* General Search Input */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+        <span>Global Search:</span>
+        <input
+          type="text"
+          value={globalSearchTerm}
+          onChange={(e) => setGlobalSearchTerm(e.target.value)}
+          style={{ padding: '0.5rem', fontSize: '1rem' }}
+        />
+      </div>
+
       <DataTableHeader selectedRows={selectedRows} onAction={handleAction} />
       {isLoading && <div>Loading...</div>}
       <DataTableBody table={table} />
@@ -416,9 +450,10 @@ export const MyDataTableExample: React.FC = () => {
   const columns: MyColumn<User>[] = [
     { header: "ID", accessor: "id", sortable: true, filterable: true },
     { header: "Name", accessor: "firstName", sortable: true, filterable: true },
+    { header: "Surname", accessor: "lastName", sortable: false, filterable: false },
     { header: "Email", accessor: "email", sortable: true, filterable: true },
     { header: "Age", accessor: "age", sortable: true, filterable: true },
-    { header: "Status", accessor: "status", sortable: true, filterable: true },
+    { header: "Status", accessor: "statusType", sortable: true, filterable: true },
     {
       header: "Actions",
       accessor: "id",
