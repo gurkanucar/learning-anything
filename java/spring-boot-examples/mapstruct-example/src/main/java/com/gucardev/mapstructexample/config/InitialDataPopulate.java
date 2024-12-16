@@ -68,6 +68,7 @@ public class InitialDataPopulate implements CommandLineRunner {
     empAdam.setLastName("Smith");
     empAdam.setEmail("adam@mail.com");
     empAdam.setAge(32);
+    empAdam.setStatusType(StatusType.ACTIVE);
     empAdam.setHireDate(LocalDate.of(2019, 11, 23));
     empAdam.setDepartment(hrDepartment);
 
@@ -77,6 +78,7 @@ public class InitialDataPopulate implements CommandLineRunner {
     empSusan.setLastName("Smith");
     empSusan.setEmail("brsmith@mail.com");
     empSusan.setAge(37);
+    empSusan.setStatusType(StatusType.ACTIVE);
     empSusan.setHireDate(LocalDate.of(2018, 5, 15));
     empSusan.setDepartment(hrDepartment);
 
