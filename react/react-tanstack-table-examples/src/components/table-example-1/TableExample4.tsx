@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import {
   ColumnDef,
@@ -11,7 +11,7 @@ import {
   useReactTable,
   ColumnFiltersState,
 } from "@tanstack/react-table";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -47,7 +47,6 @@ type MyColumn<TData> = {
 
 type FormValues = {
   globalSearchTerm: string;
-  [key: string]: string;
 };
 
 type DataTableProps<TData> = {
@@ -73,6 +72,10 @@ function DataTable<TData extends { id: number }>({
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
+  // State for managing the filter popover
+  const [openFilterForColumn, setOpenFilterForColumn] = useState<string | null>(null);
+  const [currentFilterValue, setCurrentFilterValue] = useState("");
+  
   const columnHelper = createColumnHelper<TData>();
 
   const toggleRowSelection = (id: number) => {
@@ -136,6 +139,54 @@ function DataTable<TData extends { id: number }>({
     fetchData();
   }, [fetchData]);
 
+  // Check if a particular column currently has a filter applied
+  function getColumnFilterValue(columnId: string): string | undefined {
+    return columnFilters.find((f) => f.id === columnId)?.value as string | undefined;
+  }
+
+  // Open or close the filter popover for a column
+  function toggleFilterPopover(columnId: string) {
+    if (openFilterForColumn === columnId) {
+      setOpenFilterForColumn(null);
+    } else {
+      const existingValue = getColumnFilterValue(columnId) || "";
+      setCurrentFilterValue(existingValue);
+      setOpenFilterForColumn(columnId);
+    }
+  }
+
+  // Save the filter value for the column
+  function saveFilter(columnId: string) {
+    const val = currentFilterValue.trim();
+    setOpenFilterForColumn(null);
+    setColumnFilters((old) => {
+      // Remove existing filter if any
+      const withoutCurrent = old.filter((f) => f.id !== columnId);
+      if (val) {
+        return [...withoutCurrent, { id: columnId, value: val }];
+      }
+      return withoutCurrent;
+    });
+    // After updating filters, refetch data
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    fetchData();
+  }
+
+  // Clear the filter for a column (from popover)
+  function clearFilter(columnId: string) {
+    setOpenFilterForColumn(null);
+    setColumnFilters((old) => old.filter((f) => f.id !== columnId));
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    fetchData();
+  }
+
+  // Quick clear (by clicking the X next to the icon)
+  function quickClearFilter(columnId: string) {
+    setColumnFilters((old) => old.filter((f) => f.id !== columnId));
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    fetchData();
+  }
+
   const selectionColumn: ColumnDef<TData, unknown> = {
     id: "select",
     header: ({ table }) => (
@@ -165,16 +216,73 @@ function DataTable<TData extends { id: number }>({
         },
         {
           id: typeof col.accessor === "string" ? col.accessor : String(col.accessor),
-          header: ({ column }) => (
-            <div className="flex flex-col gap-2">
-              <div
-                className={`${col.sortable ? "cursor-pointer" : ""} flex items-center gap-2`}
-                onClick={() => col.sortable && toggleSort(column.id)}
-              >
-                {col.header} {col.sortable && getSortIcon(column.id, sorting)}
+          header: ({ column }) => {
+            const columnId = column.id;
+            const hasFilter = getColumnFilterValue(columnId) !== undefined;
+            return (
+              <div className="flex flex-col gap-2 relative">
+                <div
+                  className={`${col.sortable ? "cursor-pointer" : ""} flex items-center gap-2`}
+                  onClick={(e) => {
+                    // Only sort if click not on the filter icons
+                    if ((e.target as HTMLElement).closest(".filter-icon")) return;
+                    col.sortable && toggleSort(column.id);
+                  }}
+                >
+                  {col.header} {col.sortable && getSortIcon(column.id, sorting)}
+
+                  {col.filterable && (
+                    <div className="filter-icon flex items-center gap-1">
+                      <Search
+                        className={`h-4 w-4 ${hasFilter ? "text-blue-500" : "text-gray-500"}`}
+                        onClick={() => toggleFilterPopover(columnId)}
+                        style={{ cursor: "pointer" }}
+                      />
+                      {hasFilter && (
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          onClick={() => quickClearFilter(columnId)}
+                        >
+                          ✕
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {openFilterForColumn === columnId && (
+                  <div
+                    className="absolute z-10 mt-2 p-2 border bg-white rounded shadow"
+                    style={{ top: "100%", left: 0 }}
+                  >
+                    <div className="flex flex-col gap-2">
+                      <Input
+                        value={currentFilterValue}
+                        onChange={(e) => setCurrentFilterValue(e.target.value)}
+                        placeholder={`Filter ${col.header}`}
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => clearFilter(columnId)}
+                        >
+                          Clear
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => saveFilter(columnId)}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          ),
+            );
+          },
           cell: (info) => {
             const row = info.row.original;
             const value = info.getValue();
@@ -204,29 +312,34 @@ function DataTable<TData extends { id: number }>({
   const { register, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
       globalSearchTerm: "",
-      ...Object.fromEntries(
-        myColumns
-          .filter((col) => col.filterable)
-          .map((col) => [String(col.accessor), ""])
-      ),
     },
   });
 
-  const onSubmit = (values: Record<string, string>) => {
+  const onSubmit = (values: FormValues) => {
     setGlobalFilter(values.globalSearchTerm || "");
-    const newColumnFilters: ColumnFiltersState = [];
-    myColumns.forEach((col) => {
-      if (col.filterable) {
-        const val = values[String(col.accessor)];
-        if (val?.trim()) {
-          newColumnFilters.push({ id: String(col.accessor), value: val });
-        }
-      }
-    });
-    setColumnFilters(newColumnFilters);
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     fetchData();
   };
+
+  async function handleAction(actionType: string) {
+    if (selectedRows.length === 0) return;
+    alert(`${actionType} action on IDs: ${selectedRows.join(", ")}`);
+
+    if (actionType === "Delete") {
+      const confirmed = window.confirm(`Are you sure you want to delete these items?`);
+      if (!confirmed) return;
+      try {
+        await Promise.all(selectedRows.map((id) => axios.delete(`${apiUrl}/${id}`)));
+        setSelectedRows([]);
+        await fetchData();
+      } catch (err) {
+        console.error("Error deleting items:", err);
+      }
+    } else {
+      // Just clear the selection after action
+      setSelectedRows([]);
+    }
+  }
 
   return (
     <Card>
@@ -234,6 +347,7 @@ function DataTable<TData extends { id: number }>({
         <CardTitle>Data Table</CardTitle>
       </CardHeader>
       <CardContent>
+        {/* Global Search Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mb-4">
           <div className="space-y-2">
             <div className="flex gap-4 items-end">
@@ -245,22 +359,6 @@ function DataTable<TData extends { id: number }>({
                 />
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {myColumns.map(
-                (col) =>
-                  col.filterable && (
-                    <div key={String(col.accessor)}>
-                      <Label htmlFor={String(col.accessor)}>{col.header}</Label>
-                      <Input
-                        id={String(col.accessor)}
-                        {...register(String(col.accessor))}
-                      />
-                    </div>
-                  )
-              )}
-            </div>
-
             <div className="flex gap-2">
               <Button type="submit">Search</Button>
               <Button
@@ -313,7 +411,7 @@ function DataTable<TData extends { id: number }>({
         {isLoading ? (
           <div className="flex justify-center py-8">Loading...</div>
         ) : (
-          <div className="rounded-md border">
+          <div className="rounded-md border relative">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -409,10 +507,6 @@ function getSortIcon(id: string, sorting: SortingState) {
   const currentSort = sorting.find((s) => s.id === id);
   if (!currentSort) return null;
   return currentSort.desc ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />;
-}
-
-function handleAction(actionType: string) {
-  alert(`${actionType} action will be handled here`);
 }
 
 export const MyDataTableExample: React.FC = () => {
