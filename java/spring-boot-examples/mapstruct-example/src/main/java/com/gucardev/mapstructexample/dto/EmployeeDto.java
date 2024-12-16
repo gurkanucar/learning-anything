@@ -1,5 +1,6 @@
 package com.gucardev.mapstructexample.dto;
 
+import com.gucardev.mapstructexample.enumeration.StatusType;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,6 +16,10 @@ public class EmployeeDto {
   private String lastName;
   private String fullName;
   private DepartmentDto department;
+  private String email;
+  private Integer age;
+  private StatusType statusType;
+
   private Long departmentId;
   private Long headOfDepartmentId;
   private Set<ProjectDto> projects;

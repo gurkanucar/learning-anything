@@ -2,14 +2,20 @@ package com.gucardev.mapstructexample.service;
 
 import com.gucardev.mapstructexample.dto.EmployeeDto;
 import com.gucardev.mapstructexample.dto.request.EmployeeRequest;
+import com.gucardev.mapstructexample.dto.request.EmployeeSearchRequest;
 import com.gucardev.mapstructexample.entity.Employee;
 import com.gucardev.mapstructexample.entity.Project;
 import com.gucardev.mapstructexample.mapper.EmployeeMapper;
 import com.gucardev.mapstructexample.repository.EmployeeRepository;
+import com.gucardev.mapstructexample.repository.EmployeeSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,11 +26,19 @@ public class EmployeeService {
   private final EmployeeMapper employeeMapper;
   private final ProjectService projectService; // Inject ProjectService
 
-  public List<EmployeeDto> getAllEmployees() {
-    return employeeRepository.findAll()
-        .stream()
-        .map(employeeMapper::toSummaryDto)
-        .toList();
+  public Page<EmployeeDto> searchEmployees(EmployeeSearchRequest request) {
+    Pageable pageable = PageRequest.of(
+        request.getPage(),
+        request.getPageSize(),
+        Sort.by(request.getSortOrder(), request.getSortBy())
+    );
+
+    Page<Employee> employeePage = employeeRepository.findAll(
+        EmployeeSpecification.createSpecification(request),
+        pageable
+    );
+
+    return employeePage.map(employeeMapper::toSummaryDto);
   }
 
   public EmployeeDto createEmployee(EmployeeRequest employeeRequest) {

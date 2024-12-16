@@ -1,6 +1,9 @@
 package com.gucardev.mapstructexample.entity;
 
+import com.gucardev.mapstructexample.enumeration.StatusType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,7 +26,12 @@ public class Employee extends BaseEntity {
 
   private String firstName;
   private String lastName;
+  private String email;
+  private Integer age;
   private LocalDate hireDate;
+
+  @Enumerated(EnumType.STRING)
+  private StatusType statusType;
 
   @ManyToOne
   @JoinColumn(name = "department_id")
