@@ -14,6 +14,20 @@ import {
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { useForm } from "react-hook-form";
 
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "../ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Input } from "../ui/input";
+
 type User = {
   id: number;
   firstName: string;
@@ -25,10 +39,15 @@ type User = {
 
 type MyColumn<TData> = {
   header: string;
-  accessor: keyof TData | string; // allow a string that may not be a key of TData
+  accessor: keyof TData | string;
   sortable?: boolean;
   renderCell?: (value: any, row: TData) => React.ReactNode;
   filterable?: boolean;
+};
+
+type FormValues = {
+  globalSearchTerm: string;
+  [key: string]: string;
 };
 
 type DataTableProps<TData> = {
@@ -72,40 +91,29 @@ function DataTable<TData extends { id: number }>({
   function toggleSort(id: string) {
     setSorting((prevSorting) => {
       const existingSort = prevSorting.find((s) => s.id === id);
-
-      if (!existingSort) {
-        return [{ id, desc: false }];
-      }
-
-      if (!existingSort.desc) {
-        return [{ id, desc: true }];
-      }
-
+      if (!existingSort) return [{ id, desc: false }];
+      if (!existingSort.desc) return [{ id, desc: true }];
       return [];
     });
   }
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
-
     const params: any = {
       page: pagination.pageIndex,
       pageSize: pagination.pageSize,
     };
 
-    // Sorting
     if (sorting.length > 0) {
       const sort = sorting[0];
       params.sortBy = sort.id;
       params.sortOrder = sort.desc ? "DESC" : "ASC";
     }
 
-    // Column Filters
     columnFilters.forEach((f) => {
       params[f.id] = f.value;
     });
 
-    // Global Filter
     if (globalFilter) {
       params.searchParam = globalFilter;
     }
@@ -131,28 +139,25 @@ function DataTable<TData extends { id: number }>({
   const selectionColumn: ColumnDef<TData, unknown> = {
     id: "select",
     header: ({ table }) => (
-      <input
-        type="checkbox"
+      <Checkbox
         checked={
           table.getRowModel().rows.length > 0 &&
           selectedRows.length === table.getRowModel().rows.length
         }
-        onChange={(e) => toggleSelectAll(e.target.checked)}
+        onCheckedChange={(checked) => toggleSelectAll(checked as boolean)}
       />
     ),
     cell: ({ row }) => (
-      <input
-        type="checkbox"
+      <Checkbox
         checked={selectedRows.includes(row.original.id)}
-        onChange={() => toggleRowSelection(row.original.id)}
+        onCheckedChange={() => toggleRowSelection(row.original.id)}
       />
     ),
   };
 
-  // Ensure each column has a unique id.
   const columnDefs: ColumnDef<TData, any>[] = [
     selectionColumn,
-    ...myColumns.map((col, index) =>
+    ...myColumns.map((col) =>
       columnHelper.accessor(
         (row) => {
           const accessorKey = typeof col.accessor === "string" ? col.accessor : String(col.accessor);
@@ -161,11 +166,9 @@ function DataTable<TData extends { id: number }>({
         {
           id: typeof col.accessor === "string" ? col.accessor : String(col.accessor),
           header: ({ column }) => (
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-            >
+            <div className="flex flex-col gap-2">
               <div
-                style={{ cursor: col.sortable ? "pointer" : "default" }}
+                className={`${col.sortable ? "cursor-pointer" : ""} flex items-center gap-2`}
                 onClick={() => col.sortable && toggleSort(column.id)}
               >
                 {col.header} {col.sortable && getSortIcon(column.id, sorting)}
@@ -198,35 +201,24 @@ function DataTable<TData extends { id: number }>({
     pageCount: Math.ceil(totalRows / pagination.pageSize),
   });
 
-  function handleAction(actionType: string) {
-    if (selectedRows.length > 0) {
-      alert(`${actionType} action on IDs: ${selectedRows.join(", ")}`);
-      setSelectedRows([]);
-      fetchData();
-    }
-  }
-
-  // ----- React Hook Form Integration -----
-  const defaultValues: Record<string, string> = { globalSearchTerm: "" };
-  myColumns.forEach((col) => {
-    if (col.filterable) {
-      defaultValues[String(col.accessor)] = "";
-    }
-  });
-
-  const { register, handleSubmit, reset } = useForm({
-    defaultValues,
+  const { register, handleSubmit, reset } = useForm<FormValues>({
+    defaultValues: {
+      globalSearchTerm: "",
+      ...Object.fromEntries(
+        myColumns
+          .filter((col) => col.filterable)
+          .map((col) => [String(col.accessor), ""])
+      ),
+    },
   });
 
   const onSubmit = (values: Record<string, string>) => {
-    const globalValue = values.globalSearchTerm || "";
-    setGlobalFilter(globalValue);
-
+    setGlobalFilter(values.globalSearchTerm || "");
     const newColumnFilters: ColumnFiltersState = [];
     myColumns.forEach((col) => {
       if (col.filterable) {
         const val = values[String(col.accessor)];
-        if (val && val.trim() !== "") {
+        if (val?.trim()) {
           newColumnFilters.push({ id: String(col.accessor), value: val });
         }
       }
@@ -237,223 +229,190 @@ function DataTable<TData extends { id: number }>({
   };
 
   return (
-    <div>
-      {/* The Search Form */}
-      <form onSubmit={handleSubmit(onSubmit)} style={{ marginBottom: "1rem" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <div>
-            <label style={{ marginRight: "1rem" }}>Global Search:</label>
-            <input
-              type="text"
-              {...register("globalSearchTerm")}
-              style={{ padding: "0.5rem", fontSize: "1rem" }}
-            />
-          </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Data Table</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mb-4">
+          <div className="space-y-2">
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <Label htmlFor="globalSearchTerm">Global Search</Label>
+                <Input
+                  id="globalSearchTerm"
+                  {...register("globalSearchTerm")}
+                />
+              </div>
+            </div>
 
-          {/* Column Filters */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-            {myColumns.map(
-              (col) =>
-                col.filterable && (
-                  <div key={col.accessor.toString()}>
-                    <label>{col.header}:</label>
-                    <input
-                      type="text"
-                      {...register(String(col.accessor))}
-                      style={{ fontSize: "0.9rem", padding: "0.25rem" }}
-                    />
-                  </div>
-                )
-            )}
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {myColumns.map(
+                (col) =>
+                  col.filterable && (
+                    <div key={String(col.accessor)}>
+                      <Label htmlFor={String(col.accessor)}>{col.header}</Label>
+                      <Input
+                        id={String(col.accessor)}
+                        {...register(String(col.accessor))}
+                      />
+                    </div>
+                  )
+              )}
+            </div>
 
-          <div>
-            <button type="submit">Search</button>
-            <button
-              type="button"
-              onClick={() => {
-                reset();
-                setGlobalFilter("");
-                setColumnFilters([]);
-                setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-                fetchData();
-              }}
-              style={{ marginLeft: "1rem" }}
+            <div className="flex gap-2">
+              <Button type="submit">Search</Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  reset();
+                  setGlobalFilter("");
+                  setColumnFilters([]);
+                  setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+                  fetchData();
+                }}
+              >
+                Clear
+              </Button>
+            </div>
+          </div>
+        </form>
+
+        <div className="mb-4 flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">
+            {selectedRows.length} row(s) selected
+          </p>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => handleAction("View")}
+            disabled={selectedRows.length === 0}
+          >
+            View
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => handleAction("Edit")}
+            disabled={selectedRows.length === 0}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => handleAction("Delete")}
+            disabled={selectedRows.length === 0}
+          >
+            Delete
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center py-8">Loading...</div>
+        ) : (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between space-x-2 py-4">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm font-medium">Rows per page</p>
+            <Select
+              value={String(table.getState().pagination.pageSize)}
+              onValueChange={(value) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  pageSize: Number(value),
+                  pageIndex: 0,
+                }))
+              }
             >
-              Clear
-            </button>
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue placeholder={table.getState().pagination.pageSize} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {pageSizeOptions.map((size) => (
+                  <SelectItem key={size} value={String(size)}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+            <div className="flex items-center gap-1">
+              <div className="text-sm font-medium">
+                Page {table.getState().pagination.pageIndex + 1} of{" "}
+                {table.getPageCount()}
+              </div>
+            </div>
+            <div className="text-sm font-medium">Total: {totalRows}</div>
           </div>
         </div>
-      </form>
-
-      <DataTableHeader selectedRows={selectedRows} onAction={handleAction} />
-      {isLoading && <div>Loading...</div>}
-      <DataTableBody table={table} />
-      <DataTablePagination
-        table={table}
-        pageSizeOptions={pageSizeOptions}
-        setPagination={setPagination}
-        totalRows={totalRows}
-      />
-    </div>
-  );
-}
-
-type DataTableHeaderProps = {
-  selectedRows: number[];
-  onAction: (action: string) => void;
-};
-function DataTableHeader({ selectedRows, onAction }: DataTableHeaderProps) {
-  return (
-    <div
-      style={{
-        marginBottom: "1rem",
-        display: "flex",
-        gap: "1rem",
-        alignItems: "center",
-      }}
-    >
-      <p>{selectedRows.length} row(s) selected</p>
-      <button
-        onClick={() => onAction("View")}
-        disabled={selectedRows.length === 0}
-      >
-        View
-      </button>
-      <button
-        onClick={() => onAction("Edit")}
-        disabled={selectedRows.length === 0}
-      >
-        Edit
-      </button>
-      <button
-        onClick={() => onAction("Delete")}
-        disabled={selectedRows.length === 0}
-      >
-        Delete
-      </button>
-    </div>
-  );
-}
-
-function DataTableBody<TData extends { id: number }>({
-  table,
-}: {
-  table: ReturnType<typeof useReactTable<TData>>;
-}) {
-  return (
-    <table style={{ borderCollapse: "collapse", width: "100%" }}>
-      <thead>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id}>
-            {headerGroup.headers.map((header) => {
-              return (
-                <th
-                  key={header.id}
-                  style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </th>
-              );
-            })}
-          </tr>
-        ))}
-      </thead>
-      <tbody>
-        {table.getRowModel().rows.map((row) => (
-          // row.id is unique as provided by react-table
-          <tr key={row.id} style={{ borderBottom: "1px solid #eee" }}>
-            {row.getVisibleCells().map((cell) => {
-              // cell.id is unique if each column has a unique id
-              return (
-                <td key={cell.id} style={{ padding: "0.5rem" }}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              );
-            })}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-type DataTablePaginationProps = {
-  table: ReturnType<typeof useReactTable<any>>;
-  pageSizeOptions: number[];
-  setPagination: React.Dispatch<
-    React.SetStateAction<{
-      pageIndex: number;
-      pageSize: number;
-    }>
-  >;
-  totalRows: number;
-};
-function DataTablePagination({
-  table,
-  pageSizeOptions,
-  setPagination,
-  totalRows,
-}: DataTablePaginationProps) {
-  return (
-    <div
-      style={{
-        marginTop: "1rem",
-        display: "flex",
-        gap: "0.5rem",
-        alignItems: "center",
-      }}
-    >
-      <span>Rows per page:</span>
-      <select
-        value={table.getState().pagination.pageSize}
-        onChange={(e) =>
-          setPagination((prev) => ({
-            ...prev,
-            pageSize: Number(e.target.value),
-            pageIndex: 0,
-          }))
-        }
-      >
-        {pageSizeOptions.map((size) => (
-          <option key={size} value={size}>
-            {size}
-          </option>
-        ))}
-      </select>
-
-      <button
-        onClick={() => table.previousPage()}
-        disabled={!table.getCanPreviousPage()}
-      >
-        Previous
-      </button>
-      <button
-        onClick={() => table.nextPage()}
-        disabled={!table.getCanNextPage()}
-      >
-        Next
-      </button>
-
-      <span>
-        Page <strong>{table.getState().pagination.pageIndex + 1}</strong> of{" "}
-        {table.getPageCount()}
-      </span>
-
-      <span>Total: {totalRows}</span>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
 function getSortIcon(id: string, sorting: SortingState) {
   const currentSort = sorting.find((s) => s.id === id);
   if (!currentSort) return null;
-  return currentSort.desc ? <ChevronDown /> : <ChevronUp />;
+  return currentSort.desc ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />;
+}
+
+function handleAction(actionType: string) {
+  alert(`${actionType} action will be handled here`);
 }
 
 export const MyDataTableExample: React.FC = () => {
@@ -464,15 +423,32 @@ export const MyDataTableExample: React.FC = () => {
     { header: "Email", accessor: "email", sortable: true, filterable: true },
     { header: "Age", accessor: "age", sortable: true, filterable: true },
     { header: "Status", accessor: "statusType", sortable: true, filterable: true },
-    // Use a unique accessor for actions so it does not clash with "id"
     {
       header: "Actions",
-      accessor: "actions", 
+      accessor: "actions",
       renderCell: (_, row) => (
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={() => alert(`Viewing user: ${row.id}`)}>View</button>
-          <button onClick={() => alert(`Editing user: ${row.id}`)}>Edit</button>
-          <button onClick={() => alert(`Deleting user: ${row.id}`)}>Delete</button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => alert(`Viewing user: ${row.id}`)}
+          >
+            View
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => alert(`Editing user: ${row.id}`)}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => alert(`Deleting user: ${row.id}`)}
+          >
+            Delete
+          </Button>
         </div>
       ),
     },
