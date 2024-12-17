@@ -1,0 +1,21 @@
+# Stage 1: Build the WAR file using a Maven image
+FROM maven:3.9.5-eclipse-temurin-17 AS build
+# Set the working directory in the Maven container
+WORKDIR /app
+# Copy the Maven project files into the container
+COPY pom.xml .
+COPY src ./src
+# Run the Maven package command to build the WAR file
+RUN mvn clean package -DskipTests
+# Stage 2: Deploy the WAR file to Tomcat
+FROM tomcat:10.1-jdk17
+# Set the working directory inside the Tomcat container
+WORKDIR /usr/local/tomcat
+# Remove the default ROOT application if needed
+RUN rm -rf webapps/ROOT
+# Copy the WAR file from the Maven build stage to the Tomcat webapps directory
+COPY --from=build /app/target/product-service-*.war webapps/ROOT.war
+# Expose the default Tomcat port
+EXPOSE 8080
+# Start Tomcat
+CMD ["catalina.sh", "run"]

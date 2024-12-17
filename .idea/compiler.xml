@@ -39,6 +39,16 @@
         <module name="spring-scopes" />
         <module name="dto-field-masker" />
       </profile>
+      <profile name="Annotation profile for dockerize-spring-boot-example" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="dockerize-spring-boot-example" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="gucardev" target="1.8" />
@@ -53,6 +63,7 @@
       <module name="caffeine-cache-example-1" options="-parameters" />
       <module name="db-config-parameters" options="-parameters" />
       <module name="debezium-cdc" options="-parameters" />
+      <module name="dockerize-spring-boot-example" options="-parameters" />
       <module name="dto-field-masker" options="-parameters" />
       <module name="entity-auditing" options="-parameters" />
       <module name="entity-encryption" options="-parameters" />

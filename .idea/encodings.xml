@@ -8,6 +8,7 @@
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/cache/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/db-config-parameters/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/debezium-cdc/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/java/spring-boot-examples/dockerize-spring-boot-example/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/dto-field-masker/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/entity-auditing/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/entity-encryption/src/main/java" charset="UTF-8" />

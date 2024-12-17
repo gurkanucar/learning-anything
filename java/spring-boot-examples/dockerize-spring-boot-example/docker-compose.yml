@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: project_db
+      MYSQL_USER: project_user
+      MYSQL_PASSWORD: project_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - project
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: --default-authentication-plugin=mysql_native_password
+
+  spring-boot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile-without_maven
+    container_name: spring_boot_app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/project_db?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: project_user
+      SPRING_DATASOURCE_PASSWORD: project_password
+    ports:
+      - "8080:8080"
+    networks:
+      - project
+
+networks:
+  project:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
