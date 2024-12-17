@@ -13,5 +13,6 @@
         <module>debezium-cdc</module>
         <module>redis-examples</module>
       <module>security</module>
+      <module>cache</module>
     </modules>
 </project>

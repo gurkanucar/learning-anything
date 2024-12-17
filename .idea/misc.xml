@@ -16,6 +16,8 @@
         <option value="$PROJECT_DIR$/java/spring-boot-examples/db-config-parameters/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/formula-calculated-fields/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/mapstruct-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/cache/caffein-cache-example-1/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/cache/caffeine-cache-example-1/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

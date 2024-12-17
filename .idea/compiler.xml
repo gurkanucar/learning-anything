@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
+    <excludeFromCompile>
+      <directory url="file://$PROJECT_DIR$/java/spring-boot-examples/cache/src/main/resources/archetype-resources" includeSubdirectories="true" />
+    </excludeFromCompile>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
@@ -9,6 +12,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="redis-examples" />
         <module name="security" />
+        <module name="cache" />
         <module name="mapstruct-example" />
         <module name="debezium-cdc" />
         <module name="formula-calculated-fields" />
@@ -17,6 +21,15 @@
         <module name="redis-caching-example" />
         <module name="spring-security-jwt-example" />
         <module name="sqs-example" />
+      </profile>
+      <profile name="Annotation profile for caffein-cache-example-1" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="caffeine-cache-example-1" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -27,6 +40,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="caffeine-cache-example-1" options="-parameters" />
       <module name="db-config-parameters" options="-parameters" />
       <module name="debezium-cdc" options="-parameters" />
       <module name="formula-calculated-fields" options="-parameters" />
