@@ -1,10 +1,10 @@
 package org.gucardev.awss3fileservice;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import software.amazon.awssdk.http.SdkHttpMethod;
 
 import java.io.IOException;
@@ -66,8 +66,9 @@ public class FileController {
     /**
      * Downloads a file.
      */
+
     @GetMapping("/download/{fileName}")
-    public ResponseEntity<StreamingResponseBody> downloadFile(@PathVariable("fileName") String fileName) throws Exception {
+    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable("fileName") String fileName) throws IOException {
         return fileService.downloadFileResponse(fileName);
     }
 

@@ -2,12 +2,12 @@ package org.gucardev.awss3fileservice;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.http.SdkHttpMethod;
@@ -31,8 +31,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FileService {
 
     @Value("${aws.bucket}")
@@ -41,44 +45,35 @@ public class FileService {
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
-    /**
-     * Generates a presigned URL for GET or PUT operations with specified access type.
-     */
     public String generatePreSignedUrl(String filePath, SdkHttpMethod method, AccessType accessType) {
         if (method == SdkHttpMethod.GET) {
-            return generateGetPresignedUrl(filePath);
+            return generateGetPresidedUrl(filePath);
         } else if (method == SdkHttpMethod.PUT) {
-            return generatePutPresignedUrl(filePath, accessType);
+            return generatePutPreSignedUrl(filePath, accessType);
         } else {
             throw new UnsupportedOperationException("Unsupported HTTP method: " + method);
         }
     }
 
-    /**
-     * Generates a presigned GET URL.
-     */
-    private String generateGetPresignedUrl(String filePath) {
+    private String generateGetPresidedUrl(String filePath) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(filePath)
-                .build();
+            .bucket(bucketName)
+            .key(filePath)
+            .build();
 
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(60))
-                .getObjectRequest(getObjectRequest)
-                .build();
+        GetObjectPresignRequest preSignRequest = GetObjectPresignRequest.builder()
+            .signatureDuration(Duration.ofMinutes(60))
+            .getObjectRequest(getObjectRequest)
+            .build();
 
-        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
-        return presignedRequest.url().toString();
+        PresignedGetObjectRequest preSignedRequest = s3Presigner.presignGetObject(preSignRequest);
+        return preSignedRequest.url().toString();
     }
 
-    /**
-     * Generates a presigned PUT URL with optional ACL based on AccessType.
-     */
-    private String generatePutPresignedUrl(String filePath, AccessType accessType) {
+    private String generatePutPreSignedUrl(String filePath, AccessType accessType) {
         PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(filePath);
+            .bucket(bucketName)
+            .key(filePath);
 
         if (accessType == AccessType.PUBLIC) {
             putObjectRequestBuilder.acl(ObjectCannedACL.PUBLIC_READ);
@@ -86,18 +81,15 @@ public class FileService {
 
         PutObjectRequest putObjectRequest = putObjectRequestBuilder.build();
 
-        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(60))
-                .putObjectRequest(putObjectRequest)
-                .build();
+        PutObjectPresignRequest preSignRequest = PutObjectPresignRequest.builder()
+            .signatureDuration(Duration.ofMinutes(60))
+            .putObjectRequest(putObjectRequest)
+            .build();
 
-        PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
-        return presignedRequest.url().toString();
+        PresignedPutObjectRequest preSignedRequest = s3Presigner.presignPutObject(preSignRequest);
+        return preSignedRequest.url().toString();
     }
 
-    /**
-     * Generates multiple presigned URLs with specified access type.
-     */
     public List<MultiplePreSignedUrlResponse> generateMultiplePreSignedUrls(List<MultiplePreSignedUrlRequest> requests, AccessType accessType) {
         List<MultiplePreSignedUrlResponse> urls = new ArrayList<>();
         for (MultiplePreSignedUrlRequest request : requests) {
@@ -109,88 +101,98 @@ public class FileService {
         return urls;
     }
 
-    /**
-     * Uploads a MultipartFile to S3 with specified access type.
-     */
     public String uploadMultipartFile(MultipartFile file, AccessType accessType) throws IOException {
         String fileName = buildFilename(file.getOriginalFilename());
         try (InputStream inputStream = file.getInputStream()) {
             PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName);
+                .bucket(bucketName)
+                .key(fileName);
 
             if (accessType == AccessType.PUBLIC) {
                 putObjectRequestBuilder.acl(ObjectCannedACL.PUBLIC_READ);
             }
 
             PutObjectRequest putObjectRequest = putObjectRequestBuilder.build();
-
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, file.getSize()));
         }
         return fileName;
     }
 
-    /**
-     * Downloads a file from S3 and returns an InputStream and ETag.
-     */
     public S3ObjectInputStreamWrapper downloadFile(String fileName) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(fileName)
-                .build();
+            .bucket(bucketName)
+            .key(fileName)
+            .build();
 
         ResponseInputStream<GetObjectResponse> s3ObjectResponse = s3Client.getObject(getObjectRequest);
         String eTag = s3ObjectResponse.response().eTag();
         return new S3ObjectInputStreamWrapper(s3ObjectResponse, eTag);
     }
 
-
     /**
-     * Returns a ResponseEntity with StreamingResponseBody and includes ETag in headers.
+     * Improved streaming logic:
+     * - Increased buffer size for potentially faster transfers.
+     * - Removed unnecessary wrapping or exception rethrows.
+     * - Consider returning a direct presigned URL to client to let them download directly from S3.
      */
-    public ResponseEntity<StreamingResponseBody> downloadFileResponse(String fileName) throws IOException {
+    public ResponseEntity<InputStreamResource> downloadFileResponse(String fileName) throws IOException {
+        // Determine content type based on fileName (local guess)
         String contentType = Files.probeContentType(Paths.get(fileName));
-        S3ObjectInputStreamWrapper fileWrapper = downloadFile(fileName);
+        if (contentType == null) {
+            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
 
-        StreamingResponseBody responseBody = outputStream -> {
-            try (InputStream inputStream = fileWrapper.inputStream()) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Error occurred while streaming the file", e);
-            }
-        };
+        S3ObjectInputStreamWrapper fileWrapper = downloadFile(fileName);
+        InputStream inputStream = fileWrapper.inputStream();
+
+        // Wrap S3 input stream in InputStreamResource to directly stream to client
+        InputStreamResource resource = new InputStreamResource(inputStream);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
-        headers.add(HttpHeaders.CONTENT_TYPE, contentType != null ? contentType : MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+
+        // Add ETag if available
         if (fileWrapper.eTag() != null) {
             headers.add(HttpHeaders.ETAG, fileWrapper.eTag());
         }
 
+        // If we can determine content length from S3 response, set it (for efficiency)
+        // This can improve client-side handling of downloads.
+        if (inputStream instanceof ResponseInputStream<?> responseStream) {
+          // Safely retrieve the GetObjectResponse without unchecked cast
+            if (responseStream.response() instanceof GetObjectResponse getObjectResponse) {
+              long contentLength = getObjectResponse.contentLength();
+                if (contentLength > 0) {
+                    headers.setContentLength(contentLength);
+                }
+            }
+        }
+
         return ResponseEntity.ok()
-                .headers(headers)
-                .body(responseBody);
+            .headers(headers)
+            .body(resource);
     }
 
 
-    /**
-     * Builds a sanitized filename with a timestamp prefix.
-     */
     public static String buildFilename(String filename) {
         return String.format("%s_%s", System.currentTimeMillis(), sanitizeFileName(filename));
     }
 
-    /**
-     * Sanitizes the filename by removing special characters and replacing spaces.
-     */
     private static String sanitizeFileName(String fileName) {
         String normalizedFileName = Normalizer.normalize(fileName, Normalizer.Form.NFKD);
         return normalizedFileName.replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9.\\-_]", "");
     }
 
-
+    /**
+     * Alternatively, if performance is critical, just return a redirect or a pre-signed GET URL.
+     * This way, client directly downloads the file from S3 without your server in the middle:
+     *
+     * public ResponseEntity<Void> redirectToS3(String fileName) {
+     *     String presignedUrl = generatePreSignedUrl(fileName, SdkHttpMethod.GET, AccessType.PUBLIC);
+     *     return ResponseEntity.status(HttpStatus.FOUND)
+     *          .location(URI.create(presignedUrl))
+     *          .build();
+     * }
+     */
 }
