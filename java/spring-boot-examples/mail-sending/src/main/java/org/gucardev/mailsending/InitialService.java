@@ -1,4 +1,4 @@
-package org.gucardev.awssesmailsending;
+package org.gucardev.mailsending;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.gucardev.awssesmailsending.dto.EmailRequest;
-import org.gucardev.awssesmailsending.dto.HtmlEmailRequest;
+import org.gucardev.mailsending.dto.EmailRequest;
+import org.gucardev.mailsending.dto.HtmlEmailRequest;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

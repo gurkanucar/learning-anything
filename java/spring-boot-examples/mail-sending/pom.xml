@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.gucardev</groupId>
-	<artifactId>aws-ses-mail-sending</artifactId>
+	<artifactId>mail-sending</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>aws-ses-mail-sending</name>
 	<description>aws-ses-mail-sending</description>

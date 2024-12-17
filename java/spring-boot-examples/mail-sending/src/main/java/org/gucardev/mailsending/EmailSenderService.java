@@ -1,9 +1,9 @@
-package org.gucardev.awssesmailsending;
+package org.gucardev.mailsending;
 
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.gucardev.awssesmailsending.dto.HtmlEmailRequest;
+import org.gucardev.mailsending.dto.HtmlEmailRequest;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;

@@ -35,6 +35,7 @@
         <option value="$PROJECT_DIR$/java/spring-boot-examples/kafka-example/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-boot-test/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/aws-s3-file-service/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/mail-sending/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

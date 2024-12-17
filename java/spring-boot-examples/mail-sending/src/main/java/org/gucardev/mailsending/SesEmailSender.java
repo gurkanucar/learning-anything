@@ -1,4 +1,4 @@
-package org.gucardev.awssesmailsending;
+package org.gucardev.mailsending;
 
 
 import com.amazonaws.AmazonServiceException;

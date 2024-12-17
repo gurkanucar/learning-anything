@@ -1,4 +1,4 @@
-package org.gucardev.awssesmailsending;
+package org.gucardev.mailsending;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

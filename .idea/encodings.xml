@@ -2,7 +2,6 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/aws-s3-file-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/java/spring-boot-examples/aws-ses-mail-sending/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/bulk_db_operations/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/cache/caffeine-cache-example-1/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/cache/src/main/java" charset="UTF-8" />
@@ -15,6 +14,7 @@
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/file-uploading-with-io/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/formula-calculated-fields/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/kafka-example/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/java/spring-boot-examples/mail-sending/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/mapstruct-example/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/optimistic-pessimistic-locking/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/pure-websocket/src/main/java" charset="UTF-8" />

@@ -1,4 +1,4 @@
-package org.gucardev.awssesmailsending.dto;
+package org.gucardev.mailsending.dto;
 
 public record HtmlEmailRequest(String subject, String to, String name, String templateName) {
 }

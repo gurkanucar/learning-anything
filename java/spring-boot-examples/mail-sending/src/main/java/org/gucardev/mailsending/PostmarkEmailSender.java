@@ -1,4 +1,4 @@
-package org.gucardev.awssesmailsending;
+package org.gucardev.mailsending;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -13,7 +13,6 @@
         <module name="spring-profiles" />
         <module name="pure-websocket" />
         <module name="utility" />
-        <module name="aws-ses-mail-sending" />
         <module name="kafka-example" />
         <module name="file-uploading-with-io" />
         <module name="optimistic-pessimistic-locking" />
@@ -29,6 +28,7 @@
         <module name="cache" />
         <module name="aws-s3-file-service" />
         <module name="spring-shell" />
+        <module name="mail-sending" />
         <module name="db-config-parameters" />
         <module name="redis-caching-example" />
         <module name="sqs-example" />
@@ -49,7 +49,6 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="aws-s3-file-service" options="-parameters" />
-      <module name="aws-ses-mail-sending" options="-parameters" />
       <module name="bulk_db_operations" options="-parameters" />
       <module name="caffeine-cache-example-1" options="-parameters" />
       <module name="db-config-parameters" options="-parameters" />
@@ -60,6 +59,7 @@
       <module name="file-uploading-with-io" options="-parameters" />
       <module name="formula-calculated-fields" options="-parameters" />
       <module name="kafka-example" options="-parameters" />
+      <module name="mail-sending" options="-parameters" />
       <module name="mapstruct-example" options="-parameters" />
       <module name="optimistic-pessimistic-locking" options="-parameters" />
       <module name="pure-websocket" options="-parameters" />
