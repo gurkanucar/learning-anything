@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 @EnableCaching
@@ -31,6 +32,7 @@ public class CacheConfig {
   @Value("${cache.expiration.seconds.cache2}")
   private int cache2ExpirationSeconds;
 
+  @Primary
   @Bean
   public CacheManager cacheManager() {
     CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
