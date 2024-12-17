@@ -18,6 +18,17 @@
         <option value="$PROJECT_DIR$/java/spring-boot-examples/mapstruct-example/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/cache/caffein-cache-example-1/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/cache/caffeine-cache-example-1/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/bulk_db_operations/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/aws-ses-mail-sending/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/dto-field-masker/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/entity-auditing/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/entity-encryption/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/file-uploading-with-io/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/optimistic-pessimistic-locking/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/pure-websocket/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/redis-examples/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/resillience4j/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-profiles/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
