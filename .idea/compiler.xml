@@ -11,27 +11,33 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="spring-profiles" />
-        <module name="cache" />
-        <module name="db-config-parameters" />
         <module name="pure-websocket" />
         <module name="utility" />
-        <module name="redis-caching-example" />
-        <module name="sqs-example" />
         <module name="aws-ses-mail-sending" />
-        <module name="resillience4j" />
+        <module name="kafka-example" />
         <module name="file-uploading-with-io" />
         <module name="optimistic-pessimistic-locking" />
-        <module name="redis-examples" />
         <module name="security" />
-        <module name="entity-auditing" />
         <module name="mapstruct-example" />
-        <module name="bulk_db_operations" />
         <module name="debezium-cdc" />
         <module name="formula-calculated-fields" />
-        <module name="dto-field-masker" />
         <module name="caffeine-cache-example-1" />
         <module name="entity-encryption" />
         <module name="spring-security-jwt-example" />
+        <module name="strategy-pattern" />
+        <module name="spring-boot-test" />
+        <module name="cache" />
+        <module name="aws-s3-file-service" />
+        <module name="spring-shell" />
+        <module name="db-config-parameters" />
+        <module name="redis-caching-example" />
+        <module name="sqs-example" />
+        <module name="resillience4j" />
+        <module name="redis-examples" />
+        <module name="entity-auditing" />
+        <module name="bulk_db_operations" />
+        <module name="spring-scopes" />
+        <module name="dto-field-masker" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -42,6 +48,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="aws-s3-file-service" options="-parameters" />
       <module name="aws-ses-mail-sending" options="-parameters" />
       <module name="bulk_db_operations" options="-parameters" />
       <module name="caffeine-cache-example-1" options="-parameters" />
@@ -52,15 +59,20 @@
       <module name="entity-encryption" options="-parameters" />
       <module name="file-uploading-with-io" options="-parameters" />
       <module name="formula-calculated-fields" options="-parameters" />
+      <module name="kafka-example" options="-parameters" />
       <module name="mapstruct-example" options="-parameters" />
       <module name="optimistic-pessimistic-locking" options="-parameters" />
       <module name="pure-websocket" options="-parameters" />
       <module name="redis-caching-example" options="-parameters" />
       <module name="resillience4j" options="-parameters" />
+      <module name="spring-boot-test" options="-parameters" />
       <module name="spring-profiles" options="-parameters" />
+      <module name="spring-scopes" options="-parameters" />
       <module name="spring-security-jwt-example" options="-parameters" />
+      <module name="spring-shell" options="-parameters" />
       <module name="sqs-example" options="-parameters" />
       <module name="sqsexample" options="-parameters" />
+      <module name="strategy-pattern" options="-parameters" />
       <module name="utility" options="-parameters" />
     </option>
   </component>

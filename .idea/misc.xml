@@ -29,6 +29,12 @@
         <option value="$PROJECT_DIR$/java/spring-boot-examples/redis-examples/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/resillience4j/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-profiles/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-scopes/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-shell/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/strategy-pattern/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/kafka-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-boot-test/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/aws-s3-file-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

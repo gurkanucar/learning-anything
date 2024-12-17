@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/java/spring-boot-examples/aws-s3-file-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/aws-ses-mail-sending/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/bulk_db_operations/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/cache/caffeine-cache-example-1/src/main/java" charset="UTF-8" />
@@ -13,6 +14,7 @@
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/entity-encryption/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/file-uploading-with-io/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/formula-calculated-fields/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/java/spring-boot-examples/kafka-example/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/mapstruct-example/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/optimistic-pessimistic-locking/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/pure-websocket/src/main/java" charset="UTF-8" />
@@ -23,10 +25,14 @@
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/security/spring-security-jwt-example/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/security/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/security/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/java/spring-boot-examples/spring-boot-test/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/spring-profiles/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/java/spring-boot-examples/spring-scopes/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/java/spring-boot-examples/spring-shell/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/sqs-example/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/java/spring-boot-examples/strategy-pattern/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot-examples/utility/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot/gucardev/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/java/spring-boot/gucardev/src/main/resources" charset="UTF-8" />
