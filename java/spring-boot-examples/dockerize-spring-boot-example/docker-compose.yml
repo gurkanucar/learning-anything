@@ -6,12 +6,12 @@ services:
     container_name: mysql_container
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: project_db
-      MYSQL_USER: project_user
-      MYSQL_PASSWORD: project_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -32,12 +32,12 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      MYSQL_HOST: mysql
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/project_db?useSSL=false&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: project_user
-      SPRING_DATASOURCE_PASSWORD: project_password
+      MYSQL_HOST: ${MYSQL_HOST}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     ports:
-      - "8080:8080"
+      - "${SPRING_BOOT_PORT}:8080"
     networks:
       - project
 

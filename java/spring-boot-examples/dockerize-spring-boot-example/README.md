@@ -112,12 +112,14 @@ ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
 # First, build the application with Maven
 mvn clean package -DskipTests
 
-# Then build and run with docker-compose
-docker-compose build --no-cache
-docker-compose up
+# Build without cache using .env.dev
+docker-compose --env-file .env.dev build --no-cache
 
-# Or to do both in one command (still need Maven build first)
-docker-compose up --build -d
+# Start containers using .env.dev
+docker-compose --env-file .env.dev up
+
+# Or to do both in one command (rebuild and start in detached mode)
+docker-compose --env-file .env.dev up --build -d
 ```
 
 ## Environment Variables
@@ -180,7 +182,7 @@ docker-compose down -v
 docker-compose logs -f
 
 # Rebuild without cache and start
-docker-compose build --no-cache && docker-compose up -d
+docker-compose build --no-cache && docker-compose --env-file .env.dev up -d
 
 # Stop all containers
 docker-compose down
