@@ -14,12 +14,14 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 @EnableCaching
-public class CacheConfig {
+public class CacheConfiguration {
 
   // Cache Name Constants
+  public static final String CACHE_ENTITIES = "entitiesCache";
   public static final String CACHE_ONE = "cache1";
   public static final String CACHE_TWO = "cache2";
 
+  // Cache Configuration Values
   @Value("${cache.default.initialCapacity}")
   private int initialCapacity;
 
@@ -37,10 +39,11 @@ public class CacheConfig {
   public CacheManager cacheManager() {
     CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
 
-    // Define cache configurations with dynamic properties
+    // Map of caches and their expiration settings
     Map<String, Duration> cacheConfigurations = Map.of(
         CACHE_ONE, Duration.ofSeconds(cache1ExpirationSeconds),
-        CACHE_TWO, Duration.ofSeconds(cache2ExpirationSeconds)
+        CACHE_TWO, Duration.ofSeconds(cache2ExpirationSeconds),
+        CACHE_ENTITIES, Duration.ofSeconds(20) // Default fallback
     );
 
     cacheConfigurations.forEach((cacheName, duration) ->
@@ -52,8 +55,7 @@ public class CacheConfig {
     return caffeineCacheManager;
   }
 
-  private Cache<Object, Object> cacheBuilder(int initialCapacity, int maximumSize,
-      Duration duration) {
+  private Cache<Object, Object> cacheBuilder(int initialCapacity, int maximumSize, Duration duration) {
     return Caffeine.newBuilder()
         .initialCapacity(initialCapacity)
         .maximumSize(maximumSize)

@@ -18,18 +18,10 @@
         <module name="formula-calculated-fields" />
         <module name="db-config-parameters" />
         <module name="utility" />
+        <module name="caffeine-cache-example-1" />
         <module name="redis-caching-example" />
         <module name="spring-security-jwt-example" />
         <module name="sqs-example" />
-      </profile>
-      <profile name="Annotation profile for caffein-cache-example-1" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-        </processorPath>
-        <module name="caffeine-cache-example-1" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
