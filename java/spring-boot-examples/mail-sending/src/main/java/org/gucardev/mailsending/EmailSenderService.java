@@ -18,13 +18,13 @@ public class EmailSenderService {
   private final SpringTemplateEngine templateEngine;
 
   public void sendEmail(String to, String subject, String body) {
-    sesEmailSender.sendEmail(to, subject, body);
-    postmarkEmailSender.sendEmail(to, subject, body);
+    //sesEmailSender.sendEmail(to, subject, body);
+    //postmarkEmailSender.sendEmail(to, subject, body);
   }
 
   public void sendHtmlEmail(String to, String subject, String body) {
-    sesEmailSender.sendHtmlEmail(to, subject, body);
-    postmarkEmailSender.sendEmail(to, subject, body);
+    //sesEmailSender.sendHtmlEmail(to, subject, body);
+    //postmarkEmailSender.sendEmail(to, subject, body);
   }
 
   public void htmlSend(HtmlEmailRequest HTMLrequest, Map<String, Object> model) {

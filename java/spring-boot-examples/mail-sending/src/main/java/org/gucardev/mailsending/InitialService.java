@@ -25,22 +25,43 @@ public class InitialService implements CommandLineRunner {
     var emailRequest = new EmailRequest(receiver, "subj", "deneme maili body");
     emailSenderService.sendEmail(emailRequest.to(), emailRequest.subject(), emailRequest.body());
 
-    // html template 1
-    var htmlEmailRequest = new HtmlEmailRequest("subj", receiver, "deneme", "account-password");
+    // html reset password template
+    var htmlEmailRequest = new HtmlEmailRequest("Reset Password", receiver,
+        "password-reset-modern");
     Map<String, Object> model = new HashMap<>();
-    model.put("name", htmlEmailRequest.name());
-    model.put("password", "123456");
+    model.put("company", "My Company");
+    model.put("name", "Ali Ozdemir");
+    model.put("reset_link", "https://www.google.com");
     emailSenderService.htmlSend(htmlEmailRequest, model);
 
-    // html template 2
-    htmlEmailRequest = new HtmlEmailRequest("subj", receiver, "deneme", "activate-account");
+    // html otp mail template
+    htmlEmailRequest = new HtmlEmailRequest("OTP Verification", receiver, "otp-mail-modern");
     model = new HashMap<>();
-    model.put("name", htmlEmailRequest.name());
-    model.put("link", "http://localhost:8080/user/@" + htmlEmailRequest.name());
+    model.put("company", "My Company");
+    model.put("name", "Metin Ozdemir");
+    model.put("otp_code", 352164);
+    emailSenderService.htmlSend(htmlEmailRequest, model);
+
+    // html activate account mail template
+    htmlEmailRequest = new HtmlEmailRequest("Activate Account", receiver,
+        "activate-account-modern");
+    model = new HashMap<>();
+    model.put("company", "My Company");
+    model.put("name", "Sezai Yalniz");
+    model.put("verify_link", "http://localhost:8080/verify/234asd32l32f");
+    emailSenderService.htmlSend(htmlEmailRequest, model);
+
+    // welcome mail template
+    htmlEmailRequest = new HtmlEmailRequest("Welcome!", receiver, "welcome-modern");
+    model = new HashMap<>();
+    model.put("company", "My Company");
+    model.put("name", "Sezai Yalniz");
+    model.put("dashboard_link", "http://localhost:8080/dashboard");
+    model.put("guide_link", "https://www.google.com");
     emailSenderService.htmlSend(htmlEmailRequest, model);
 
     // html template with table
-    htmlEmailRequest = new HtmlEmailRequest("subj-table", receiver, "deneme", "users");
+    htmlEmailRequest = new HtmlEmailRequest("subj-table", receiver, "users");
     // Dynamic columns and rows
     List<List<String>> tableData = new ArrayList<>();
     // Adding headers - column1, column2
