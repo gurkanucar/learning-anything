@@ -1,37 +1,150 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>User Table</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Table</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #2d3748;
+      margin: 0;
+      padding: 20px;
+      background-color: #f7fafc;
+    }
 
-        th, td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 30px;
+      background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-        th {
-            background-color: #f4f4f4;
-        }
-    </style>
+    h1 {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      margin: -30px -30px 30px -30px;
+      border-radius: 16px 16px 0 0;
+      font-size: 24px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: white;
+    }
+
+    th, td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background: linear-gradient(145deg, #f8faff 0%, #f0f5ff 100%);
+      color: #2563eb;
+      font-weight: 600;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    th:first-child {
+      border-top-left-radius: 12px;
+    }
+
+    th:last-child {
+      border-top-right-radius: 12px;
+    }
+
+    tr:last-child td:first-child {
+      border-bottom-left-radius: 12px;
+    }
+
+    tr:last-child td:last-child {
+      border-bottom-right-radius: 12px;
+    }
+
+    tbody tr {
+      transition: background-color 0.2s;
+    }
+
+    tbody tr:hover {
+      background-color: #f8faff;
+    }
+
+    /* Alternate row colors */
+    tbody tr:nth-child(even) {
+      background-color: #fafcff;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+        margin: 10px;
+      }
+
+      h1 {
+        margin: -15px -15px 20px -15px;
+        padding: 15px;
+        font-size: 20px;
+      }
+
+      th, td {
+        padding: 12px;
+        font-size: 14px;
+      }
+    }
+
+    /* Scrollbar styling */
+    .table-wrapper::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
 </head>
 <body>
-<h1>User List</h1>
-<table border="1" cellpadding="5">
-    <thead>
-    <tr>
+<div class="container">
+  <h1>User List</h1>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+      <tr>
         <th th:each="header : ${tableData[0]}" th:text="${header}"></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="row : ${tableData.subList(1, tableData.size())}">
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="row : ${tableData.subList(1, tableData.size())}">
         <td th:each="cell : ${row}" th:text="${cell}"></td>
-    </tr>
-    </tbody>
-</table>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 </body>
 </html>
