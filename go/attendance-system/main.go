@@ -73,13 +73,6 @@ func connectDB() error {
 	return nil
 }
 
-func realTimeAttendance(c *fiber.Ctx) error {
-	if websocket.IsWebSocketUpgrade(c) {
-		return c.Next()
-	}
-	return c.Status(fiber.StatusUpgradeRequired).SendString("Upgrade required")
-}
-
 func attendanceSocket(c *websocket.Conn) {
 	defer c.Close()
 	for {
@@ -103,7 +96,7 @@ func attendanceSocket(c *websocket.Conn) {
 		}
 
 		// Update every 5 seconds (adjust as needed)
-		time.Sleep(5 * time.Second)
+		time.Sleep(2 * time.Second)
 	}
 }
 
