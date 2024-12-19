@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Attendance</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Real-Time Attendance</h1>
+  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th>Lesson ID</th>
+        <th>Date</th>
+        <th>Students</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="3">Loading...</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    const tableBody = document.querySelector("#attendanceTable tbody");
+
+    function updateTable(data) {
+      tableBody.innerHTML = ""; // Clear existing rows
+      data.forEach(attendance => {
+        const row = document.createElement("tr");
+
+        const lessonCell = document.createElement("td");
+        lessonCell.textContent = attendance.lessonId;
+        row.appendChild(lessonCell);
+
+        const dateCell = document.createElement("td");
+        dateCell.textContent = new Date(attendance.date).toLocaleString();
+        row.appendChild(dateCell);
+
+        const studentsCell = document.createElement("td");
+        studentsCell.innerHTML = attendance.students
+          .map(s => `${s.studentId} (${s.present ? "Present" : "Absent"})`)
+          .join("<br>");
+        row.appendChild(studentsCell);
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    const socket = new WebSocket("ws://localhost:3000/ws/attendance");
+
+    socket.onmessage = event => {
+      const data = JSON.parse(event.data);
+      updateTable(data);
+    };
+
+    socket.onopen = () => {
+      console.log("Connected to WebSocket");
+    };
+
+    socket.onerror = error => {
+      console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+  </script>
+</body>
+</html>

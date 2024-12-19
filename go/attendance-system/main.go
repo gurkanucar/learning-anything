@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -72,6 +73,40 @@ func connectDB() error {
 	return nil
 }
 
+func realTimeAttendance(c *fiber.Ctx) error {
+	if websocket.IsWebSocketUpgrade(c) {
+		return c.Next()
+	}
+	return c.Status(fiber.StatusUpgradeRequired).SendString("Upgrade required")
+}
+
+func attendanceSocket(c *websocket.Conn) {
+	defer c.Close()
+	for {
+		// Send updated attendance data periodically
+		var attendances []Attendance
+		cursor, err := db.Collection("attendance").Find(context.Background(), bson.M{})
+		if err != nil {
+			log.Println("Failed to fetch attendance data:", err)
+			break
+		}
+		if err := cursor.All(context.Background(), &attendances); err != nil {
+			log.Println("Failed to parse attendance data:", err)
+			break
+		}
+		cursor.Close(context.Background())
+
+		// Send data as JSON
+		if err := c.WriteJSON(attendances); err != nil {
+			log.Println("Error sending attendance data:", err)
+			break
+		}
+
+		// Update every 5 seconds (adjust as needed)
+		time.Sleep(5 * time.Second)
+	}
+}
+
 func main() {
 	// Connect to MongoDB with retry
 	maxRetries := 5
@@ -106,6 +141,8 @@ func main() {
 	app.Post("/attendance", createAttendance)
 	app.Get("/attendance/:lessonId/:date", getAttendance)
 	app.Put("/attendance/:id/mark", markAttendance)
+
+	app.Get("/ws/attendance", websocket.New(attendanceSocket))
 
 	log.Println("Server starting on :3000")
 	log.Fatal(app.Listen(":3000"))
