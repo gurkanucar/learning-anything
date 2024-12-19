@@ -4,7 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Real-Time Attendance</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .left-panel, .right-panel {
+      flex: 1;
+      min-width: 300px;
+    }
+    .filters {
+      margin-bottom: 20px;
+    }
+    .filters label, .filters select, .filters input, .filters button {
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -17,56 +37,190 @@
     th {
       background-color: #f2f2f2;
     }
+    .present {
+      color: green;
+      font-weight: bold;
+    }
+    .absent {
+      color: red;
+      font-weight: bold;
+    }
+    canvas {
+      margin-top: 20px;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
   <h1>Real-Time Attendance</h1>
-  <table id="attendanceTable">
-    <thead>
-      <tr>
-        <th>Lesson ID</th>
-        <th>Date</th>
-        <th>Students</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td colspan="3">Loading...</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="container">
+    <!-- Left Panel: Filters and Attendance Table -->
+    <div class="left-panel">
+      <div class="filters">
+        <label for="lessonSelect">Lesson:</label>
+        <select id="lessonSelect">
+          <option value="">All Lessons</option>
+        </select>
+
+        <label for="dateSelect">Date:</label>
+        <input type="date" id="dateSelect" />
+        <button onclick="filterAttendance()">Filter</button>
+      </div>
+      <table id="attendanceTable">
+        <thead>
+          <tr>
+            <th>Lesson ID</th>
+            <th>Date</th>
+            <th>Student</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="4">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Right Panel: Graph -->
+    <div class="right-panel">
+      <canvas id="attendanceChart"></canvas>
+    </div>
+  </div>
 
   <script>
     const tableBody = document.querySelector("#attendanceTable tbody");
+    const lessonSelect = document.querySelector("#lessonSelect");
+    const dateSelect = document.querySelector("#dateSelect");
+    const attendanceChart = document.getElementById("attendanceChart").getContext("2d");
 
+    let allData = [];
+    let filteredData = [];
+    let chart;
+    let currentFilters = { lesson: "", date: "" }; // Store current filter selections
+
+    // Update attendance table
     function updateTable(data) {
       tableBody.innerHTML = ""; // Clear existing rows
+      const lessons = new Set();
+
       data.forEach(attendance => {
-        const row = document.createElement("tr");
+        attendance.students.forEach(student => {
+          const row = document.createElement("tr");
 
-        const lessonCell = document.createElement("td");
-        lessonCell.textContent = attendance.lessonId;
-        row.appendChild(lessonCell);
+          const lessonCell = document.createElement("td");
+          lessonCell.textContent = attendance.lessonId;
+          row.appendChild(lessonCell);
 
-        const dateCell = document.createElement("td");
-        dateCell.textContent = new Date(attendance.date).toLocaleString();
-        row.appendChild(dateCell);
+          const dateCell = document.createElement("td");
+          dateCell.textContent = new Date(attendance.date).toLocaleDateString();
+          row.appendChild(dateCell);
 
-        const studentsCell = document.createElement("td");
-        studentsCell.innerHTML = attendance.students
-          .map(s => `${s.studentId} (${s.present ? "Present" : "Absent"})`)
-          .join("<br>");
-        row.appendChild(studentsCell);
+          const studentCell = document.createElement("td");
+          studentCell.textContent = student.studentId;
+          row.appendChild(studentCell);
 
-        tableBody.appendChild(row);
+          const statusCell = document.createElement("td");
+          statusCell.innerHTML = student.present
+            ? '<span class="present">Present</span>'
+            : '<span class="absent">Absent</span>';
+          row.appendChild(statusCell);
+
+          tableBody.appendChild(row);
+        });
+
+        lessons.add(attendance.lessonId);
+      });
+
+      // Populate lesson dropdown if not populated
+      if (lessonSelect.options.length === 1) {
+        lessons.forEach(lesson => {
+          const option = document.createElement("option");
+          option.value = lesson;
+          option.textContent = lesson;
+          lessonSelect.appendChild(option);
+        });
+      }
+    }
+
+    // Filter attendance based on lesson and date
+    function filterAttendance() {
+      const selectedLesson = lessonSelect.value;
+      const selectedDate = dateSelect.value;
+
+      currentFilters.lesson = selectedLesson;
+      currentFilters.date = selectedDate;
+
+      filteredData = allData.filter(attendance => {
+        const matchesLesson = selectedLesson === "" || attendance.lessonId === selectedLesson;
+        const matchesDate =
+          !selectedDate ||
+          new Date(attendance.date).toISOString().split("T")[0] === selectedDate;
+        return matchesLesson && matchesDate;
+      });
+
+      updateTable(filteredData);
+      updateGraph(filteredData);
+    }
+
+    // Update attendance graph
+    function updateGraph(data) {
+      const labels = [...new Set(data.map(attendance => attendance.lessonId))];
+      const presentData = labels.map(lesson =>
+        data
+          .filter(attendance => attendance.lessonId === lesson)
+          .reduce((sum, attendance) => sum + attendance.students.filter(s => s.present).length, 0)
+      );
+      const absentData = labels.map(lesson =>
+        data
+          .filter(attendance => attendance.lessonId === lesson)
+          .reduce((sum, attendance) => sum + attendance.students.filter(s => !s.present).length, 0)
+      );
+
+      if (chart) chart.destroy();
+
+      chart = new Chart(attendanceChart, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Present",
+              data: presentData,
+              backgroundColor: "green",
+            },
+            {
+              label: "Absent",
+              data: absentData,
+              backgroundColor: "red",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              title: { display: true, text: "Lessons" },
+            },
+            y: {
+              title: { display: true, text: "Students Count" },
+              beginAtZero: true,
+            },
+          },
+        },
       });
     }
 
+    // WebSocket setup
     const socket = new WebSocket("ws://localhost:3000/ws/attendance");
 
     socket.onmessage = event => {
       const data = JSON.parse(event.data);
-      updateTable(data);
+      allData = data;
+
+      // Reapply current filters when new data arrives
+      filterAttendance();
     };
 
     socket.onopen = () => {
