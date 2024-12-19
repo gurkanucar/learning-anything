@@ -1,0 +1,364 @@
+{
+	"info": {
+		"_postman_id": "d6c9f73b-a570-4a07-9413-073682814afc",
+		"name": "s3 file upload",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23162952"
+	},
+	"item": [
+		{
+			"name": "presigned-public-upload",
+			"item": [
+				{
+					"name": "public upload-presigned",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/files/pre-signed-url?filename=test.pdf&accessType=PUBLIC",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"files",
+								"pre-signed-url"
+							],
+							"query": [
+								{
+									"key": "filename",
+									"value": "test.pdf"
+								},
+								{
+									"key": "accessType",
+									"value": "PUBLIC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload via presigned",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "X-AMZ-ACL",
+								"value": "public-read",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "/Users/gurkanucar/Downloads/test.pdf"
+							}
+						},
+						"url": {
+							"raw": "https://myawesomeuniquebucket.s3.amazonaws.com/1729957467694_test.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241026T154427Z&X-Amz-SignedHeaders=host%3Bx-amz-acl&X-Amz-Credential=AKIAYMCOFGJVFLVO2AMY%2F20241026%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=3600&X-Amz-Signature=084947089e037066627412bba9cacbc279cf0ae03b007b55ea957a5ba423792a",
+							"protocol": "https",
+							"host": [
+								"myawesomeuniquebucket",
+								"s3",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"1729957467694_test.pdf"
+							],
+							"query": [
+								{
+									"key": "X-Amz-Algorithm",
+									"value": "AWS4-HMAC-SHA256"
+								},
+								{
+									"key": "X-Amz-Date",
+									"value": "20241026T154427Z"
+								},
+								{
+									"key": "X-Amz-SignedHeaders",
+									"value": "host%3Bx-amz-acl"
+								},
+								{
+									"key": "X-Amz-Credential",
+									"value": "AKIAYMCOFGJVFLVO2AMY%2F20241026%2Fus-east-1%2Fs3%2Faws4_request"
+								},
+								{
+									"key": "X-Amz-Expires",
+									"value": "3600"
+								},
+								{
+									"key": "X-Amz-Signature",
+									"value": "084947089e037066627412bba9cacbc279cf0ae03b007b55ea957a5ba423792a"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "public read",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://myawesomeuniquebucket.s3.us-east-1.amazonaws.com/1729957467694_test.pdf",
+							"protocol": "https",
+							"host": [
+								"myawesomeuniquebucket",
+								"s3",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"1729957467694_test.pdf"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "presigned-private-upload",
+			"item": [
+				{
+					"name": "private upload-presigned",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/files/pre-signed-url?filename=test.pdf&accessType=PRIVATE",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"files",
+								"pre-signed-url"
+							],
+							"query": [
+								{
+									"key": "filename",
+									"value": "test.pdf"
+								},
+								{
+									"key": "accessType",
+									"value": "PRIVATE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload via presigned",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "/Users/gurkanucar/Downloads/test.pdf"
+							}
+						},
+						"url": {
+							"raw": "https://myawesomeuniquebucket.s3.amazonaws.com/1729958037118_test.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241026T155357Z&X-Amz-SignedHeaders=host&X-Amz-Credential=AKIAYMCOFGJVFLVO2AMY%2F20241026%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=3600&X-Amz-Signature=b5d50eee26d24667ba9d07095965f7e12be20008488418e3cffc4f58e3590a3f",
+							"protocol": "https",
+							"host": [
+								"myawesomeuniquebucket",
+								"s3",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"1729958037118_test.pdf"
+							],
+							"query": [
+								{
+									"key": "X-Amz-Algorithm",
+									"value": "AWS4-HMAC-SHA256"
+								},
+								{
+									"key": "X-Amz-Date",
+									"value": "20241026T155357Z"
+								},
+								{
+									"key": "X-Amz-SignedHeaders",
+									"value": "host"
+								},
+								{
+									"key": "X-Amz-Credential",
+									"value": "AKIAYMCOFGJVFLVO2AMY%2F20241026%2Fus-east-1%2Fs3%2Faws4_request"
+								},
+								{
+									"key": "X-Amz-Expires",
+									"value": "3600"
+								},
+								{
+									"key": "X-Amz-Signature",
+									"value": "b5d50eee26d24667ba9d07095965f7e12be20008488418e3cffc4f58e3590a3f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "public read [will not work]",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://myawesomeuniquebucket.s3.amazonaws.com/1729958037118_test.pdf",
+							"protocol": "https",
+							"host": [
+								"myawesomeuniquebucket",
+								"s3",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"1729958037118_test.pdf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get private read url",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/files/1729958037118_test.pdf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"files",
+								"1729958037118_test.pdf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "private read",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://myawesomeuniquebucket.s3.amazonaws.com/1729958037118_test.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20241026T160142Z&X-Amz-SignedHeaders=host&X-Amz-Credential=AKIAYMCOFGJVFLVO2AMY%2F20241026%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=3600&X-Amz-Signature=3e98837003c218607d07ffdc6e5d1c0b27fa89046254fe656e577d46dfb2ee62",
+							"protocol": "https",
+							"host": [
+								"myawesomeuniquebucket",
+								"s3",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"1729958037118_test.pdf"
+							],
+							"query": [
+								{
+									"key": "X-Amz-Algorithm",
+									"value": "AWS4-HMAC-SHA256"
+								},
+								{
+									"key": "X-Amz-Date",
+									"value": "20241026T160142Z"
+								},
+								{
+									"key": "X-Amz-SignedHeaders",
+									"value": "host"
+								},
+								{
+									"key": "X-Amz-Credential",
+									"value": "AKIAYMCOFGJVFLVO2AMY%2F20241026%2Fus-east-1%2Fs3%2Faws4_request"
+								},
+								{
+									"key": "X-Amz-Expires",
+									"value": "3600"
+								},
+								{
+									"key": "X-Amz-Signature",
+									"value": "3e98837003c218607d07ffdc6e5d1c0b27fa89046254fe656e577d46dfb2ee62"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "upload over java",
+			"item": [
+				{
+					"name": "multipart upload",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/gurkanucar/Downloads/test.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/files/upload",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"files",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get by name over java",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/files/download/1729958802565_test.pdf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"files",
+								"download",
+								"1729958802565_test.pdf"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

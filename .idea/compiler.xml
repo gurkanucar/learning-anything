@@ -1,22 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
+    <excludeFromCompile>
+      <directory url="file://$PROJECT_DIR$/java/spring-boot-examples/cache/src/main/resources/archetype-resources" includeSubdirectories="true" />
+    </excludeFromCompile>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="redis-examples" />
+        <module name="spring-profiles" />
+        <module name="pure-websocket" />
+        <module name="utility" />
+        <module name="kafka-example" />
+        <module name="file-uploading-with-io" />
+        <module name="optimistic-pessimistic-locking" />
         <module name="security" />
         <module name="mapstruct-example" />
         <module name="debezium-cdc" />
         <module name="formula-calculated-fields" />
-        <module name="db-config-parameters" />
-        <module name="utility" />
-        <module name="redis-caching-example" />
+        <module name="caffeine-cache-example-1" />
+        <module name="entity-encryption" />
         <module name="spring-security-jwt-example" />
+        <module name="strategy-pattern" />
+        <module name="spring-boot-test" />
+        <module name="cache" />
+        <module name="aws-s3-file-service" />
+        <module name="spring-shell" />
+        <module name="mail-sending" />
+        <module name="db-config-parameters" />
+        <module name="redis-caching-example" />
         <module name="sqs-example" />
+        <module name="resillience4j" />
+        <module name="redis-examples" />
+        <module name="entity-auditing" />
+        <module name="bulk_db_operations" />
+        <module name="spring-scopes" />
+        <module name="dto-field-masker" />
+      </profile>
+      <profile name="Annotation profile for dockerize-spring-boot-example" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="dockerize-spring-boot-example" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -27,14 +58,32 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="aws-s3-file-service" options="-parameters" />
+      <module name="bulk_db_operations" options="-parameters" />
+      <module name="caffeine-cache-example-1" options="-parameters" />
       <module name="db-config-parameters" options="-parameters" />
       <module name="debezium-cdc" options="-parameters" />
+      <module name="dockerize-spring-boot-example" options="-parameters" />
+      <module name="dto-field-masker" options="-parameters" />
+      <module name="entity-auditing" options="-parameters" />
+      <module name="entity-encryption" options="-parameters" />
+      <module name="file-uploading-with-io" options="-parameters" />
       <module name="formula-calculated-fields" options="-parameters" />
+      <module name="kafka-example" options="-parameters" />
+      <module name="mail-sending" options="-parameters" />
       <module name="mapstruct-example" options="-parameters" />
+      <module name="optimistic-pessimistic-locking" options="-parameters" />
+      <module name="pure-websocket" options="-parameters" />
       <module name="redis-caching-example" options="-parameters" />
+      <module name="resillience4j" options="-parameters" />
+      <module name="spring-boot-test" options="-parameters" />
+      <module name="spring-profiles" options="-parameters" />
+      <module name="spring-scopes" options="-parameters" />
       <module name="spring-security-jwt-example" options="-parameters" />
+      <module name="spring-shell" options="-parameters" />
       <module name="sqs-example" options="-parameters" />
       <module name="sqsexample" options="-parameters" />
+      <module name="strategy-pattern" options="-parameters" />
       <module name="utility" options="-parameters" />
     </option>
   </component>

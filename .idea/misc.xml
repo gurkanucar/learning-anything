@@ -16,6 +16,28 @@
         <option value="$PROJECT_DIR$/java/spring-boot-examples/db-config-parameters/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/formula-calculated-fields/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/mapstruct-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/cache/caffein-cache-example-1/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/cache/caffeine-cache-example-1/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/bulk_db_operations/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/aws-ses-mail-sending/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/dto-field-masker/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/entity-auditing/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/entity-encryption/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/file-uploading-with-io/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/optimistic-pessimistic-locking/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/pure-websocket/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/redis-examples/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/resillience4j/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-profiles/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-scopes/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-shell/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/strategy-pattern/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/kafka-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/spring-boot-test/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/aws-s3-file-service/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/mail-sending/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/dcokerize-spring-boot-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/dockerize-spring-boot-example/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

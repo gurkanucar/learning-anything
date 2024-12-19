@@ -1,0 +1,16 @@
+FROM eclipse-temurin:17-jre-focal
+WORKDIR /app
+# Create a non-root user for security
+RUN groupadd -r spring && useradd -r -g spring spring
+# Copy the pre-built jar from your local target directory
+COPY target/*.jar app.jar
+# Set ownership of the jar file to the spring user
+RUN chown spring:spring app.jar
+# Switch to non-root user
+USER spring:spring
+# Configure JVM options for containers
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+# Expose the application port
+EXPOSE 8080
+# Start the application
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

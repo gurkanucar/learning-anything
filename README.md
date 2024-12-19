@@ -1,3 +1,6 @@
-### This repository created for documentation about doing stuffs in different programing languages/framework/environments
+## Dev Notes Collection 🛠️
 
-#### i really tired to create new repository for each project :D
+### Got tired of making new repos for every tiny project... so here's everything in one place 😄
+
+---
+*Just trying to make life easier*
