@@ -1,15 +1,15 @@
 # Essential Configs
-## Helpfull commands
 
-## Update the package lists and upgrade the system
+```bash
+# Update the package lists and upgrade the system
 sudo apt-get update
 sudo apt upgrade -y
 
-## Install basic utilities
+# Install basic utilities
 sudo apt install ufw -y
 sudo apt-get install lsof
 
-## Enable the Uncomplicated Firewall
+# Enable the Uncomplicated Firewall
 sudo ufw enable
 
 # Add some useful aliases
@@ -66,3 +66,4 @@ alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'
 
 # Update aliases in the current session
 source ~/.bashrc
+```
