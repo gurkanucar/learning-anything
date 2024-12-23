@@ -42,4 +42,9 @@ public class DirectoryController {
   public void deleteDirectory(@PathVariable Long id) {
     directoryService.deleteDirectory(id);
   }
+
+  @GetMapping("/by-ids")
+  public List<DirectoryDTO> getDirectoriesByIds(@RequestParam List<Long> ids) {
+    return directoryService.getAllByIds(ids);
+  }
 }

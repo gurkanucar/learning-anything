@@ -52,5 +52,13 @@ public class DirectoryService {
         .toList();
   }
 
+  public List<DirectoryDTO> getAllByIds(List<Long> ids) {
+    // Fetch directories by IDs
+    List<Directory> directories = directoryRepository.findAllWithChildrenByIds(ids);
+    // Map to DTOs
+    return directories.stream()
+        .map(DirectoryMapper::toDTO)
+        .toList();
+  }
 
 }
