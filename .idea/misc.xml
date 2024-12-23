@@ -38,6 +38,7 @@
         <option value="$PROJECT_DIR$/java/spring-boot-examples/mail-sending/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/dcokerize-spring-boot-example/pom.xml" />
         <option value="$PROJECT_DIR$/java/spring-boot-examples/dockerize-spring-boot-example/pom.xml" />
+        <option value="$PROJECT_DIR$/java/spring-boot-examples/tree-directory-structure/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

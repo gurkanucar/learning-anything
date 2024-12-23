@@ -49,6 +49,15 @@
         </processorPath>
         <module name="dockerize-spring-boot-example" />
       </profile>
+      <profile name="Annotation profile for tree-directory-structure" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="tree-directory-structure" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="gucardev" target="1.8" />
@@ -84,6 +93,7 @@
       <module name="sqs-example" options="-parameters" />
       <module name="sqsexample" options="-parameters" />
       <module name="strategy-pattern" options="-parameters" />
+      <module name="tree-directory-structure" options="-parameters" />
       <module name="utility" options="-parameters" />
     </option>
   </component>
