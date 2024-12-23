@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface DirectoryRepository extends JpaRepository<Directory, Long> {
 
-
   @Query("SELECT d FROM Directory d WHERE d.parent IS NULL")
   List<Directory> findRootDirectories();
 

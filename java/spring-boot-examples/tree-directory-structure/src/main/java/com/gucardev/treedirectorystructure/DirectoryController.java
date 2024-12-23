@@ -38,6 +38,11 @@ public class DirectoryController {
     return directoryService.getDirectory(id);
   }
 
+  @GetMapping("/only-directory/{id}")
+  public DirectoryDTO getOnlyDirectory(@PathVariable Long id) {
+    return directoryService.getOnlyDirectory(id);
+  }
+
   @DeleteMapping("/{id}")
   public void deleteDirectory(@PathVariable Long id) {
     directoryService.deleteDirectory(id);

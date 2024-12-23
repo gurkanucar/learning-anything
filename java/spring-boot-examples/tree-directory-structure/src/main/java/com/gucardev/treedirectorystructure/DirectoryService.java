@@ -61,4 +61,15 @@ public class DirectoryService {
         .toList();
   }
 
+  public DirectoryDTO getOnlyDirectory(Long id) {
+    Directory directory = directoryRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Directory not found"));
+    // Map the entity to DTO (children will not be loaded due to LAZY fetching)
+    return new DirectoryDTO(
+        directory.getId(),
+        directory.getName(),
+        directory.getParent() != null ? directory.getParent().getId() : null
+    );
+  }
+
 }
