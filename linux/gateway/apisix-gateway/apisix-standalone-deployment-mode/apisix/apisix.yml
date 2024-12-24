@@ -8,7 +8,9 @@ upstreams:
     id: 1
     type: roundrobin
     nodes:
-      "192.168.0.5:8080": 1 # Changed from backend:80 to match your actual backend
+      "192.168.0.5:8080": 1  # Node 1 with weight 1
+      # "192.168.0.6:8080": 1  # Node 2 with weight 1
+    # retries: 3 # retry other nodes 3 times
     timeout:
       connect: 1 # 1 seconds to send the request
       send: 1 # 1 seconds to send the request
@@ -45,7 +47,7 @@ routes:
     plugins:
       basic-auth: {}
       limit-count:
-        count: 10
+        count: 20
         time_window: 60
         rejected_code: 429
         key_type: var
@@ -65,4 +67,5 @@ routes:
         expose_headers: "Content-Length,Content-Type"
         max_age: 3600
         allow_credential: true
+
 #END
