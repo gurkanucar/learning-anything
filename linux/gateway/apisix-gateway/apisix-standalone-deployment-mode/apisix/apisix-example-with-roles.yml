@@ -1,0 +1,153 @@
+# apisix.yaml (standalone mode)
+
+# ─────────────────────────────────────────────────────────
+#  UPSTREAMS
+# ─────────────────────────────────────────────────────────
+upstreams:
+  - name: "example-upstream"
+    id: 1
+    type: roundrobin
+    nodes:
+      "192.168.0.5:8080": 1 # Node 1 with weight 1
+      # "192.168.0.6:8080": 1  # Node 2 with weight 1
+    # retries: 3 # retry other nodes 3 times
+    timeout:
+      connect: 1 # 1 seconds to send the request
+      send: 1 # 1 seconds to send the request
+      read: 1 # 1 seconds to read the response
+      #connect: 0.7 # 700 milliseconds to send the request
+
+# ─────────────────────────────────────────────────────────
+#  CONSUMERS (for basic auth)
+# ─────────────────────────────────────────────────────────
+consumers:
+  # Admin consumer
+  - username: admin
+    plugins:
+      basic-auth:
+        username: admin
+        password: admin123
+
+  # User consumer
+  - username: user
+    plugins:
+      basic-auth:
+        username: user
+        password: user123
+# ─────────────────────────────────────────────────────────
+#  ROUTES
+# ─────────────────────────────────────────────────────────
+# 1) Public route - /firstapp/public/*
+#    - No authentication required.
+routes:
+  - name: "firstapp-public-route"
+    uri: /firstapp/public/*
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+      - OPTIONS
+      - HEAD
+    upstream_id: 1
+    # Public does not require any authentication, so no "basic-auth" or "consumer-restriction"
+    plugins:
+      # If you still want other plugins (like cors, proxy-rewrite, limit-count), add them below
+      proxy-rewrite:
+        scheme: http
+        regex_uri:
+          - "^/firstapp/public/(.*)"
+          - "/$1"
+        headers:
+          remove: ["Origin"]
+      cors:
+        allow_origins: "http://example.com,https://app.example.com,http://localhost:3000,http://localhost:8080,http://localhost:9080"
+        allow_methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS,HEAD"
+        allow_headers: "Authorization,Content-Type,Origin,Accept,X-Requested-With"
+        expose_headers: "Content-Length,Content-Type"
+        max_age: 3600
+        allow_credential: true
+
+  # 2) Orders route - /firstapp/orders/*
+  #    - Requires authentication from either admin or user.
+  - name: "firstapp-orders-route"
+    uri: /firstapp/orders/*
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+      - OPTIONS
+      - HEAD
+    upstream_id: 1
+    plugins:
+      # Basic Auth required
+      basic-auth: {}
+      # Only allow specific consumers
+      consumer-restriction:
+        whitelist: ["admin", "user"]
+      limit-count:
+        count: 20
+        time_window: 60
+        rejected_code: 429
+        key_type: var
+        key: remote_addr
+        policy: local
+      proxy-rewrite:
+        scheme: http
+        regex_uri:
+          - "^/firstapp/orders/(.*)"
+          - "/$1"
+        headers:
+          remove: ["Origin"]
+      cors:
+        allow_origins: "http://example.com,https://app.example.com,http://localhost:3000,http://localhost:8080,http://localhost:9080"
+        allow_methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS,HEAD"
+        allow_headers: "Authorization,Content-Type,Origin,Accept,X-Requested-With"
+        expose_headers: "Content-Length,Content-Type"
+        max_age: 3600
+        allow_credential: true
+
+  # 3) Configs route - /firstapp/configs/*
+  #    - Requires authentication from admin ONLY.
+  - name: "firstapp-configs-route"
+    uri: /firstapp/configs/*
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+      - OPTIONS
+      - HEAD
+    upstream_id: 1
+    plugins:
+      # Basic Auth required
+      basic-auth: {}
+      # Only allow admin consumer
+      consumer-restriction:
+        whitelist: ["admin"]
+      limit-count:
+        count: 20
+        time_window: 60
+        rejected_code: 429
+        key_type: var
+        key: remote_addr
+        policy: local
+      proxy-rewrite:
+        scheme: http
+        regex_uri:
+          - "^/firstapp/configs/(.*)"
+          - "/$1"
+        headers:
+          remove: ["Origin"]
+      cors:
+        allow_origins: "http://example.com,https://app.example.com,http://localhost:3000,http://localhost:8080,http://localhost:9080"
+        allow_methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS,HEAD"
+        allow_headers: "Authorization,Content-Type,Origin,Accept,X-Requested-With"
+        expose_headers: "Content-Length,Content-Type"
+        max_age: 3600
+        allow_credential: true
+#END
