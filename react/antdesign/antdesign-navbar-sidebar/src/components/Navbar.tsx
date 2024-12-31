@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Layout, Menu, Button, Dropdown, Space, Avatar, Switch } from 'antd';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import {
     MenuOutlined,
     UserOutlined,
@@ -34,6 +34,11 @@ export default function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
             key: '/dashboard',
             label: 'Dashboard',
             onClick: () => navigate('/dashboard'),
+        },
+        {
+            key: 'form',
+            label: 'Form Demo',
+            onClick: () => navigate('/form'),
         },
     ];
 

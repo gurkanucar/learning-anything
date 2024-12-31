@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import AuthLayout from './components/Layout/AuthLayout';
 import MainLayout from './components/Layout/MainLayout';
 import Dashboard from './pages/Dashboard';
+import FormDemo from './pages/FormDemo';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -45,6 +46,7 @@ function App() {
               </div>
             } />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/form" element={<FormDemo />} />
             {/* Add more main routes as needed */}
           </Route>
         </Routes>
