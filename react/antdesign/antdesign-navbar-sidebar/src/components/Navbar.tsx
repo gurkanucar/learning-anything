@@ -188,14 +188,6 @@ export default function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
                             border: 'none',
                             height: '100%',
                         }}
-                        itemStyle={{
-                            borderRadius: '6px',
-                            margin: '0 4px',
-                        }}
-                        selectedStyle={{
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            borderRadius: '6px',
-                        }}
                     />
                 </div>
 
@@ -250,7 +242,7 @@ export default function Navbar({ isDarkMode, toggleTheme }: NavbarProps) {
                 selectedKeys={[location.pathname]}
                 items={[
                     ...menuItems,
-                    { type: 'divider' },
+                    { type: 'divider' as const },
                     ...(isLoggedIn ? profileMenu : authMenu),
                 ].filter(Boolean)}
             />
