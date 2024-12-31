@@ -11,7 +11,7 @@ interface MainLayoutProps {
 
 export default function MainLayout({ isDarkMode, toggleTheme }: MainLayoutProps) {
   return (
-    <AntLayout style={{ minHeight: '100vh' }}>
+    <AntLayout className="main-layout" style={{ minHeight: '100vh' }}>
       <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       <Content style={{ 
         display: 'flex',

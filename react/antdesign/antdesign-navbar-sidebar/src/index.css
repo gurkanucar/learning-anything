@@ -1,5 +1,25 @@
+/* General styles */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Layout styles */
+.main-layout {
+  min-height: 100vh;
+}
+
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Navbar styles */
 .navbar {
+  padding: 0 16px;
   backdrop-filter: blur(10px);
 }
 
@@ -11,6 +31,7 @@
   background-color: rgba(255, 255, 255, 0.2) !important;
 }
 
+/* Mobile menu styles */
 .mobile-menu-button {
   display: none !important;
 }
@@ -58,15 +79,23 @@
 }
 
 /* Mobile menu drawer styles */
-.mobile-menu-drawer .ant-drawer-body {
-  padding: 0;
-}
-
-.mobile-menu-drawer .ant-menu {
+.mobile-menu {
   border-inline-end: none !important;
 }
 
-/* Add these styles to your existing CSS */
+.mobile-menu .ant-menu-item-selected {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+}
+
+.mobile-menu .ant-menu-item.ant-menu-item-danger {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid rgba(255, 77, 79, 0.2);
+  margin-top: 0;
+}
+
+/* Avatar and dropdown styles */
 .ant-avatar {
   transition: all 0.3s ease;
 }
@@ -84,31 +113,34 @@
   background-color: rgba(255, 77, 79, 0.1) !important;
 }
 
-.ant-menu-item-selected {
-  background-color: rgba(24, 144, 255, 0.1) !important;
-  color: #1890ff !important;
+.settings-menu {
+  width: 256px;
 }
 
-/* For mobile menu */
-.mobile-menu .ant-menu-item-selected {
-  background-color: rgba(24, 144, 255, 0.1) !important;
+/* Dashboard styles */
+.ant-card {
+  transition: all 0.3s ease;
 }
 
-/* Add these styles to your existing CSS */
-.ant-dropdown-menu {
-  padding: 4px 0 !important;
+.ant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
-  margin-top: 4px;
-  border-top: 1px solid rgba(255, 77, 79, 0.2);
+.ant-statistic-title {
+  margin-bottom: 8px !important;
 }
 
-/* Update mobile menu styles */
-.mobile-menu .ant-menu-item.ant-menu-item-danger {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  border-top: 1px solid rgba(255, 77, 79, 0.2);
-  margin-top: 0;
+.ant-statistic-content {
+  font-size: 24px !important;
+}
+
+@media (max-width: 576px) {
+  .ant-card {
+    margin-bottom: 16px;
+  }
+  
+  .ant-statistic-content {
+    font-size: 20px !important;
+  }
 }
