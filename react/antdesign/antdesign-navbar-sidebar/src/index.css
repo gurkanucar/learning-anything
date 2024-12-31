@@ -68,3 +68,20 @@
 .settings-menu {
   width: 256px;
 }
+
+/* Add this to your existing CSS */
+.desktop-menu .ant-menu-item {
+  border-radius: 6px !important;
+  margin: 12px 4px !important;
+  padding: 0 16px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+}
+
+.desktop-menu .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.desktop-menu .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
