@@ -23,14 +23,6 @@
   backdrop-filter: blur(10px);
 }
 
-.desktop-menu .ant-menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.desktop-menu .ant-menu-item-selected {
-  background-color: rgba(255, 255, 255, 0.2) !important;
-}
-
 /* Mobile menu styles */
 .mobile-menu-button {
   display: none !important;
@@ -60,12 +52,6 @@
   .navbar {
     padding: 0 16px !important;
   }
-
-  .mobile-menu .ant-menu-item,
-  .mobile-menu .ant-menu-submenu-title {
-    height: 48px !important;
-    line-height: 48px !important;
-  }
 }
 
 @media (max-width: 576px) {
@@ -78,69 +64,7 @@
   }
 }
 
-/* Mobile menu drawer styles */
-.mobile-menu {
-  border-inline-end: none !important;
-}
-
-.mobile-menu .ant-menu-item-selected {
-  background-color: rgba(24, 144, 255, 0.1) !important;
-}
-
-.mobile-menu .ant-menu-item.ant-menu-item-danger {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  border-top: 1px solid rgba(255, 77, 79, 0.2);
-  margin-top: 0;
-}
-
-/* Avatar and dropdown styles */
-.ant-avatar {
-  transition: all 0.3s ease;
-}
-
-.ant-avatar:hover {
-  opacity: 0.8;
-  transform: scale(1.05);
-}
-
-.ant-dropdown-menu-item-danger {
-  color: #ff4d4f !important;
-}
-
-.ant-dropdown-menu-item-danger:hover {
-  background-color: rgba(255, 77, 79, 0.1) !important;
-}
-
+/* Settings menu */
 .settings-menu {
   width: 256px;
-}
-
-/* Dashboard styles */
-.ant-card {
-  transition: all 0.3s ease;
-}
-
-.ant-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.ant-statistic-title {
-  margin-bottom: 8px !important;
-}
-
-.ant-statistic-content {
-  font-size: 24px !important;
-}
-
-@media (max-width: 576px) {
-  .ant-card {
-    margin-bottom: 16px;
-  }
-  
-  .ant-statistic-content {
-    font-size: 20px !important;
-  }
 }
