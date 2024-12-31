@@ -1,0 +1,114 @@
+/* Navbar styles */
+.navbar {
+  backdrop-filter: blur(10px);
+}
+
+.desktop-menu .ant-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.desktop-menu .ant-menu-item-selected {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.mobile-menu-button {
+  display: none !important;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .desktop-menu,
+  .desktop-controls {
+    display: none !important;
+  }
+
+  .mobile-menu-button {
+    display: flex !important;
+    align-items: center;
+    height: 64px;
+  }
+
+  .app-title {
+    font-size: 1rem !important;
+  }
+
+  .navbar {
+    padding: 0 16px !important;
+  }
+
+  .mobile-menu .ant-menu-item,
+  .mobile-menu .ant-menu-submenu-title {
+    height: 48px !important;
+    line-height: 48px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .user-name {
+    display: none;
+  }
+
+  .app-title {
+    font-size: 0.9rem !important;
+  }
+}
+
+/* Mobile menu drawer styles */
+.mobile-menu-drawer .ant-drawer-body {
+  padding: 0;
+}
+
+.mobile-menu-drawer .ant-menu {
+  border-inline-end: none !important;
+}
+
+/* Add these styles to your existing CSS */
+.ant-avatar {
+  transition: all 0.3s ease;
+}
+
+.ant-avatar:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+.ant-dropdown-menu-item-danger {
+  color: #ff4d4f !important;
+}
+
+.ant-dropdown-menu-item-danger:hover {
+  background-color: rgba(255, 77, 79, 0.1) !important;
+}
+
+.ant-menu-item-selected {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+  color: #1890ff !important;
+}
+
+/* For mobile menu */
+.mobile-menu .ant-menu-item-selected {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+}
+
+/* Add these styles to your existing CSS */
+.ant-dropdown-menu {
+  padding: 4px 0 !important;
+}
+
+.ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 77, 79, 0.2);
+}
+
+/* Update mobile menu styles */
+.mobile-menu .ant-menu-item.ant-menu-item-danger {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid rgba(255, 77, 79, 0.2);
+  margin-top: 0;
+}
