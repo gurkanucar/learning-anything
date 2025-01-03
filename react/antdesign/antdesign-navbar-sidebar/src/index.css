@@ -1,0 +1,87 @@
+/* General styles */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Layout styles */
+.main-layout {
+  min-height: 100vh;
+}
+
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Navbar styles */
+.navbar {
+  padding: 0 16px;
+  backdrop-filter: blur(10px);
+}
+
+/* Mobile menu styles */
+.mobile-menu-button {
+  display: none !important;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .desktop-menu,
+  .desktop-controls {
+    display: none !important;
+  }
+
+  .mobile-menu-button {
+    display: flex !important;
+    align-items: center;
+    height: 64px;
+  }
+
+  .app-title {
+    font-size: 1rem !important;
+  }
+
+  .navbar {
+    padding: 0 16px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .user-name {
+    display: none;
+  }
+
+  .app-title {
+    font-size: 0.9rem !important;
+  }
+}
+
+/* Settings menu */
+.settings-menu {
+  width: 256px;
+}
+
+/* Add this to your existing CSS */
+.desktop-menu .ant-menu-item {
+  border-radius: 6px !important;
+  margin: 12px 4px !important;
+  padding: 0 16px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+}
+
+.desktop-menu .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.desktop-menu .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
