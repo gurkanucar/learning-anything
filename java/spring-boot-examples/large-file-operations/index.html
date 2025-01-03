@@ -3,116 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>File Download Examples</title>
+  <title>Modern File Download</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      color: #333;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f6f8ff 0%, #f1f5fe 100%);
+      min-height: 100vh;
     }
 
-    .container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 500px;
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    h1 {
-      text-align: center;
-      color: #4caf50;
+    .download-button {
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
+    .download-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     }
 
-    input {
-      width: calc(100% - 20px);
-      padding: 10px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
+    .input-focus-ring {
+      transition: all 0.2s;
     }
 
-    button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 10px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    .message {
-      text-align: center;
-      margin-top: 10px;
-      color: #333;
-      font-size: 14px;
+    .input-focus-ring:focus {
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+      border-color: #4f46e5;
     }
   </style>
 </head>
-<body>
-<div class="container">
-  <h1>File Download</h1>
+<body class="flex items-center justify-center p-6">
+<div class="glass-effect w-full max-w-md p-8 rounded-2xl shadow-xl">
+  <h1 class="text-3xl font-semibold text-gray-800 text-center mb-8">
+    File Download
+  </h1>
 
-  <label for="fileName">Enter File Name:</label>
-  <input type="text" id="fileName" placeholder="e.g., myfile.txt" />
+  <div class="space-y-6">
+    <div>
+      <label for="fileName" class="block text-sm font-medium text-gray-700 mb-2">
+        Enter File Name
+      </label>
+      <input
+          type="text"
+          id="fileName"
+          placeholder="e.g., myfile.txt"
+          class="input-focus-ring w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none"
+      />
+    </div>
 
-  <h2>Choose a Download Method:</h2>
-  <button onclick="downloadFile('/download')">Download (Resource Approach)</button>
-  <button onclick="downloadFile('/download2')">Download (Files.copy)</button>
-  <button onclick="downloadFile('/download/stream')">Download (StreamingResponseBody)</button>
+    <div>
+      <h2 class="text-lg font-medium text-gray-800 mb-4">Choose a Download Method</h2>
+      <div class="space-y-3">
+        <button onclick="downloadFile('/download')" class="download-button w-full py-3 px-4 rounded-lg text-white font-medium">
+          Resource Approach
+        </button>
+        <button onclick="downloadFile('/download2')" class="download-button w-full py-3 px-4 rounded-lg text-white font-medium">
+          Files.copy Method
+        </button>
+        <button onclick="downloadFile('/download/stream')" class="download-button w-full py-3 px-4 rounded-lg text-white font-medium">
+          StreamingResponseBody
+        </button>
+      </div>
+    </div>
 
-  <div id="message" class="message"></div>
+    <div id="message" class="text-center text-sm font-medium text-gray-600 mt-4 h-6"></div>
+  </div>
 </div>
 
 <script>
-  /**
-   * Function to download a file using the selected method
-   * @param {string} method - The download method endpoint
-   */
   function downloadFile(method) {
     const fileName = document.getElementById("fileName").value;
     const message = document.getElementById("message");
 
     if (!fileName) {
-      alert("Please enter a file name.");
+      message.textContent = "Please enter a file name";
+      message.className = "text-center text-sm font-medium text-red-500 mt-4 h-6";
       return;
     }
 
     const downloadUrl = `http://localhost:8080/api/files${method}/${fileName}`;
 
-    // Create an invisible link element to trigger the download
     const link = document.createElement("a");
     link.href = downloadUrl;
     link.download = fileName;
-    document.body.appendChild(link); // Required for Firefox
+    document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    // Display a message to the user
-    message.innerHTML = "Download in progress...";
+    message.className = "text-center text-sm font-medium text-indigo-600 mt-4 h-6";
+    message.textContent = "Download in progress...";
+
     setTimeout(() => {
-      message.innerHTML = "Download complete!";
+      message.className = "text-center text-sm font-medium text-green-600 mt-4 h-6";
+      message.textContent = "Download complete!";
     }, 3000);
   }
 </script>
