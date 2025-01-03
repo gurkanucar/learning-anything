@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Download Examples</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4caf50;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 10px;
+      color: #333;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>File Download</h1>
+
+  <label for="fileName">Enter File Name:</label>
+  <input type="text" id="fileName" placeholder="e.g., myfile.txt" />
+
+  <h2>Choose a Download Method:</h2>
+  <button onclick="downloadFile('/download')">Download (Resource Approach)</button>
+  <button onclick="downloadFile('/download2')">Download (Files.copy)</button>
+  <button onclick="downloadFile('/download/stream')">Download (StreamingResponseBody)</button>
+
+  <div id="message" class="message"></div>
+</div>
+
+<script>
+  /**
+   * Function to download a file using the selected method
+   * @param {string} method - The download method endpoint
+   */
+  function downloadFile(method) {
+    const fileName = document.getElementById("fileName").value;
+    const message = document.getElementById("message");
+
+    if (!fileName) {
+      alert("Please enter a file name.");
+      return;
+    }
+
+    const downloadUrl = `http://localhost:8080/api/files${method}/${fileName}`;
+
+    // Create an invisible link element to trigger the download
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = fileName;
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+    document.body.removeChild(link);
+
+    // Display a message to the user
+    message.innerHTML = "Download in progress...";
+    setTimeout(() => {
+      message.innerHTML = "Download complete!";
+    }, 3000);
+  }
+</script>
+</body>
+</html>

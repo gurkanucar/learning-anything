@@ -39,15 +39,14 @@
         <module name="spring-scopes" />
         <module name="dto-field-masker" />
       </profile>
-      <profile name="Annotation profile for dockerize-spring-boot-example" enabled="true">
+      <profile name="Annotation profile for large-file-operations" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
-        <module name="dockerize-spring-boot-example" />
+        <module name="large-file-operations" />
       </profile>
       <profile name="Annotation profile for tree-directory-structure" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -55,8 +54,10 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
         <module name="tree-directory-structure" />
+        <module name="dockerize-spring-boot-example" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -79,6 +80,7 @@
       <module name="file-uploading-with-io" options="-parameters" />
       <module name="formula-calculated-fields" options="-parameters" />
       <module name="kafka-example" options="-parameters" />
+      <module name="large-file-operations" options="-parameters" />
       <module name="mail-sending" options="-parameters" />
       <module name="mapstruct-example" options="-parameters" />
       <module name="optimistic-pessimistic-locking" options="-parameters" />
