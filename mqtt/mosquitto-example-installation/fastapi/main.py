@@ -9,6 +9,7 @@ users_db = {
     "test": {"password": "pass", "superuser": False},
     "admin": {"password": "pass", "superuser": True},
     "user1": {"password": "pass", "superuser": False},
+    "user2": {"password": "pass", "superuser": False},
 }
 
 # Define Pydantic models for incoming request data
