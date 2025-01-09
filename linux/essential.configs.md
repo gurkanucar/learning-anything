@@ -11,6 +11,10 @@ sudo apt-get install lsof
 
 # Enable the Uncomplicated Firewall
 sudo ufw enable
+sudo ufw allow ssh
+
+mkdir -p /opt/apps/{dev,test}/{go,java,javascript}
+
 
 # Add some useful aliases
 echo "
@@ -48,7 +52,7 @@ alias meminfo='free -m -l -t'
 ## get top process eating memory
 alias psmem='ps auxf | sort -nr -k 4'
 alias psmem10='ps auxf | sort -nr -k 4 | head -10'
- 
+
 ## get top process eating cpu ##
 alias pscpu='ps auxf | sort -nr -k 3'
 alias pscpu10='ps auxf | sort -nr -k 3 | head -10'
