@@ -1,0 +1,27 @@
+version: "3"
+services:
+  mosquitto:
+    image: iegomez/mosquitto-go-auth:2.1.0-mosquitto_1.6.14
+    container_name: mosquitto
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    ports:
+      - 1884:1883
+    depends_on:
+      - fastapi
+    networks:
+      - mqtt-network
+
+  fastapi:
+    build: ./fastapi
+    container_name: fastapi
+    ports:
+      - 8000:8000
+    networks:
+      - mqtt-network
+
+networks:
+  mqtt-network:
+    driver: bridge
