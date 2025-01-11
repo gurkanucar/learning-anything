@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Login Success</title>
+</head>
+<body>
+    <header>
+        <h1>Welcome, {{ user_info.get('name', 'User') }}</h1>
+    </header>
+    <main class="container">
+        <h2>Your Account Details</h2>
+        <ul>
+            <li><strong>ID:</strong> {{ user_info.get('sub') }}</li>
+            <li><strong>Email:</strong> {{ user_info.get('email') }}</li>
+            <li><strong>Verified Email:</strong> {{ 'Yes' if user_info.get('email_verified') else 'No' }}</li>
+            <li><strong>Preferred Username:</strong> {{ user_info.get('preferred_username') }}</li>
+            <li><strong>First Name:</strong> {{ user_info.get('given_name') }}</li>
+            <li><strong>Last Name:</strong> {{ user_info.get('family_name') }}</li>
+        </ul>
+
+        <h2>Your Roles</h2>
+        <ul>
+            {% for role in roles %}
+            <li>{{ role }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Token Details</h2>
+        <p><strong>Access Token:</strong> {{ truncated_token }}</p>
+    </main>
+</body>
+</html>
