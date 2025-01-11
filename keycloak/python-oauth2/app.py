@@ -56,14 +56,14 @@ def callback():
 
         # Fetch user information
         user_info = oauth2_session.get('http://localhost:8080/realms/general_project/protocol/openid-connect/userinfo').json()
-        roles = user_info.get('roles', [])  # Mock roles if not available
-        truncated_token = token['access_token'][:20] + '...'  # Truncate token for display
+        roles = user_info.get('roles', [])
 
         return render_template(
             'login_success.html',
             user_info=user_info,
             roles=roles,
-            truncated_token=truncated_token
+            access_token=token['access_token'],
+            refresh_token=token.get('refresh_token', 'No refresh token provided')
         )
     except Exception as e:
         return render_template('error.html', error_message=str(e))

@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="/static/styles.css">
     <title>Error</title>
 </head>
 <body>
     <header>
-        <h1>Error During Authentication</h1>
+        <h1>Authentication Error</h1>
     </header>
     <main class="container">
-        <p class="error">{{ error_message }}</p>
+        <div class="error">
+            {{ error_message }}
+        </div>
+        <a href="/" class="btn" style="margin-top: 1rem;">Return Home</a>
     </main>
 </body>
 </html>

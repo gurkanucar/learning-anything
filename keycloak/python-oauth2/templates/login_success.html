@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="/static/styles.css">
     <title>Login Success</title>
 </head>
@@ -11,25 +12,72 @@
         <h1>Welcome, {{ user_info.get('name', 'User') }}</h1>
     </header>
     <main class="container">
-        <h2>Your Account Details</h2>
-        <ul>
-            <li><strong>ID:</strong> {{ user_info.get('sub') }}</li>
-            <li><strong>Email:</strong> {{ user_info.get('email') }}</li>
-            <li><strong>Verified Email:</strong> {{ 'Yes' if user_info.get('email_verified') else 'No' }}</li>
-            <li><strong>Preferred Username:</strong> {{ user_info.get('preferred_username') }}</li>
-            <li><strong>First Name:</strong> {{ user_info.get('given_name') }}</li>
-            <li><strong>Last Name:</strong> {{ user_info.get('family_name') }}</li>
+        <h2>Account Details</h2>
+        <ul class="info-list">
+            <li>
+                <span class="label">ID</span>
+                <span class="value">{{ user_info.get('sub') }}</span>
+            </li>
+            <li>
+                <span class="label">Email</span>
+                <span class="value">{{ user_info.get('email') }}</span>
+            </li>
+            <li>
+                <span class="label">Email Verified</span>
+                <span class="value">{{ 'Yes' if user_info.get('email_verified') else 'No' }}</span>
+            </li>
+            <li>
+                <span class="label">Username</span>
+                <span class="value">{{ user_info.get('preferred_username') }}</span>
+            </li>
+            <li>
+                <span class="label">Full Name</span>
+                <span class="value">{{ user_info.get('given_name', '') }} {{ user_info.get('family_name', '') }}</span>
+            </li>
         </ul>
 
-        <h2>Your Roles</h2>
-        <ul>
+        <h2>Roles</h2>
+        <div class="roles-list">
             {% for role in roles %}
-            <li>{{ role }}</li>
+            <span class="role-tag">{{ role }}</span>
             {% endfor %}
-        </ul>
+        </div>
 
-        <h2>Token Details</h2>
-        <p><strong>Access Token:</strong> {{ truncated_token }}</p>
+        <h2>Access Token</h2>
+        <div class="token-section">
+            <div class="token-box">
+                {{ access_token }}
+            </div>
+            <button class="btn copy-btn" onclick="copyToClipboard(this, 'access-token')">Copy Token</button>
+        </div>
+
+        <h2>Refresh Token</h2>
+        <div class="token-section">
+            <div class="token-box">
+                {{ refresh_token }}
+            </div>
+            <button class="btn copy-btn" onclick="copyToClipboard(this, 'refresh-token')">Copy Token</button>
+        </div>
     </main>
+
+    <script>
+        function copyToClipboard(button, tokenType) {
+            const tokenElement = button.previousElementSibling;
+            const text = tokenElement.textContent.trim();
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
 </body>
 </html>
