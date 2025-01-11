@@ -10,6 +10,7 @@
 <body>
     <header>
         <h1>Welcome, {{ user_info.get('name', 'User') }}</h1>
+        <a href="/logout" class="btn logout-btn">Logout</a>
     </header>
     <main class="container">
         <h2>Account Details</h2>
@@ -41,6 +42,12 @@
             {% for role in roles %}
             <span class="role-tag">{{ role }}</span>
             {% endfor %}
+        </div>
+
+        <h2>API Test</h2>
+        <div class="api-test-section">
+            <button class="btn fetch-btn" onclick="fetchUserInfo()">Fetch User Info</button>
+            <div id="api-response" class="token-box" style="display: none;"></div>
         </div>
 
         <h2>Access Token</h2>
@@ -77,6 +84,50 @@
             }).catch(err => {
                 console.error('Failed to copy text: ', err);
             });
+        }
+
+        async function fetchUserInfo() {
+            const responseBox = document.getElementById('api-response');
+            const fetchBtn = document.querySelector('.fetch-btn');
+            
+            try {
+                fetchBtn.disabled = true;
+                fetchBtn.textContent = 'Fetching...';
+                
+                const response = await fetch('/api/userinfo', {
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin'  // This ensures cookies are sent
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    responseBox.style.backgroundColor = '#f0fdf4';
+                    responseBox.style.color = '#166534';
+                    responseBox.classList.add('success');
+                    responseBox.classList.remove('error');
+                } else {
+                    responseBox.style.backgroundColor = '#fef2f2';
+                    responseBox.style.color = '#991b1b';
+                    responseBox.classList.add('error');
+                    responseBox.classList.remove('success');
+                }
+                
+                responseBox.textContent = JSON.stringify(data, null, 2);
+                responseBox.style.display = 'block';
+            } catch (error) {
+                responseBox.style.backgroundColor = '#fef2f2';
+                responseBox.style.color = '#991b1b';
+                responseBox.classList.add('error');
+                responseBox.classList.remove('success');
+                responseBox.textContent = `Error: ${error.message}`;
+                responseBox.style.display = 'block';
+            } finally {
+                fetchBtn.disabled = false;
+                fetchBtn.textContent = 'Fetch User Info';
+            }
         }
     </script>
 </body>

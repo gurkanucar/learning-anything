@@ -22,6 +22,7 @@ header {
   padding: 2rem;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 header h1 {
@@ -180,4 +181,78 @@ h2 {
 
 .token-box::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+}
+
+.logout-btn {
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #ef4444;
+}
+
+.logout-btn:hover {
+    background-color: #dc2626;
+}
+
+.api-test-section {
+    margin: 1rem 0 2rem;
+}
+
+.fetch-btn {
+    background-color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.fetch-btn:disabled {
+    background-color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+#api-response {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: auto;
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+#api-response.error {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+#api-response.success {
+    background-color: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.fetch-btn {
+    background-color: var(--primary-color);
+    margin-bottom: 1rem;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.fetch-btn:disabled {
+    background-color: var(--text-secondary);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.api-test-section {
+    margin: 1rem 0 2rem;
+    padding: 1.5rem;
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
 }
