@@ -34,7 +34,6 @@ services:
     command: start
     environment:
       KC_HOSTNAME: keycloak.dev.com
-      KC_HOSTNAME_STRICT_BACKCHANNEL: true
       KC_HTTP_ENABLED: false
       KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/certs/local-dev.crt
       KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/certs/local-dev.key
