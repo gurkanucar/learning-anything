@@ -15,12 +15,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/realms/general_project/protocol/openid-connect/userinfo",
-							"protocol": "http",
+							"raw": "https://keycloak.dev.com/realms/general_project/protocol/openid-connect/userinfo",
+							"protocol": "https",
 							"host": [
-								"localhost"
+								"keycloak",
+								"dev",
+								"com"
 							],
-							"port": "8080",
 							"path": [
 								"realms",
 								"general_project",
@@ -37,13 +38,18 @@
 				"type": "oauth2",
 				"oauth2": [
 					{
-						"key": "clientId",
-						"value": "my_application",
+						"key": "authUrl",
+						"value": "https://keycloak.dev.com/realms/general_project/protocol/openid-connect/auth",
 						"type": "string"
 					},
 					{
 						"key": "redirect_uri",
-						"value": "http://develop.frontend.com/oauth2/callback",
+						"value": "https://frontend.dev.com/oauth2/callback",
+						"type": "string"
+					},
+					{
+						"key": "clientId",
+						"value": "my_application",
 						"type": "string"
 					},
 					{
@@ -54,11 +60,6 @@
 					{
 						"key": "tokenName",
 						"value": "access_token",
-						"type": "string"
-					},
-					{
-						"key": "authUrl",
-						"value": "http://localhost:8080/realms/general_project/protocol/openid-connect/auth",
 						"type": "string"
 					},
 					{
