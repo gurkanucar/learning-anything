@@ -4,6 +4,8 @@
 KEYCLOAK_URL="http://localhost:8080"
 ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="password"
+ADMIN_NAME="Admin"
+ADMIN_SURNAME="User"
 REALM_NAME="general_project"
 REALM_DISPLAY_NAME="General Project Realm"
 FRONTEND_CLIENT_ID="frontend-client"
@@ -15,6 +17,8 @@ ADMIN_USER_USERNAME="admin"
 ADMIN_USER_EMAIL="admin@example.com"
 ADMIN_USER_PASSWORD="pass"
 USER_USERNAME="jdoe"
+USER_NAME="John"
+USER_SURNAME="Doe"
 USER_EMAIL="jdoe@mail.com"
 USER_PASSWORD="pass"
 
@@ -123,6 +127,8 @@ make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
         \"email\": \"${ADMIN_USER_EMAIL}\",
         \"enabled\": true,
         \"emailVerified\": true,
+        \"firstName\": \"${ADMIN_NAME}\",
+        \"lastName\": \"${ADMIN_SURNAME}\",
         \"credentials\": [{
             \"type\": \"password\",
             \"value\": \"${ADMIN_USER_PASSWORD}\",
@@ -184,6 +190,8 @@ make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
         \"email\": \"${USER_EMAIL}\",
         \"enabled\": true,
         \"emailVerified\": true,
+        \"firstName\": \"${USER_NAME}\",
+        \"lastName\": \"${USER_SURNAME}\",
         \"credentials\": [{
             \"type\": \"password\",
             \"value\": \"${USER_PASSWORD}\",
