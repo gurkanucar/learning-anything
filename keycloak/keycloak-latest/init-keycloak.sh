@@ -90,9 +90,9 @@ make_request -X POST "${KEYCLOAK_URL}/admin/realms" \
         \"sslRequired\": \"external\"
     }"
 
-# Create public client for frontend
+# Create public client for frontend and store the response
 echo "Creating public client for frontend: ${FRONTEND_CLIENT_ID}..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients" \
+CLIENT_RESPONSE=$(make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
     -d "{
@@ -105,7 +105,22 @@ make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients" \
         \"serviceAccountsEnabled\": false,
         \"redirectUris\": [\"${FRONTEND_REDIRECT_URIS}\"],
         \"webOrigins\": [\"${FRONTEND_WEB_ORIGINS}\"]
-    }"
+    }")
+
+# Since the client was created, we need to query for its ID
+echo "Getting client ID..."
+CLIENTS_RESPONSE=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients" \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json")
+
+CLIENT_ID=$(echo "$CLIENTS_RESPONSE" | jq -r ".[] | select(.clientId==\"${FRONTEND_CLIENT_ID}\") | .id")
+if [ -z "$CLIENT_ID" ] || [ "$CLIENT_ID" = "null" ]; then
+    echo "Failed to get client ID. Response was:"
+    echo "$CLIENTS_RESPONSE"
+    exit 1
+fi
+
+echo "Successfully obtained client ID: $CLIENT_ID"
 
 # Create admin role in realm
 echo "Creating admin role: ${ADMIN_ROLE_NAME}..."
@@ -116,6 +131,27 @@ make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
         \"name\": \"${ADMIN_ROLE_NAME}\",
         \"description\": \"${ADMIN_ROLE_DESCRIPTION}\"
     }"
+
+# Create moderator role in realm
+echo "Creating moderator role..."
+make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"name\": \"moderator\",
+        \"description\": \"Moderator role\"
+    }"
+
+# Create user role in realm
+echo "Creating user role..."
+make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"name\": \"user\",
+        \"description\": \"Regular user role\"
+    }"
+
 
 # Create admin user
 echo "Creating admin user: ${ADMIN_USER_USERNAME}..."
@@ -150,6 +186,17 @@ ADMIN_ROLE_ID=$(echo "$ROLES_RESPONSE" | jq -r ".[] | select(.name==\"${ADMIN_RO
 if [ -z "$ADMIN_ROLE_ID" ] || [ "$ADMIN_ROLE_ID" = "null" ]; then
     echo "Failed to get admin role ID. Full roles response:"
     echo "$ROLES_RESPONSE"
+    exit 1
+fi
+
+# Get user role details
+echo "Getting user role details..."
+USER_ROLE_ID=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" | jq -r ".[] | select(.name==\"user\") | .id")
+
+if [ -z "$USER_ROLE_ID" ] || [ "$USER_ROLE_ID" = "null" ]; then
+    echo "Failed to get user role ID."
     exit 1
 fi
 
@@ -198,5 +245,58 @@ make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
             \"temporary\": false
         }]
     }"
+
+# Get John Doe's user ID
+echo "Getting user ID for John Doe..."
+JOHN_DOE_USER_ID=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" | jq -r ".[] | select(.username==\"${USER_USERNAME}\") | .id")
+
+if [ -z "$JOHN_DOE_USER_ID" ] || [ "$JOHN_DOE_USER_ID" = "null" ]; then
+    echo "Failed to get user ID for John Doe."
+    exit 1
+fi
+
+# Assign user role to John Doe
+echo "Assigning user role to John Doe..."
+make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users/${JOHN_DOE_USER_ID}/role-mappings/realm" \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "[{
+        \"id\": \"${USER_ROLE_ID}\",
+        \"name\": \"user\"
+    }]"
+
+if [ $? -ne 0 ]; then
+    echo "Failed to assign user role to John Doe."
+    exit 1
+fi
+
+echo "Adding role to user info..."
+make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_ID}/protocol-mappers/models" \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"protocol\": \"openid-connect\",
+        \"protocolMapper\": \"oidc-usermodel-realm-role-mapper\",
+        \"name\": \"roles\",
+        \"config\": {
+            \"usermodel.realmRoleMapping.rolePrefix\": \"\",
+            \"multivalued\": \"true\",
+            \"claim.name\": \"roles\",
+            \"jsonType.label\": \"String\",
+            \"id.token.claim\": \"true\",
+            \"access.token.claim\": \"true\",
+            \"lightweight.claim\": \"false\",
+            \"userinfo.token.claim\": \"true\",
+            \"introspection.token.claim\": \"true\"
+        }
+    }"
+
+if [ $? -ne 0 ]; then
+  echo "Failed to add role to user info."
+  exit 1
+fi
+
 
 echo "Initialization completed successfully!"
