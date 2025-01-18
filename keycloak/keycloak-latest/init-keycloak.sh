@@ -1,20 +1,38 @@
 #!/bin/bash
 
+# Configurable parameters
+KEYCLOAK_URL="http://localhost:8080"
+ADMIN_USERNAME="admin"
+ADMIN_PASSWORD="password"
+REALM_NAME="general_project"
+REALM_DISPLAY_NAME="General Project Realm"
+FRONTEND_CLIENT_ID="frontend-client"
+FRONTEND_REDIRECT_URIS="http://localhost:5173/*"
+FRONTEND_WEB_ORIGINS="*"
+ADMIN_ROLE_NAME="admin"
+ADMIN_ROLE_DESCRIPTION="Administrator role"
+ADMIN_USER_USERNAME="admin"
+ADMIN_USER_EMAIL="admin@example.com"
+ADMIN_USER_PASSWORD="pass"
+USER_USERNAME="jdoe"
+USER_EMAIL="jdoe@mail.com"
+USER_PASSWORD="pass"
+
 # Enable debug mode to see more information
 set -x
 
 # Wait for Keycloak to be ready
 echo "Waiting for Keycloak to be ready..."
-while ! curl -s http://localhost:8080/health/ready > /dev/null; do
+while ! curl -s "${KEYCLOAK_URL}/health/ready" > /dev/null; do
     sleep 5
 done
 
 # Login to Keycloak and get admin token with direct response handling
 echo "Logging in to Keycloak..."
-TOKEN_RESPONSE=$(curl -s -X POST http://localhost:8080/realms/master/protocol/openid-connect/token \
+TOKEN_RESPONSE=$(curl -s -X POST "${KEYCLOAK_URL}/realms/master/protocol/openid-connect/token" \
     -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "username=admin" \
-    -d "password=password" \
+    -d "username=${ADMIN_USERNAME}" \
+    -d "password=${ADMIN_PASSWORD}" \
     -d "grant_type=password" \
     -d "client_id=admin-cli")
 
@@ -52,69 +70,69 @@ make_request() {
     return 0
 }
 
-# Create general_project realm
-echo "Creating general_project realm..."
-make_request -X POST http://localhost:8080/admin/realms \
+# Create realm
+echo "Creating realm: ${REALM_NAME}..."
+make_request -X POST "${KEYCLOAK_URL}/admin/realms" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{
-        "realm": "general_project",
-        "enabled": true,
-        "displayName": "General Project Realm",
-        "registrationAllowed": false,
-        "resetPasswordAllowed": true,
-        "loginWithEmailAllowed": true,
-        "duplicateEmailsAllowed": false,
-        "sslRequired": "external"
-    }'
+    -d "{
+        \"realm\": \"${REALM_NAME}\",
+        \"enabled\": true,
+        \"displayName\": \"${REALM_DISPLAY_NAME}\",
+        \"registrationAllowed\": false,
+        \"resetPasswordAllowed\": true,
+        \"loginWithEmailAllowed\": true,
+        \"duplicateEmailsAllowed\": false,
+        \"sslRequired\": \"external\"
+    }"
 
 # Create public client for frontend
-echo "Creating public client for frontend..."
-make_request -X POST http://localhost:8080/admin/realms/general_project/clients \
+echo "Creating public client for frontend: ${FRONTEND_CLIENT_ID}..."
+make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{
-        "clientId": "frontend-client",
-        "enabled": true,
-        "publicClient": true,
-        "standardFlowEnabled": true,
-        "implicitFlowEnabled": true,
-        "directAccessGrantsEnabled": true,
-        "serviceAccountsEnabled": false,
-        "redirectUris": ["http://localhost:5173/*"],
-        "webOrigins": ["*"]
-    }'
+    -d "{
+        \"clientId\": \"${FRONTEND_CLIENT_ID}\",
+        \"enabled\": true,
+        \"publicClient\": true,
+        \"standardFlowEnabled\": true,
+        \"implicitFlowEnabled\": true,
+        \"directAccessGrantsEnabled\": true,
+        \"serviceAccountsEnabled\": false,
+        \"redirectUris\": [\"${FRONTEND_REDIRECT_URIS}\"],
+        \"webOrigins\": [\"${FRONTEND_WEB_ORIGINS}\"]
+    }"
 
 # Create admin role in realm
-echo "Creating admin role..."
-make_request -X POST http://localhost:8080/admin/realms/general_project/roles \
+echo "Creating admin role: ${ADMIN_ROLE_NAME}..."
+make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{
-        "name": "admin",
-        "description": "Administrator role"
-    }'
+    -d "{
+        \"name\": \"${ADMIN_ROLE_NAME}\",
+        \"description\": \"${ADMIN_ROLE_DESCRIPTION}\"
+    }"
 
 # Create admin user
-echo "Creating admin user..."
-make_request -X POST http://localhost:8080/admin/realms/general_project/users \
+echo "Creating admin user: ${ADMIN_USER_USERNAME}..."
+make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{
-        "username": "admin",
-        "email": "admin@example.com",
-        "enabled": true,
-        "emailVerified": true,
-        "credentials": [{
-            "type": "password",
-            "value": "pass",
-            "temporary": false
+    -d "{
+        \"username\": \"${ADMIN_USER_USERNAME}\",
+        \"email\": \"${ADMIN_USER_EMAIL}\",
+        \"enabled\": true,
+        \"emailVerified\": true,
+        \"credentials\": [{
+            \"type\": \"password\",
+            \"value\": \"${ADMIN_USER_PASSWORD}\",
+            \"temporary\": false
         }]
-    }'
+    }"
 
-# Get admin role details with proper JSON handling
+# Get admin role details
 echo "Getting admin role details..."
-ROLES_RESPONSE=$(make_request -X GET http://localhost:8080/admin/realms/general_project/roles \
+ROLES_RESPONSE=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json")
 if [ $? -ne 0 ]; then
@@ -122,16 +140,16 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Extract admin role ID with proper error handling
-ADMIN_ROLE_ID=$(echo "$ROLES_RESPONSE" | jq -r '.[] | select(.name=="admin") | .id')
+ADMIN_ROLE_ID=$(echo "$ROLES_RESPONSE" | jq -r ".[] | select(.name==\"${ADMIN_ROLE_NAME}\") | .id")
 if [ -z "$ADMIN_ROLE_ID" ] || [ "$ADMIN_ROLE_ID" = "null" ]; then
     echo "Failed to get admin role ID. Full roles response:"
     echo "$ROLES_RESPONSE"
     exit 1
 fi
 
-# Get admin user ID with proper error handling
-USERS_RESPONSE=$(make_request -X GET "http://localhost:8080/admin/realms/general_project/users" \
+# Get admin user ID
+echo "Getting admin user ID..."
+USERS_RESPONSE=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json")
 if [ $? -ne 0 ]; then
@@ -139,7 +157,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-ADMIN_USER_ID=$(echo "$USERS_RESPONSE" | jq -r '.[] | select(.username=="admin") | .id')
+ADMIN_USER_ID=$(echo "$USERS_RESPONSE" | jq -r ".[] | select(.username==\"${ADMIN_USER_USERNAME}\") | .id")
 if [ -z "$ADMIN_USER_ID" ] || [ "$ADMIN_USER_ID" = "null" ]; then
     echo "Failed to get admin user ID. Full users response:"
     echo "$USERS_RESPONSE"
@@ -148,29 +166,29 @@ fi
 
 # Assign admin role to admin user
 echo "Assigning admin role to admin user..."
-make_request -X POST "http://localhost:8080/admin/realms/general_project/users/$ADMIN_USER_ID/role-mappings/realm" \
+make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users/${ADMIN_USER_ID}/role-mappings/realm" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
     -d "[{
-        \"id\": \"$ADMIN_ROLE_ID\",
-        \"name\": \"admin\"
+        \"id\": \"${ADMIN_ROLE_ID}\",
+        \"name\": \"${ADMIN_ROLE_NAME}\"
     }]"
 
-# Create John Doe user
-echo "Creating user John Doe..."
-make_request -X POST http://localhost:8080/admin/realms/general_project/users \
+# Create additional user
+echo "Creating user: ${USER_USERNAME}..."
+make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
-    -d '{
-        "username": "jdoe",
-        "email": "jdoe@mail.com",
-        "enabled": true,
-        "emailVerified": true,
-        "credentials": [{
-            "type": "password",
-            "value": "pass",
-            "temporary": false
+    -d "{
+        \"username\": \"${USER_USERNAME}\",
+        \"email\": \"${USER_EMAIL}\",
+        \"enabled\": true,
+        \"emailVerified\": true,
+        \"credentials\": [{
+            \"type\": \"password\",
+            \"value\": \"${USER_PASSWORD}\",
+            \"temporary\": false
         }]
-    }'
+    }"
 
 echo "Initialization completed successfully!"
