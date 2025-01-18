@@ -36,6 +36,23 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Link to="/profile" className="nav-link">
             Profile
           </Link>
+          
+          {/* Always show both links, but style them based on access */}
+          <Link 
+            to="/admin" 
+            className={`nav-link admin-link ${!keycloak?.hasRealmRole('admin') ? 'disabled-link' : ''}`}
+          >
+            Admin
+          </Link>
+          <Link 
+            to="/user" 
+            className={`nav-link user-link ${
+              !keycloak?.hasRealmRole('user') && !keycloak?.hasRealmRole('admin') ? 'disabled-link' : ''
+            }`}
+          >
+            User
+          </Link>
+
           {!keycloak?.authenticated && (
             <Link to="/login" className="nav-link">
               Login

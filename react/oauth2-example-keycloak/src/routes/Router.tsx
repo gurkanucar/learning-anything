@@ -5,7 +5,10 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
 import Profile from '../pages/Profile';
+import AdminPage from '../pages/AdminPage';
+import UserPage from '../pages/UserPage';
 import PrivateRoute from './PrivateRoute';
+import RoleRoute from './RoleRoute';
 
 const Router: React.FC = () => {
   return (
@@ -29,6 +32,24 @@ const Router: React.FC = () => {
           <PrivateRoute>
             <Profile />
           </PrivateRoute>
+        }
+      />
+
+      {/* Role-based routes */}
+      <Route
+        path="/admin"
+        element={
+          <RoleRoute requiredRoles={['admin']}>
+            <AdminPage />
+          </RoleRoute>
+        }
+      />
+      <Route
+        path="/user"
+        element={
+          <RoleRoute requiredRoles={['user', 'manager']}>
+            <UserPage />
+          </RoleRoute>
         }
       />
 

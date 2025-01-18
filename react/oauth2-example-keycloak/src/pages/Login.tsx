@@ -19,7 +19,18 @@ const Login: React.FC = () => {
     return <Navigate to={from} replace />;
   }
 
-  return <div>Redirecting to login...</div>;
+  return (
+    <div className="login-redirect-container">
+      <div className="login-redirect-content">
+        <div className="redirect-spinner"></div>
+        <h2 className="redirect-title">Redirecting to Login</h2>
+        <p className="redirect-message">Please wait while we redirect you to the login page...</p>
+        <div className="redirect-progress">
+          <div className="progress-bar"></div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Login;
