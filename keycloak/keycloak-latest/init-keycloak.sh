@@ -1,85 +1,118 @@
 #!/bin/bash
 
-# Configurable parameters
-KEYCLOAK_URL="http://localhost:8080"
-ADMIN_USERNAME="admin"
-ADMIN_PASSWORD="password"
-ADMIN_NAME="Admin"
-ADMIN_SURNAME="User"
-REALM_NAME="general_project"
-REALM_DISPLAY_NAME="General Project Realm"
-FRONTEND_CLIENT_ID="frontend-client"
-FRONTEND_REDIRECT_URIS="http://localhost:5173/*"
-FRONTEND_WEB_ORIGINS="*"
-ADMIN_ROLE_NAME="admin"
-ADMIN_ROLE_DESCRIPTION="Administrator role"
-ADMIN_USER_USERNAME="admin"
-ADMIN_USER_EMAIL="admin@example.com"
-ADMIN_USER_PASSWORD="pass"
-USER_USERNAME="jdoe"
-USER_NAME="John"
-USER_SURNAME="Doe"
-USER_EMAIL="jdoe@mail.com"
-USER_PASSWORD="pass"
+# Exit on error, undefined variables, and pipe failures
+set -euo pipefail
 
-# Enable debug mode to see more information
-set -x
+###################
+# Configuration
+###################
 
-# Wait for Keycloak to be ready
-echo "Waiting for Keycloak to be ready..."
-while ! curl -s "${KEYCLOAK_URL}/health/ready" > /dev/null; do
-    sleep 5
-done
+# Keycloak connection settings
+readonly KEYCLOAK_URL="http://localhost:8080"
+readonly ADMIN_USERNAME="admin"
+readonly ADMIN_PASSWORD="password"
 
-# Login to Keycloak and get admin token with direct response handling
-echo "Logging in to Keycloak..."
-TOKEN_RESPONSE=$(curl -s -X POST "${KEYCLOAK_URL}/realms/master/protocol/openid-connect/token" \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "username=${ADMIN_USERNAME}" \
-    -d "password=${ADMIN_PASSWORD}" \
-    -d "grant_type=password" \
-    -d "client_id=admin-cli")
+# Realm configuration
+readonly REALM_NAME="general_project"
+readonly REALM_DISPLAY_NAME="General Project Realm"
 
-# Extract token with error handling
-TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.access_token')
-if [ "$TOKEN" = "null" ] || [ -z "$TOKEN" ]; then
-    echo "Failed to obtain access token. Response was:"
-    echo "$TOKEN_RESPONSE"
-    exit 1
-fi
+# Frontend client settings
+readonly FRONTEND_CLIENT_ID="frontend-client"
+readonly FRONTEND_REDIRECT_URIS="http://localhost:5173/*"
+readonly FRONTEND_WEB_ORIGINS="*"
 
-echo "Successfully obtained access token"
+# User configurations
+declare -A ADMIN_USER=(
+    [username]="admin"
+    [email]="admin@example.com"
+    [password]="pass"
+    [firstName]="Admin"
+    [lastName]="User"
+)
 
-# Function to make curl requests with error handling.
-# Print extra info to stderr (so it won't pollute JSON in stdout).
+declare -A REGULAR_USER=(
+    [username]="jdoe"
+    [email]="jdoe@mail.com"
+    [password]="pass"
+    [firstName]="John"
+    [lastName]="Doe"
+)
+
+# Role definitions
+readonly ROLES=(
+    "admin:Administrator role"
+    "moderator:Moderator role"
+    "user:Regular user role"
+)
+
+###################
+# Helper Functions
+###################
+
+log_info() {
+    echo "[INFO] $1"
+}
+
+log_error() {
+    echo "[ERROR] $1" >&2
+}
+
+# Enhanced request function with better error handling and logging
 make_request() {
+    local method=$1
+    local endpoint=$2
+    shift 2
     local response
     local http_code
-    response=$(curl -s -w "\n%{http_code}" "$@")
+    
+    response=$(curl -s -w "\n%{http_code}" \
+        -X "$method" \
+        "$KEYCLOAK_URL$endpoint" \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        "$@")
+    
     http_code=$(echo "$response" | tail -n1)
     body=$(echo "$response" | sed '$d')
 
-    # Print debug info to stderr:
-    echo "HTTP Status Code: $http_code" >&2
-    echo "Response Body:" >&2
-    echo "$body" >&2
-
-    # If HTTP code is not 2xx, return error
     if [[ ! "$http_code" =~ ^2[0-9][0-9]$ ]]; then
+        log_error "Request failed with status $http_code"
+        log_error "Response: $body"
         return 1
     fi
 
-    # Echo **only** the JSON body to stdout
     echo "$body"
-    return 0
 }
 
-# Create realm
-echo "Creating realm: ${REALM_NAME}..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "{
+wait_for_keycloak() {
+    log_info "Waiting for Keycloak to be ready..."
+    while ! curl -s "${KEYCLOAK_URL}/health/ready" > /dev/null; do
+        sleep 5
+    done
+    log_info "Keycloak is ready"
+}
+
+get_admin_token() {
+    local token_response
+    
+    token_response=$(curl -s -X POST "${KEYCLOAK_URL}/realms/master/protocol/openid-connect/token" \
+        -H "Content-Type: application/x-www-form-urlencoded" \
+        -d "username=${ADMIN_USERNAME}" \
+        -d "password=${ADMIN_PASSWORD}" \
+        -d "grant_type=password" \
+        -d "client_id=admin-cli")
+
+    TOKEN=$(echo "$token_response" | jq -r '.access_token')
+    if [ "$TOKEN" = "null" ] || [ -z "$TOKEN" ]; then
+        log_error "Failed to obtain access token"
+        echo "$token_response"
+        exit 1
+    fi
+}
+
+create_realm() {
+    log_info "Creating realm: ${REALM_NAME}"
+    make_request POST "/admin/realms" -d "{
         \"realm\": \"${REALM_NAME}\",
         \"enabled\": true,
         \"displayName\": \"${REALM_DISPLAY_NAME}\",
@@ -89,13 +122,11 @@ make_request -X POST "${KEYCLOAK_URL}/admin/realms" \
         \"duplicateEmailsAllowed\": false,
         \"sslRequired\": \"external\"
     }"
+}
 
-# Create public client for frontend and store the response
-echo "Creating public client for frontend: ${FRONTEND_CLIENT_ID}..."
-CLIENT_RESPONSE=$(make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "{
+create_client() {
+    log_info "Creating frontend client: ${FRONTEND_CLIENT_ID}"
+    make_request POST "/admin/realms/${REALM_NAME}/clients" -d "{
         \"clientId\": \"${FRONTEND_CLIENT_ID}\",
         \"enabled\": true,
         \"publicClient\": true,
@@ -105,178 +136,85 @@ CLIENT_RESPONSE=$(make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAM
         \"serviceAccountsEnabled\": false,
         \"redirectUris\": [\"${FRONTEND_REDIRECT_URIS}\"],
         \"webOrigins\": [\"${FRONTEND_WEB_ORIGINS}\"]
-    }")
-
-# Since the client was created, we need to query for its ID
-echo "Getting client ID..."
-CLIENTS_RESPONSE=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json")
-
-CLIENT_ID=$(echo "$CLIENTS_RESPONSE" | jq -r ".[] | select(.clientId==\"${FRONTEND_CLIENT_ID}\") | .id")
-if [ -z "$CLIENT_ID" ] || [ "$CLIENT_ID" = "null" ]; then
-    echo "Failed to get client ID. Response was:"
-    echo "$CLIENTS_RESPONSE"
-    exit 1
-fi
-
-echo "Successfully obtained client ID: $CLIENT_ID"
-
-# Create admin role in realm
-echo "Creating admin role: ${ADMIN_ROLE_NAME}..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "{
-        \"name\": \"${ADMIN_ROLE_NAME}\",
-        \"description\": \"${ADMIN_ROLE_DESCRIPTION}\"
     }"
+}
 
-# Create moderator role in realm
-echo "Creating moderator role..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "{
-        \"name\": \"moderator\",
-        \"description\": \"Moderator role\"
-    }"
+get_client_id() {
+    local clients_response
+    
+    clients_response=$(make_request GET "/admin/realms/${REALM_NAME}/clients")
+    CLIENT_ID=$(echo "$clients_response" | jq -r ".[] | select(.clientId==\"${FRONTEND_CLIENT_ID}\") | .id")
+    
+    if [ -z "$CLIENT_ID" ] || [ "$CLIENT_ID" = "null" ]; then
+        log_error "Failed to get client ID"
+        exit 1
+    fi
+}
 
-# Create user role in realm
-echo "Creating user role..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "{
-        \"name\": \"user\",
-        \"description\": \"Regular user role\"
-    }"
+create_roles() {
+    for role_def in "${ROLES[@]}"; do
+        local role_name="${role_def%%:*}"
+        local role_desc="${role_def#*:}"
+        
+        log_info "Creating role: ${role_name}"
+        make_request POST "/admin/realms/${REALM_NAME}/roles" -d "{
+            \"name\": \"${role_name}\",
+            \"description\": \"${role_desc}\"
+        }"
+    done
+}
 
-
-# Create admin user
-echo "Creating admin user: ${ADMIN_USER_USERNAME}..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "{
-        \"username\": \"${ADMIN_USER_USERNAME}\",
-        \"email\": \"${ADMIN_USER_EMAIL}\",
+create_user() {
+    local -n user=$1
+    local username=${user[username]}
+    
+    log_info "Creating user: ${username}"
+    make_request POST "/admin/realms/${REALM_NAME}/users" -d "{
+        \"username\": \"${username}\",
+        \"email\": \"${user[email]}\",
         \"enabled\": true,
         \"emailVerified\": true,
-        \"firstName\": \"${ADMIN_NAME}\",
-        \"lastName\": \"${ADMIN_SURNAME}\",
+        \"firstName\": \"${user[firstName]}\",
+        \"lastName\": \"${user[lastName]}\",
         \"credentials\": [{
             \"type\": \"password\",
-            \"value\": \"${ADMIN_USER_PASSWORD}\",
+            \"value\": \"${user[password]}\",
             \"temporary\": false
         }]
     }"
+}
 
-# Get admin role details
-echo "Getting admin role details..."
-ROLES_RESPONSE=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json")
-if [ $? -ne 0 ]; then
-  echo "Failed to retrieve roles."
-  exit 1
-fi
+get_role_id() {
+    local role_name=$1
+    local roles_response
+    
+    roles_response=$(make_request GET "/admin/realms/${REALM_NAME}/roles")
+    echo "$roles_response" | jq -r ".[] | select(.name==\"${role_name}\") | .id"
+}
 
-ADMIN_ROLE_ID=$(echo "$ROLES_RESPONSE" | jq -r ".[] | select(.name==\"${ADMIN_ROLE_NAME}\") | .id")
-if [ -z "$ADMIN_ROLE_ID" ] || [ "$ADMIN_ROLE_ID" = "null" ]; then
-    echo "Failed to get admin role ID. Full roles response:"
-    echo "$ROLES_RESPONSE"
-    exit 1
-fi
+get_user_id() {
+    local username=$1
+    local users_response
+    
+    users_response=$(make_request GET "/admin/realms/${REALM_NAME}/users")
+    echo "$users_response" | jq -r ".[] | select(.username==\"${username}\") | .id"
+}
 
-# Get user role details
-echo "Getting user role details..."
-USER_ROLE_ID=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/roles" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" | jq -r ".[] | select(.name==\"user\") | .id")
-
-if [ -z "$USER_ROLE_ID" ] || [ "$USER_ROLE_ID" = "null" ]; then
-    echo "Failed to get user role ID."
-    exit 1
-fi
-
-# Get admin user ID
-echo "Getting admin user ID..."
-USERS_RESPONSE=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json")
-if [ $? -ne 0 ]; then
-  echo "Failed to retrieve users."
-  exit 1
-fi
-
-ADMIN_USER_ID=$(echo "$USERS_RESPONSE" | jq -r ".[] | select(.username==\"${ADMIN_USER_USERNAME}\") | .id")
-if [ -z "$ADMIN_USER_ID" ] || [ "$ADMIN_USER_ID" = "null" ]; then
-    echo "Failed to get admin user ID. Full users response:"
-    echo "$USERS_RESPONSE"
-    exit 1
-fi
-
-# Assign admin role to admin user
-echo "Assigning admin role to admin user..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users/${ADMIN_USER_ID}/role-mappings/realm" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "[{
-        \"id\": \"${ADMIN_ROLE_ID}\",
-        \"name\": \"${ADMIN_ROLE_NAME}\"
+assign_role() {
+    local user_id=$1
+    local role_id=$2
+    local role_name=$3
+    
+    log_info "Assigning role ${role_name} to user"
+    make_request POST "/admin/realms/${REALM_NAME}/users/${user_id}/role-mappings/realm" -d "[{
+        \"id\": \"${role_id}\",
+        \"name\": \"${role_name}\"
     }]"
+}
 
-# Create additional user
-echo "Creating user: ${USER_USERNAME}..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "{
-        \"username\": \"${USER_USERNAME}\",
-        \"email\": \"${USER_EMAIL}\",
-        \"enabled\": true,
-        \"emailVerified\": true,
-        \"firstName\": \"${USER_NAME}\",
-        \"lastName\": \"${USER_SURNAME}\",
-        \"credentials\": [{
-            \"type\": \"password\",
-            \"value\": \"${USER_PASSWORD}\",
-            \"temporary\": false
-        }]
-    }"
-
-# Get John Doe's user ID
-echo "Getting user ID for John Doe..."
-JOHN_DOE_USER_ID=$(make_request -X GET "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" | jq -r ".[] | select(.username==\"${USER_USERNAME}\") | .id")
-
-if [ -z "$JOHN_DOE_USER_ID" ] || [ "$JOHN_DOE_USER_ID" = "null" ]; then
-    echo "Failed to get user ID for John Doe."
-    exit 1
-fi
-
-# Assign user role to John Doe
-echo "Assigning user role to John Doe..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/users/${JOHN_DOE_USER_ID}/role-mappings/realm" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "[{
-        \"id\": \"${USER_ROLE_ID}\",
-        \"name\": \"user\"
-    }]"
-
-if [ $? -ne 0 ]; then
-    echo "Failed to assign user role to John Doe."
-    exit 1
-fi
-
-echo "Adding role to user info..."
-make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients/${CLIENT_ID}/protocol-mappers/models" \
-    -H "Authorization: Bearer $TOKEN" \
-    -H "Content-Type: application/json" \
-    -d "{
+setup_role_mapper() {
+    log_info "Setting up role mapper for client"
+    make_request POST "/admin/realms/${REALM_NAME}/clients/${CLIENT_ID}/protocol-mappers/models" -d "{
         \"protocol\": \"openid-connect\",
         \"protocolMapper\": \"oidc-usermodel-realm-role-mapper\",
         \"name\": \"roles\",
@@ -292,11 +230,36 @@ make_request -X POST "${KEYCLOAK_URL}/admin/realms/${REALM_NAME}/clients/${CLIEN
             \"introspection.token.claim\": \"true\"
         }
     }"
+}
 
-if [ $? -ne 0 ]; then
-  echo "Failed to add role to user info."
-  exit 1
-fi
+###################
+# Main Execution
+###################
 
+main() {
+    wait_for_keycloak
+    get_admin_token
+    
+    create_realm
+    create_client
+    get_client_id
+    create_roles
+    
+    # Create and setup admin user
+    create_user ADMIN_USER
+    local admin_user_id=$(get_user_id "${ADMIN_USER[username]}")
+    local admin_role_id=$(get_role_id "admin")
+    assign_role "$admin_user_id" "$admin_role_id" "admin"
+    
+    # Create and setup regular user
+    create_user REGULAR_USER
+    local regular_user_id=$(get_user_id "${REGULAR_USER[username]}")
+    local user_role_id=$(get_role_id "user")
+    assign_role "$regular_user_id" "$user_role_id" "user"
+    
+    setup_role_mapper
+    
+    log_info "Initialization completed successfully!"
+}
 
-echo "Initialization completed successfully!"
+main
