@@ -33,11 +33,11 @@ services:
     image: keycloak/keycloak:25.0.6
     command: start
     environment:
-      KC_HOSTNAME: keycloak.dev.com
-      KC_HTTP_ENABLED: false
-      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/certs/local-dev.crt
-      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/certs/local-dev.key
-      KC_HOSTNAME_STRICT_HTTPS: true
+      # KC_HOSTNAME: keycloak.dev.com
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT_HTTPS: false
       KC_HEALTH_ENABLED: true
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres/${POSTGRES_DB}
@@ -45,24 +45,14 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      KC_PROXY: edge
-    volumes:
-      - ./certs:/opt/keycloak/conf/certs
+      # KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/certs/local-dev.crt
+      # KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/certs/local-dev.key
+    # volumes:
+      # - ./certs:/opt/keycloak/conf/certs
     ports:
-      - "8443:8443"
+      - "8080:8080"
     depends_on:
       - postgres
-    networks:
-      - keycloak_network
-
-  nginx:
-    build: ./nginx
-    container_name: nginx-proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./certs:/etc/nginx/certs
     networks:
       - keycloak_network
 
