@@ -2,122 +2,162 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Authentication Page</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      .login-container {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 20px;
-      }
-      .login-option {
-        flex: 1;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-      button {
-        padding: 10px 20px;
-        background-color: #0366d6;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin: 5px 0;
-        width: 100%;
-      }
-      button:hover {
-        background-color: #024ea4;
-      }
-      .info-section {
-        margin-top: 20px;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        display: none;
-      }
-      .token-info {
-        word-break: break-all;
-        margin-top: 10px;
-      }
-      pre {
-        background-color: #f4f4f4;
-        padding: 10px;
-      }
-      hr {
-        margin: 30px 0;
-      }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <h1>Authentication Options</h1>
-    <div class="login-container">
-      <!-- GitHub Login -->
-      <div class="login-option">
-        <h2>GitHub Login</h2>
-        <button onclick="handleGitHubLogin()">Login with GitHub</button>
+  <body class="min-h-screen bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 py-12">
+      <div class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+        <p class="text-gray-600">Choose your preferred authentication method</p>
       </div>
 
-      <!-- Keycloak Login -->
-      <div class="login-option">
-        <h2>Keycloak Login</h2>
-        <input
-          type="text"
-          id="kc-username"
-          placeholder="Username"
-          style="width: 100%; margin-bottom: 10px; padding: 8px"
-        />
-        <input
-          type="password"
-          id="kc-password"
-          placeholder="Password"
-          style="width: 100%; margin-bottom: 10px; padding: 8px"
-        />
-        <button onclick="handleKeycloakLogin()">Login with Keycloak</button>
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <!-- GitHub Login -->
+        <div
+          class="bg-white rounded-xl shadow-md p-8 hover:shadow-lg transition-shadow"
+        >
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+            GitHub Login
+          </h2>
+          <button
+            onclick="handleGitHubLogin()"
+            class="w-full bg-gray-900 text-white py-3 px-6 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center space-x-2"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <span>Continue with GitHub</span>
+          </button>
+        </div>
+
+        <!-- Keycloak Login -->
+        <div class="bg-white rounded-xl shadow-md p-8">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+            Keycloak Login
+          </h2>
+          <div class="space-y-4">
+            <div>
+              <input
+                type="text"
+                id="kc-username"
+                placeholder="Username"
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                id="kc-password"
+                placeholder="Password"
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+              />
+            </div>
+            <button
+              onclick="handleKeycloakLogin()"
+              class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Sign in with Keycloak
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <hr />
+      <!-- Token Information Sections -->
+      <div class="space-y-8">
+        <!-- Keycloak Info -->
+        <div
+          id="keycloakTokenInfo"
+          class="hidden bg-white rounded-xl shadow-md p-8"
+        >
+          <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+            Keycloak Token Information
+          </h2>
+          <div class="space-y-4">
+            <div>
+              <h3 class="text-lg font-medium text-gray-700 mb-2">
+                Access Token:
+              </h3>
+              <pre
+                id="kc-accessToken"
+                class="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto"
+              ></pre>
+            </div>
+            <div>
+              <h3 class="text-lg font-medium text-gray-700 mb-2">
+                Refresh Token:
+              </h3>
+              <pre
+                id="kc-refreshToken"
+                class="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto"
+              ></pre>
+            </div>
+            <button
+              onclick="refreshKeycloakToken()"
+              class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Refresh Access Token
+            </button>
+          </div>
+        </div>
 
-    <!-- Keycloak Token Info Section -->
-    <div id="keycloakTokenInfo" class="info-section">
-      <h2>Keycloak Token Information</h2>
-      <div class="token-info">
-        <h3>Access Token (Keycloak):</h3>
-        <pre id="kc-accessToken"></pre>
-        <h3>Refresh Token (Keycloak):</h3>
-        <pre id="kc-refreshToken"></pre>
-        <button onclick="refreshKeycloakToken()">Refresh Keycloak Access Token</button>
+        <!-- Keycloak User Info -->
+        <div
+          id="keycloakUserInfo"
+          class="hidden bg-white rounded-xl shadow-md p-8"
+        >
+          <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+            Keycloak User Information
+          </h2>
+          <pre
+            id="kc-userInfoContent"
+            class="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto"
+          ></pre>
+        </div>
+
+        <!-- GitHub Info -->
+        <div
+          id="githubTokenInfo"
+          class="hidden bg-white rounded-xl shadow-md p-8"
+        >
+          <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+            GitHub Token Information
+          </h2>
+          <div>
+            <h3 class="text-lg font-medium text-gray-700 mb-2">
+              Access Token:
+            </h3>
+            <pre
+              id="gh-accessToken"
+              class="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto"
+            ></pre>
+          </div>
+        </div>
+
+        <!-- GitHub User Info -->
+        <div
+          id="githubUserInfo"
+          class="hidden bg-white rounded-xl shadow-md p-8"
+        >
+          <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+            GitHub User Information
+          </h2>
+          <pre
+            id="gh-userInfoContent"
+            class="bg-gray-50 p-4 rounded-lg text-sm overflow-x-auto"
+          ></pre>
+        </div>
       </div>
-    </div>
-
-    <!-- Keycloak User Info -->
-    <div id="keycloakUserInfo" class="info-section">
-      <h2>Keycloak User Information</h2>
-      <pre id="kc-userInfoContent"></pre>
-    </div>
-
-    <hr />
-
-    <!-- GitHub Token Info Section -->
-    <div id="githubTokenInfo" class="info-section">
-      <h2>GitHub Token Information</h2>
-      <div class="token-info">
-        <h3>Access Token (GitHub):</h3>
-        <pre id="gh-accessToken"></pre>
-      </div>
-    </div>
-
-    <!-- GitHub User Info -->
-    <div id="githubUserInfo" class="info-section">
-      <h2>GitHub User Information</h2>
-      <pre id="gh-userInfoContent"></pre>
     </div>
 
     <script>
@@ -132,7 +172,7 @@
 
         // GitHub
         // We'll retrieve tokens from the backend at http://localhost:3001
-        backendUrl: "http://localhost:3001" // Your Express server
+        backendUrl: "http://localhost:3001", // Your Express server
       };
 
       // We'll store Keycloak tokens here
@@ -189,8 +229,10 @@
         };
 
         // Update UI
-        document.getElementById("kc-accessToken").textContent = tokens.access_token;
-        document.getElementById("kc-refreshToken").textContent = tokens.refresh_token;
+        document.getElementById("kc-accessToken").textContent =
+          tokens.access_token;
+        document.getElementById("kc-refreshToken").textContent =
+          tokens.refresh_token;
         document.getElementById("keycloakTokenInfo").style.display = "block";
 
         // Fetch Keycloak user info
@@ -264,7 +306,7 @@
        **************************************************/
       function handleGitHubLogin() {
         // Option A: Use your backend route that starts the GitHub OAuth flow
-        window.location.href = `${config.backendUrl}/github/login`;
+        window.location.href = `${config.backendUrl}/exchange/github-to-keycloak`;
 
         // Option B: Directly go to GitHub (requires your backend callback in GH app):
         // const state = Math.random().toString(36).substring(7);
@@ -290,11 +332,8 @@
           document.getElementById("githubTokenInfo").style.display = "block";
 
           // Show user info
-          document.getElementById("gh-userInfoContent").textContent = JSON.stringify(
-            data.user,
-            null,
-            2
-          );
+          document.getElementById("gh-userInfoContent").textContent =
+            JSON.stringify(data.user, null, 2);
           document.getElementById("githubUserInfo").style.display = "block";
         } catch (error) {
           console.error("GitHub OAuth Callback error:", error);
