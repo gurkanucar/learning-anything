@@ -1,0 +1,12 @@
+{
+  "name": "webrtc-signaling-server",
+  "version": "1.0.0",
+  "description": "WebRTC Signaling Server using WebSocket",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+} 

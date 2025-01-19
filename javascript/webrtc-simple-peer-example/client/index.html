@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Video Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="join-section">
+            <h1>WebRTC Video Chat</h1>
+            <div class="connection-status">
+                <span class="status-indicator status-disconnected" id="statusIndicator"></span>
+                <span id="connectionStatus">Disconnected</span>
+            </div>
+            <div class="join-controls">
+                <input type="text" id="roomId" placeholder="Enter Room ID">
+                <button onclick="joinRoom()" id="joinBtn">
+                    <i class="fas fa-sign-in-alt"></i> Join Room
+                </button>
+                <button onclick="leaveRoom()" id="leaveBtn" disabled>
+                    <i class="fas fa-sign-out-alt"></i> Leave Room
+                </button>
+            </div>
+        </div>
+
+        <div class="video-section">
+            <div class="video-container">
+                <video id="localVideo" autoplay playsinline muted></video>
+                <p><i class="fas fa-user"></i> Your Video</p>
+                <div class="controls">
+                    <button onclick="toggleVideo()" id="videoBtn">
+                        <i class="fas fa-video"></i> Video
+                    </button>
+                    <button onclick="toggleAudio()" id="audioBtn">
+                        <i class="fas fa-microphone"></i> Audio
+                    </button>
+                </div>
+            </div>
+            <div class="video-container">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <p><i class="fas fa-user-friends"></i> Remote Video</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
