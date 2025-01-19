@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Authentication Page</title>
     <style>
       body {
@@ -46,28 +46,36 @@
         word-break: break-all;
         margin-top: 10px;
       }
+      pre {
+        background-color: #f4f4f4;
+        padding: 10px;
+      }
+      hr {
+        margin: 30px 0;
+      }
     </style>
   </head>
   <body>
     <h1>Authentication Options</h1>
-
     <div class="login-container">
+      <!-- GitHub Login -->
       <div class="login-option">
         <h2>GitHub Login</h2>
         <button onclick="handleGitHubLogin()">Login with GitHub</button>
       </div>
 
+      <!-- Keycloak Login -->
       <div class="login-option">
         <h2>Keycloak Login</h2>
         <input
           type="text"
-          id="username"
+          id="kc-username"
           placeholder="Username"
           style="width: 100%; margin-bottom: 10px; padding: 8px"
         />
         <input
           type="password"
-          id="password"
+          id="kc-password"
           placeholder="Password"
           style="width: 100%; margin-bottom: 10px; padding: 8px"
         />
@@ -75,50 +83,73 @@
       </div>
     </div>
 
-    <div id="tokenInfo" class="info-section">
-      <h2>Token Information</h2>
+    <hr />
+
+    <!-- Keycloak Token Info Section -->
+    <div id="keycloakTokenInfo" class="info-section">
+      <h2>Keycloak Token Information</h2>
       <div class="token-info">
-        <h3>Access Token:</h3>
-        <pre id="accessToken"></pre>
-        <h3>Refresh Token:</h3>
-        <pre id="refreshToken"></pre>
-        <button onclick="refreshAccessToken()">Refresh Access Token</button>
+        <h3>Access Token (Keycloak):</h3>
+        <pre id="kc-accessToken"></pre>
+        <h3>Refresh Token (Keycloak):</h3>
+        <pre id="kc-refreshToken"></pre>
+        <button onclick="refreshKeycloakToken()">Refresh Keycloak Access Token</button>
       </div>
     </div>
 
-    <div id="userInfo" class="info-section">
-      <h2>User Information</h2>
-      <pre id="userInfoContent"></pre>
+    <!-- Keycloak User Info -->
+    <div id="keycloakUserInfo" class="info-section">
+      <h2>Keycloak User Information</h2>
+      <pre id="kc-userInfoContent"></pre>
+    </div>
+
+    <hr />
+
+    <!-- GitHub Token Info Section -->
+    <div id="githubTokenInfo" class="info-section">
+      <h2>GitHub Token Information</h2>
+      <div class="token-info">
+        <h3>Access Token (GitHub):</h3>
+        <pre id="gh-accessToken"></pre>
+      </div>
+    </div>
+
+    <!-- GitHub User Info -->
+    <div id="githubUserInfo" class="info-section">
+      <h2>GitHub User Information</h2>
+      <pre id="gh-userInfoContent"></pre>
     </div>
 
     <script>
+      /**************************************************
+       * Configuration (Example Only)
+       **************************************************/
       const config = {
-        githubClientId: "5bdaed662b4e7ccef7bd",
-        githubClientSecret: "f4094fce7eed1414114487b272cb966538f9464b",
+        // Keycloak
         keycloakUrl: "http://localhost:8080",
         realm: "general_project",
         clientId: "frontend-client",
+
+        // GitHub
+        // We'll retrieve tokens from the backend at http://localhost:3001
+        backendUrl: "http://localhost:3001" // Your Express server
       };
 
-      let currentTokens = {
+      // We'll store Keycloak tokens here
+      let keycloakTokens = {
         accessToken: null,
         refreshToken: null,
       };
 
-      // Handle GitHub Login
-      function handleGitHubLogin() {
-        // Generate a random state value for security
-        const state = Math.random().toString(36).substring(7);
-        localStorage.setItem("oauth_state", state);
+      // We'll store GitHub token here
+      let githubToken = null;
 
-        const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${config.githubClientId}&scope=user:email&state=${state}`;
-        window.location.href = githubAuthUrl;
-      }
-
-      // Handle Keycloak Login
+      /**************************************************
+       * Keycloak Flow
+       **************************************************/
       async function handleKeycloakLogin() {
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
+        const username = document.getElementById("kc-username").value;
+        const password = document.getElementById("kc-password").value;
 
         try {
           const tokenResponse = await fetch(
@@ -139,39 +170,36 @@
           );
 
           if (!tokenResponse.ok) {
-            throw new Error("Failed to get token");
+            throw new Error("Failed to get Keycloak token");
           }
 
           const tokens = await tokenResponse.json();
-          await handleTokens(tokens);
+          // Store and display them
+          await handleKeycloakTokens(tokens);
         } catch (error) {
-          console.error("Login failed:", error);
-          alert("Login failed. Please check your credentials.");
+          console.error("Keycloak Login failed:", error);
+          alert("Keycloak Login failed. Check the console for details.");
         }
       }
 
-      // Handle tokens after successful authentication
-      async function handleTokens(tokens) {
-        currentTokens = {
+      async function handleKeycloakTokens(tokens) {
+        keycloakTokens = {
           accessToken: tokens.access_token,
           refreshToken: tokens.refresh_token,
         };
 
-        // Display tokens
-        document.getElementById("accessToken").textContent =
-          tokens.access_token;
-        document.getElementById("refreshToken").textContent =
-          tokens.refresh_token;
-        document.getElementById("tokenInfo").style.display = "block";
+        // Update UI
+        document.getElementById("kc-accessToken").textContent = tokens.access_token;
+        document.getElementById("kc-refreshToken").textContent = tokens.refresh_token;
+        document.getElementById("keycloakTokenInfo").style.display = "block";
 
-        // Fetch user info
-        await fetchUserInfo(tokens.access_token);
+        // Fetch Keycloak user info
+        await fetchKeycloakUserInfo(tokens.access_token);
       }
 
-      // Refresh Access Token
-      async function refreshAccessToken() {
-        if (!currentTokens.refreshToken) {
-          alert("No refresh token available");
+      async function refreshKeycloakToken() {
+        if (!keycloakTokens.refreshToken) {
+          alert("No Keycloak refresh token available");
           return;
         }
 
@@ -186,26 +214,25 @@
               body: new URLSearchParams({
                 grant_type: "refresh_token",
                 client_id: config.clientId,
-                refresh_token: currentTokens.refreshToken,
+                refresh_token: keycloakTokens.refreshToken,
               }),
             }
           );
 
           if (!response.ok) {
-            throw new Error("Failed to refresh token");
+            throw new Error("Failed to refresh Keycloak token");
           }
 
           const tokens = await response.json();
-          await handleTokens(tokens);
-          alert("Access token refreshed successfully");
+          await handleKeycloakTokens(tokens);
+          alert("Keycloak Access token refreshed successfully");
         } catch (error) {
-          console.error("Token refresh failed:", error);
-          alert("Failed to refresh token. Please login again.");
+          console.error("Keycloak token refresh failed:", error);
+          alert("Failed to refresh Keycloak token. Please login again.");
         }
       }
 
-      // Fetch User Info
-      async function fetchUserInfo(accessToken) {
+      async function fetchKeycloakUserInfo(accessToken) {
         try {
           const userInfoResponse = await fetch(
             `${config.keycloakUrl}/realms/${config.realm}/protocol/openid-connect/userinfo`,
@@ -217,29 +244,75 @@
           );
 
           if (!userInfoResponse.ok) {
-            throw new Error("Failed to get user info");
+            throw new Error("Failed to get Keycloak user info");
           }
 
           const userInfo = await userInfoResponse.json();
-          document.getElementById("userInfoContent").textContent =
+          document.getElementById("kc-userInfoContent").textContent =
             JSON.stringify(userInfo, null, 2);
-          document.getElementById("userInfo").style.display = "block";
+          document.getElementById("keycloakUserInfo").style.display = "block";
         } catch (error) {
-          console.error("Failed to fetch user info:", error);
-          alert("Failed to fetch user information");
+          console.error("Keycloak: Failed to fetch user info:", error);
         }
       }
 
-      // Handle GitHub OAuth callback
-      window.onload = function () {
+      /**************************************************
+       * GitHub Flow
+       * 1) handleGitHubLogin() => redirect user to your server or GitHub
+       * 2) GitHub redirects user back to your front-end with ?code=...
+       * 3) handleGitHubCallback() => we call our backend with code
+       **************************************************/
+      function handleGitHubLogin() {
+        // Option A: Use your backend route that starts the GitHub OAuth flow
+        window.location.href = `${config.backendUrl}/github/login`;
+
+        // Option B: Directly go to GitHub (requires your backend callback in GH app):
+        // const state = Math.random().toString(36).substring(7);
+        // window.location.href = `https://github.com/login/oauth/authorize?client_id=${config.githubClientId}&scope=user:email&state=${state}`;
+      }
+
+      async function handleGitHubCallback(code) {
+        // We'll call the backend to exchange 'code' for an access token + user info
+        try {
+          const response = await fetch(
+            `${config.backendUrl}/github/callback?code=${code}`
+          );
+          if (!response.ok) {
+            throw new Error("GitHub callback exchange failed");
+          }
+
+          const data = await response.json();
+          // Data expected: { accessToken, user }
+          githubToken = data.accessToken;
+
+          // Update the UI
+          document.getElementById("gh-accessToken").textContent = githubToken;
+          document.getElementById("githubTokenInfo").style.display = "block";
+
+          // Show user info
+          document.getElementById("gh-userInfoContent").textContent = JSON.stringify(
+            data.user,
+            null,
+            2
+          );
+          document.getElementById("githubUserInfo").style.display = "block";
+        } catch (error) {
+          console.error("GitHub OAuth Callback error:", error);
+          alert("GitHub Login failed. Check console.");
+        }
+      }
+
+      /**************************************************
+       * On Page Load
+       * - Check if we have a GitHub 'code' in URL
+       **************************************************/
+      window.onload = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get("code");
 
+        // If we got a GitHub 'code', exchange it
         if (code) {
-          // Note: You'll need a backend server to handle the GitHub OAuth code exchange
-          alert(
-            "GitHub OAuth code received. Backend server needed to complete authentication."
-          );
+          handleGitHubCallback(code);
         }
       };
     </script>
