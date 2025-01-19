@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authentication Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .login-container {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .login-option {
+        flex: 1;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #0366d6;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px 0;
+        width: 100%;
+      }
+      button:hover {
+        background-color: #024ea4;
+      }
+      .info-section {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: none;
+      }
+      .token-info {
+        word-break: break-all;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Authentication Options</h1>
+
+    <div class="login-container">
+      <div class="login-option">
+        <h2>GitHub Login</h2>
+        <button onclick="handleGitHubLogin()">Login with GitHub</button>
+      </div>
+
+      <div class="login-option">
+        <h2>Keycloak Login</h2>
+        <input
+          type="text"
+          id="username"
+          placeholder="Username"
+          style="width: 100%; margin-bottom: 10px; padding: 8px"
+        />
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          style="width: 100%; margin-bottom: 10px; padding: 8px"
+        />
+        <button onclick="handleKeycloakLogin()">Login with Keycloak</button>
+      </div>
+    </div>
+
+    <div id="tokenInfo" class="info-section">
+      <h2>Token Information</h2>
+      <div class="token-info">
+        <h3>Access Token:</h3>
+        <pre id="accessToken"></pre>
+        <h3>Refresh Token:</h3>
+        <pre id="refreshToken"></pre>
+        <button onclick="refreshAccessToken()">Refresh Access Token</button>
+      </div>
+    </div>
+
+    <div id="userInfo" class="info-section">
+      <h2>User Information</h2>
+      <pre id="userInfoContent"></pre>
+    </div>
+
+    <script>
+      const config = {
+        githubClientId: "5bdaed662b4e7ccef7bd",
+        githubClientSecret: "f4094fce7eed1414114487b272cb966538f9464b",
+        keycloakUrl: "http://localhost:8080",
+        realm: "general_project",
+        clientId: "frontend-client",
+      };
+
+      let currentTokens = {
+        accessToken: null,
+        refreshToken: null,
+      };
+
+      // Handle GitHub Login
+      function handleGitHubLogin() {
+        // Generate a random state value for security
+        const state = Math.random().toString(36).substring(7);
+        localStorage.setItem("oauth_state", state);
+
+        const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${config.githubClientId}&scope=user:email&state=${state}`;
+        window.location.href = githubAuthUrl;
+      }
+
+      // Handle Keycloak Login
+      async function handleKeycloakLogin() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        try {
+          const tokenResponse = await fetch(
+            `${config.keycloakUrl}/realms/${config.realm}/protocol/openid-connect/token`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({
+                grant_type: "password",
+                client_id: config.clientId,
+                username: username,
+                password: password,
+                scope: "email openid",
+              }),
+            }
+          );
+
+          if (!tokenResponse.ok) {
+            throw new Error("Failed to get token");
+          }
+
+          const tokens = await tokenResponse.json();
+          await handleTokens(tokens);
+        } catch (error) {
+          console.error("Login failed:", error);
+          alert("Login failed. Please check your credentials.");
+        }
+      }
+
+      // Handle tokens after successful authentication
+      async function handleTokens(tokens) {
+        currentTokens = {
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
+        };
+
+        // Display tokens
+        document.getElementById("accessToken").textContent =
+          tokens.access_token;
+        document.getElementById("refreshToken").textContent =
+          tokens.refresh_token;
+        document.getElementById("tokenInfo").style.display = "block";
+
+        // Fetch user info
+        await fetchUserInfo(tokens.access_token);
+      }
+
+      // Refresh Access Token
+      async function refreshAccessToken() {
+        if (!currentTokens.refreshToken) {
+          alert("No refresh token available");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${config.keycloakUrl}/realms/${config.realm}/protocol/openid-connect/token`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({
+                grant_type: "refresh_token",
+                client_id: config.clientId,
+                refresh_token: currentTokens.refreshToken,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to refresh token");
+          }
+
+          const tokens = await response.json();
+          await handleTokens(tokens);
+          alert("Access token refreshed successfully");
+        } catch (error) {
+          console.error("Token refresh failed:", error);
+          alert("Failed to refresh token. Please login again.");
+        }
+      }
+
+      // Fetch User Info
+      async function fetchUserInfo(accessToken) {
+        try {
+          const userInfoResponse = await fetch(
+            `${config.keycloakUrl}/realms/${config.realm}/protocol/openid-connect/userinfo`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          if (!userInfoResponse.ok) {
+            throw new Error("Failed to get user info");
+          }
+
+          const userInfo = await userInfoResponse.json();
+          document.getElementById("userInfoContent").textContent =
+            JSON.stringify(userInfo, null, 2);
+          document.getElementById("userInfo").style.display = "block";
+        } catch (error) {
+          console.error("Failed to fetch user info:", error);
+          alert("Failed to fetch user information");
+        }
+      }
+
+      // Handle GitHub OAuth callback
+      window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get("code");
+
+        if (code) {
+          // Note: You'll need a backend server to handle the GitHub OAuth code exchange
+          alert(
+            "GitHub OAuth code received. Backend server needed to complete authentication."
+          );
+        }
+      };
+    </script>
+  </body>
+</html>
