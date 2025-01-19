@@ -306,7 +306,7 @@
        **************************************************/
       function handleGitHubLogin() {
         // Option A: Use your backend route that starts the GitHub OAuth flow
-        window.location.href = `${config.backendUrl}/exchange/github-to-keycloak`;
+        window.location.href = `${config.backendUrl}/github/login`;
 
         // Option B: Directly go to GitHub (requires your backend callback in GH app):
         // const state = Math.random().toString(36).substring(7);
