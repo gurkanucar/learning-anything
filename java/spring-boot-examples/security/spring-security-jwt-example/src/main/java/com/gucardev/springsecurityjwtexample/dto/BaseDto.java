@@ -1,9 +1,10 @@
 package com.gucardev.springsecurityjwtexample.dto;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter

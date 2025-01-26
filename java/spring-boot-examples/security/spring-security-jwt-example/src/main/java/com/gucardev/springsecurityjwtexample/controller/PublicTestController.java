@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/public")
 public class PublicTestController {
 
-  @GetMapping
-  public ResponseEntity<String> sayHello() {
-    return ResponseEntity.ok("Hello! This is public endpoint");
-  }
+    @GetMapping
+    public ResponseEntity<String> sayHello() {
+        return ResponseEntity.ok("Hello! This is public endpoint");
+    }
 }

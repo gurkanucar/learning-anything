@@ -3,42 +3,41 @@ package com.gucardev.springsecurityjwtexample.config;
 import com.gucardev.springsecurityjwtexample.entity.Role;
 import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.service.UserService;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class InitialDataPopulate implements CommandLineRunner {
 
-  private final UserService userService;
+    private final UserService userService;
 
-  @Override
-  public void run(String... args) {
+    @Override
+    public void run(String... args) {
 
-    var user = new User();
-    user.setUsername("admin");
-    user.setPassword("pass");
-    user.setOtpEnabled(true);
-    user.setRoles(Set.of(Role.ADMIN, Role.USER));
-    user.setIsEnabled(true);
-    try {
-      userService.getByUsername("admin");
-    } catch (Exception e) {
-      userService.createUser(user);
+        var user = new User();
+        user.setUsername("admin");
+        user.setPassword("pass");
+        user.setRoles(Set.of(Role.ADMIN, Role.USER));
+        user.setIsEnabled(true);
+        try {
+            userService.getByUsername("admin");
+        } catch (Exception e) {
+            userService.createUser(user);
+        }
+        var user2 = new User();
+        user2.setUsername("user");
+        user2.setPassword("pass");
+        user2.setRoles(Set.of(Role.USER));
+        user2.setIsEnabled(true);
+        try {
+            userService.getByUsername("user");
+        } catch (Exception e) {
+            userService.createUser(user2);
+        }
     }
-    var user2 = new User();
-    user2.setUsername("user");
-    user2.setPassword("pass");
-    user.setOtpEnabled(false);
-    user2.setRoles(Set.of(Role.USER));
-    user2.setIsEnabled(true);
-    try {
-      userService.getByUsername("user");
-    } catch (Exception e) {
-      userService.createUser(user2);
-    }
-  }
 
 }

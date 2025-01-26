@@ -1,6 +1,5 @@
 package com.gucardev.springsecurityjwtexample.security;
 
-import java.util.Arrays;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,60 +19,61 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final JwtFilter jwtFilter;
-
-  @Bean
-  public AuthenticationManager authenticationManager(
-      final AuthenticationConfiguration authenticationConfiguration) throws Exception {
-    return authenticationConfiguration.getAuthenticationManager();
-  }
-
-  private static final String[] IGNORED_PATHS = {
+    private static final String[] IGNORED_PATHS = {
 //            "/**", // disable later
-      "/swagger-resources/**",
-      "/swagger-ui.html/**",
-      "/swagger-ui/**",
-      "/v3/api-docs/**",
-      "/auth/**",
-      "/public/**",
-      "/h2-console/**"
-  };
-
-  @Bean
-  public WebSecurityCustomizer webSecurityCustomizer() {
-    return (web) -> Arrays.stream(IGNORED_PATHS)
-        .forEach(path -> web.ignoring().requestMatchers(new AntPathRequestMatcher(path)));
-  }
-
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-    httpSecurity
-        .headers(x -> x.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-        .csrf(AbstractHttpConfigurer::disable)
-        .cors(Customizer.withDefaults())
-        .formLogin(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(x -> x.anyRequest().authenticated())
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-    return httpSecurity.build();
-  }
-
-
-  @Bean
-  public WebMvcConfigurer corsConfigurer() {
-    return new WebMvcConfigurer() {
-      @Override
-      public void addCorsMappings(@NonNull CorsRegistry registry) {
-        registry.addMapping("/**").allowedMethods("*");
-      }
+            "/swagger-resources/**",
+            "/swagger-ui.html/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/auth/**",
+            "/public/**",
+            "/h2-console/**"
     };
-  }
+    private final JwtFilter jwtFilter;
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            final AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> Arrays.stream(IGNORED_PATHS)
+                .forEach(path -> web.ignoring().requestMatchers(new AntPathRequestMatcher(path)));
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .headers(x -> x.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .formLogin(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(x -> x.anyRequest().authenticated())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        return httpSecurity.build();
+    }
+
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
+                registry.addMapping("/**").allowedMethods("*");
+            }
+        };
+    }
 
 
 }

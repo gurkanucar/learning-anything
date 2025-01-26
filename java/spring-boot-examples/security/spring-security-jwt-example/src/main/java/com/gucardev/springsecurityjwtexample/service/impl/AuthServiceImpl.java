@@ -1,15 +1,15 @@
 package com.gucardev.springsecurityjwtexample.service.impl;
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
-import com.gucardev.springsecurityjwtexample.dto.OtpValidateRequest;
-import com.gucardev.springsecurityjwtexample.dto.RefreshTokenRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
+import com.gucardev.springsecurityjwtexample.entity.RefreshToken;
 import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.mapper.UserMapper;
 import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
 import com.gucardev.springsecurityjwtexample.service.AuthService;
-import com.gucardev.springsecurityjwtexample.service.TokenService;
+import com.gucardev.springsecurityjwtexample.service.JwtTokenService;
+import com.gucardev.springsecurityjwtexample.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,54 +23,60 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-  private final AuthenticationManager authenticationManager;
-  private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenService tokenService;
+    private final RefreshTokenService refreshTokenService;
 
-  @Override
-  public TokenDto login(LoginRequest loginRequest) {
-    try {
-      Authentication authentication = authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(
-              loginRequest.getUsername(),
-              loginRequest.getPassword())
-      );
-      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-      User user = userDetails.getUser();
-      var token = tokenService.createNewTokenForUser(user);
+    @Override
+    public TokenDto login(LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticateUser(loginRequest);
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = userDetails.getUser();
 
-      if (Boolean.TRUE.equals(user.getOtpEnabled())) {
-        var otpCode = tokenService.createOtp(token.getTokenSign());
-        log.info("otp: {}, created for user {}", otpCode, loginRequest.getUsername());
-      }
-      return token;
-    } catch (Exception e) {
-      log.error("Error occurred during login for user: {}", loginRequest.getUsername(), e);
-      throw new RuntimeException("Error occurred during login");
+            String accessToken = tokenService.generateToken(user);
+            String refreshToken = refreshTokenService.generateAndSaveRefreshToken(user);
+
+            return TokenDto.buildTokenDto(user, accessToken, refreshToken);
+        } catch (Exception e) {
+            log.error("Error during login for user: {}", loginRequest.getUsername(), e);
+            throw new RuntimeException("Login failed: invalid username or password");
+        }
     }
-  }
 
-  @Override
-  public UserDto getAuthenticatedUser() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null && authentication.isAuthenticated()) {
-      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-      return UserMapper.toDto(userDetails.getUser());
+    @Override
+    public UserDto getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (isAuthenticated(authentication)) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return UserMapper.toDto(userDetails.getUser());
+        }
+        throw new IllegalStateException("No authenticated user found");
     }
-    throw new IllegalStateException("No authenticated user found");
-  }
 
-  @Override
-  public void logout(String authorizationHeader) {
-    tokenService.invalidateTokenByAuthorizationHeader(authorizationHeader);
-  }
+    @Override
+    public TokenDto refreshToken(String refreshTokenValue) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue);
+        if (!refreshTokenService.isTokenValid(refreshToken)) {
+            throw new RuntimeException("Refresh token is expired or invalid!");
+        }
+        User user = refreshToken.getUser();
+        String newAccessToken = tokenService.generateToken(user);
+        String newRefreshToken = refreshTokenService.generateAndSaveRefreshToken(user);
+        return TokenDto.buildTokenDto(user, newAccessToken, newRefreshToken);
+    }
 
-  @Override
-  public TokenDto refreshToken(RefreshTokenRequest refreshTokenRequest) {
-    return tokenService.createNewTokenWithRefreshToken(refreshTokenRequest.getRefreshToken());
-  }
+    private Authentication authenticateUser(LoginRequest loginRequest) {
+        return authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
+    }
 
-  @Override
-  public boolean validateOtp(OtpValidateRequest otpValidateRequest) {
-    return tokenService.isOtpValid(otpValidateRequest);
-  }
+    private boolean isAuthenticated(Authentication authentication) {
+        return authentication != null && authentication.isAuthenticated();
+    }
 }
+

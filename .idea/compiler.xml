@@ -39,30 +39,22 @@
         <module name="spring-scopes" />
         <module name="dto-field-masker" />
       </profile>
-      <profile name="Annotation profile for large-file-operations" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-        </processorPath>
-        <module name="large-file-operations" />
-      </profile>
       <profile name="Annotation profile for tree-directory-structure" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
         <module name="tree-directory-structure" />
+        <module name="large-file-operations" />
         <module name="dockerize-spring-boot-example" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="gucardev" target="1.8" />
       <module name="parent-module" target="21" />
+      <module name="spring-security-oauth2-server" target="17" />
       <module name="sqsexample" target="21" />
     </bytecodeTargetLevel>
   </component>

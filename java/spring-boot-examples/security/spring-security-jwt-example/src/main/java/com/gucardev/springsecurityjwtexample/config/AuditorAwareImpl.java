@@ -2,11 +2,12 @@ package com.gucardev.springsecurityjwtexample.config;
 
 import com.gucardev.springsecurityjwtexample.constants.Constants;
 import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.Optional;
 
 @Slf4j
 public class AuditorAwareImpl implements AuditorAware<String> {
@@ -18,7 +19,7 @@ public class AuditorAwareImpl implements AuditorAware<String> {
         }
         CustomUserDetails userPrincipal = (CustomUserDetails) authentication.getPrincipal();
         try {
-            return Optional.of(userPrincipal.getUsername().toString());
+            return Optional.of(userPrincipal.getUsername());
         } catch (IllegalArgumentException e) {
             log.error("Could not get current auditor", e);
             return Optional.of(Constants.DEFAULT_AUDITOR);
