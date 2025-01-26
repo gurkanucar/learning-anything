@@ -1,11 +1,13 @@
 package com.gucardev.springsecurityjwtexample.service;
 
-import com.gucardev.springsecurityjwtexample.entity.User;
+import java.util.List;
 
 public interface JwtTokenService {
 
-    String generateToken(User user);
+    String generateToken(String username, List<String> roles);
+
     boolean validateToken(String token);
+
     String getUsernameFromToken(String token);
 
 }

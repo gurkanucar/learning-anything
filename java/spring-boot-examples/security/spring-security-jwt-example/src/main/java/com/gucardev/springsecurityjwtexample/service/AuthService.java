@@ -4,6 +4,7 @@ package com.gucardev.springsecurityjwtexample.service;
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
+import jakarta.validation.constraints.NotBlank;
 
 public interface AuthService {
 
@@ -11,5 +12,5 @@ public interface AuthService {
 
     UserDto getAuthenticatedUser();
 
-    TokenDto refreshToken(String refreshTokenValue);
+    TokenDto refreshToken(@NotBlank String refreshToken);
 }

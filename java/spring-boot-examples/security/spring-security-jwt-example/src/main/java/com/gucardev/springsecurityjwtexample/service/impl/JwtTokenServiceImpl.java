@@ -32,15 +32,10 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         this.jwtExpiration = jwtExpiration;
     }
 
-    public String generateToken(User user) {
-        List<String> roleList = user.getRoles()
-                .stream()
-                .map(Role::name)
-                .collect(Collectors.toList());
-
+    public String generateToken(String username, List<String> roles) {
         return Jwts.builder()
-                .setSubject(user.getUsername())
-                .claim("roles", roleList)
+                .setSubject(username)
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(signingKey, SignatureAlgorithm.HS256)

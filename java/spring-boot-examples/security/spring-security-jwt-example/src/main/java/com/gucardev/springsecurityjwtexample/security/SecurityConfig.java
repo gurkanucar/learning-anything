@@ -1,5 +1,7 @@
 package com.gucardev.springsecurityjwtexample.security;
 
+import com.gucardev.springsecurityjwtexample.security.magiclink.CustomAuthenticationErrorHandler;
+import com.gucardev.springsecurityjwtexample.security.magiclink.CustomAuthenticationSuccessHandler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +40,8 @@ public class SecurityConfig {
             "/h2-console/**"
     };
     private final JwtFilter jwtFilter;
+    private final CustomAuthenticationSuccessHandler magicLinkSuccessHandler;
+    private final CustomAuthenticationErrorHandler magicLinkErrorHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -51,15 +55,33 @@ public class SecurityConfig {
                 .forEach(path -> web.ignoring().requestMatchers(new AntPathRequestMatcher(path)));
     }
 
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//                .headers(x -> x.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .formLogin(Customizer.withDefaults())
+//                .oneTimeTokenLogin(x ->
+//                        x.authenticationSuccessHandler(magicLinkSuccessHandler)
+//                                .authenticationFailureHandler(magicLinkErrorHandler))
+//                .cors(Customizer.withDefaults())
+//                .authorizeHttpRequests(x -> x.anyRequest().authenticated())
+//        ;
+//        return http.build();
+//    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .headers(x -> x.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(Customizer.withDefaults())
+                .formLogin(Customizer.withDefaults())
+                .oneTimeTokenLogin(x ->
+                        x.authenticationSuccessHandler(magicLinkSuccessHandler)
+                                .authenticationFailureHandler(magicLinkErrorHandler))
                 .cors(Customizer.withDefaults())
-                .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(x -> x.anyRequest().authenticated())
-                .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
