@@ -19,7 +19,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\":\"user\",\r\n    \"password\":\"pass\"\r\n}",
+							"raw": "{\r\n    \"username\":\"admin\",\r\n    \"password\":\"pass\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -41,6 +41,102 @@
 					"response": []
 				},
 				{
+					"name": "ott send token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/ott/generate",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"ott",
+								"generate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ott validate token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "03293020-e7ed-43dd-bfea-64bfd3007a82",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/login/ott",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"login",
+								"ott"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "validate otp",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tokenSign\": \"95c8d815-bb85-44e3-b8d4-42b657a9e45a\",\r\n    \"otpCode\": 6058\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/auth/validate-otp",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"validate-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "refresh token",
 					"request": {
 						"auth": {
@@ -50,7 +146,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"refreshToken\":\"33893c35-cc83-4791-a0f9-18ca67780396\"\r\n}",
+							"raw": "{\r\n    \"refreshToken\":\"0ab8576c-b619-43b3-aa9b-db97a4971a41\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -58,14 +154,14 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/auth/refresh-token",
+							"raw": "localhost:8080/auth/refresh",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"auth",
-								"refresh-token"
+								"refresh"
 							]
 						}
 					},
@@ -190,7 +286,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJVU0VSIl0sInRva2VuU2lnbiI6ImVlMDgxNGVlLWY4MTQtNDk5OS1hZTcyLTcyNWZjMmE4YWU2YSIsInN1YiI6InVzZXIiLCJpYXQiOjE3MzI0ODI2MDUsImV4cCI6MTczMjUxODYwNX0.kmp74Va8rBOzY753Kc0kc98-a6WHXUjUxhoPCD7ej6g",
+				"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlVTRVIiLCJBRE1JTiJdLCJpYXQiOjE3Mzc5MzQ1NDEsImV4cCI6MTczNzk3MDU0MX0.7pam1HBPrEm0cRORWrnqdcKdkOU4zQ8g1nW-KgtV0Ug",
 				"type": "string"
 			}
 		]
