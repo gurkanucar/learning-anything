@@ -3,6 +3,7 @@ package com.gucardev.springsecurityjwtexample.service.impl;
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
+import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.mapper.UserMapper;
 import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
 import com.gucardev.springsecurityjwtexample.service.AuthService;
@@ -27,30 +28,30 @@ public class AuthServiceImpl implements AuthService {
     public TokenDto login(LoginRequest loginRequest) {
         try {
             Authentication authentication = authenticateUser(loginRequest);
-            return tokenService.getTokenDto(getPrincipal(authentication).getUser());
-        } catch (Exception e) {
-            log.error("Error during login for user: {}", loginRequest.getUsername(), e);
-            throw new RuntimeException("Login failed: invalid username or password");
+            User user = extractUser(authentication);
+            return tokenService.getTokenDto(user);
+        } catch (Exception ex) {
+            log.error("Authentication error for user: {}", loginRequest.getUsername(), ex);
+            throw new RuntimeException("Authentication failed", ex);
         }
-    }
-
-    private static CustomUserDetails getPrincipal(Authentication authentication) {
-        return (CustomUserDetails) authentication.getPrincipal();
     }
 
     @Override
     public UserDto getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (isAuthenticated(authentication)) {
-            return UserMapper.toDto(getPrincipal(authentication).getUser());
+            User user = extractUser(authentication);
+            return UserMapper.toDto(user);
         }
-        throw new IllegalStateException("No authenticated user found");
+        throw new RuntimeException("No authenticated user found");
     }
 
     @Override
     public TokenDto refreshToken(String refreshToken) {
         return tokenService.refreshToken(refreshToken);
     }
+
+    // --- Private Helpers ---
 
     private Authentication authenticateUser(LoginRequest loginRequest) {
         return authenticationManager.authenticate(
@@ -61,8 +62,22 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
+    private User extractUser(Authentication authentication) {
+        if (!isAuthenticated(authentication)) {
+            throw new RuntimeException("No valid authentication found");
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof CustomUserDetails)) {
+            throw new RuntimeException("Principal is not of expected type");
+        }
+
+        return ((CustomUserDetails) principal).getUser();
+    }
+
     private boolean isAuthenticated(Authentication authentication) {
         return authentication != null && authentication.isAuthenticated();
     }
 }
+
 

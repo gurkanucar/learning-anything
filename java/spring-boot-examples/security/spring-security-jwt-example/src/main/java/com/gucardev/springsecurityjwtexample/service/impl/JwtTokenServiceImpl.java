@@ -1,8 +1,6 @@
 package com.gucardev.springsecurityjwtexample.service.impl;
 
 
-import com.gucardev.springsecurityjwtexample.entity.Role;
-import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.service.JwtTokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class JwtTokenServiceImpl implements JwtTokenService {
@@ -32,6 +29,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         this.jwtExpiration = jwtExpiration;
     }
 
+    @Override
     public String generateToken(String username, List<String> roles) {
         return Jwts.builder()
                 .setSubject(username)
@@ -42,6 +40,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 .compact();
     }
 
+    @Override
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -54,12 +53,14 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         }
     }
 
+    @Override
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
         return claims.getSubject();
     }
 
@@ -70,7 +71,9 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
         return (List<String>) claims.get("roles");
     }
 }
+
 

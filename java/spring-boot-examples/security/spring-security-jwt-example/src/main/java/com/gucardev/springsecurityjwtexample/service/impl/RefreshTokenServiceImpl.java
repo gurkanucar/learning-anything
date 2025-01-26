@@ -17,33 +17,36 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
+    private static final long TOKEN_VALIDITY_DAYS = 7; // Or configure in properties
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
+    @Override
     public String generateAndSaveRefreshToken(User user) {
         // Delete old tokens for that user
         refreshTokenRepository.deleteByUser(user);
 
         // Create and save a new refresh token
-        String token = UUID.randomUUID().toString();
-        Date expiryDate = Date.from(Instant.now().plus(7, ChronoUnit.DAYS));
+        String tokenValue = UUID.randomUUID().toString();
+        Date expiryDate = Date.from(Instant.now().plus(TOKEN_VALIDITY_DAYS, ChronoUnit.DAYS));
 
         RefreshToken refreshToken = RefreshToken.builder()
-                .token(token)
+                .token(tokenValue)
                 .expiryDate(expiryDate)
                 .user(user)
                 .build();
 
         refreshTokenRepository.save(refreshToken);
-
-        return token;
+        return tokenValue;
     }
 
+    @Override
     public RefreshToken findByToken(String token) {
         return refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found!"));
     }
 
+    @Override
     public boolean isTokenValid(RefreshToken token) {
         return token.getExpiryDate().after(new Date());
     }

@@ -55,21 +55,6 @@ public class SecurityConfig {
                 .forEach(path -> web.ignoring().requestMatchers(new AntPathRequestMatcher(path)));
     }
 
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                .headers(x -> x.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .formLogin(Customizer.withDefaults())
-//                .oneTimeTokenLogin(x ->
-//                        x.authenticationSuccessHandler(magicLinkSuccessHandler)
-//                                .authenticationFailureHandler(magicLinkErrorHandler))
-//                .cors(Customizer.withDefaults())
-//                .authorizeHttpRequests(x -> x.anyRequest().authenticated())
-//        ;
-//        return http.build();
-//    }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity

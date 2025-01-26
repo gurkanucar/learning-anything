@@ -19,35 +19,39 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TokenServiceImpl implements TokenService {
 
-    private final JwtTokenService tokenService;
+    private final JwtTokenService jwtTokenService;
     private final RefreshTokenService refreshTokenService;
 
-
     @Override
-    public TokenDto getTokenDto(User userDetails) {
-        String accessToken = tokenService.generateToken(userDetails.getUsername(),
-                getRoles(userDetails));
-        String refreshToken = refreshTokenService.generateAndSaveRefreshToken(userDetails);
+    public TokenDto getTokenDto(User user) {
+        String accessToken = jwtTokenService.generateToken(
+                user.getUsername(),
+                extractRoles(user)
+        );
 
-        return TokenDto.buildTokenDto(userDetails, accessToken, refreshToken);
+        String refreshToken = refreshTokenService.generateAndSaveRefreshToken(user);
+
+        return TokenDto.buildTokenDto(user, accessToken, refreshToken);
     }
 
-    private static List<String> getRoles(User user) {
+    @Override
+    public TokenDto refreshToken(String refreshTokenValue) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue);
+
+        if (!refreshTokenService.isTokenValid(refreshToken)) {
+            throw new RuntimeException("Refresh token is expired or invalid!");
+        }
+
+        return getTokenDto(refreshToken.getUser());
+    }
+
+    // --- Private Helpers ---
+
+    private List<String> extractRoles(User user) {
         return user.getRoles()
                 .stream()
                 .map(Role::name)
                 .collect(Collectors.toList());
     }
-
-
-    @Override
-    public TokenDto refreshToken(String refreshTokenValue) {
-        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue);
-        if (!refreshTokenService.isTokenValid(refreshToken)) {
-            throw new RuntimeException("Refresh token is expired or invalid!");
-        }
-        return getTokenDto(refreshToken.getUser());
-    }
-
 }
 
