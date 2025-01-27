@@ -41,7 +41,6 @@ public class JwtFilter extends OncePerRequestFilter {
 //        UsernamePasswordAuthenticationToken authToken =
 //                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-            // Custom authentication token that includes the JWT
             CustomUsernamePasswordAuthenticationToken authToken =
                     new CustomUsernamePasswordAuthenticationToken(userDetails, userDetails.getAuthorities(), jwt);
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
