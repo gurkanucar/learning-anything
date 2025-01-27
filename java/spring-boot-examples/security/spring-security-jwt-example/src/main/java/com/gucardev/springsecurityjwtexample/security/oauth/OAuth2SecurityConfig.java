@@ -66,18 +66,13 @@ public class OAuth2SecurityConfig {
                             .roles(Set.of(Role.USER))
                             .build()
             );
-            // Serialize the TokenDto as JSON
             ObjectMapper objectMapper = new ObjectMapper();
             String tokenJson = objectMapper.writeValueAsString(token);
-            // Encode the serialized token in Base64
             String encodedToken = Base64.getEncoder().encodeToString(tokenJson.getBytes(StandardCharsets.UTF_8));
-            // Replace the placeholder in the redirect URI
             String redirectUrl = oauth2SuccessRedirectUri.replace("{token}", encodedToken);
-            // Redirect the user
             response.sendRedirect(redirectUrl);
         };
     }
-
 
     @Bean
     public AuthenticationFailureHandler oauth2FailureHandler() {

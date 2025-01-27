@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -21,51 +20,24 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class CustomGithubOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+
     private final UserService userService;
     private final GithubApiClient githubApiClient;
 
+    private final DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
+
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) {
-        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
-        String email = getEmailForUser(userRequest, oAuth2User);
-        processUser(oAuth2User, email);
-        return mapToOAuth2User(oAuth2User, email);
-    }
-
-    private String getEmailForUser(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
-        String email = (String) oAuth2User.getAttributes().get("email");
-        if (email == null) {
-            log.debug("Email not found in primary attributes, fetching from GitHub API");
-            String accessToken = userRequest.getAccessToken().getTokenValue();
-            email = fetchPrimaryEmail(accessToken);
-        }
-        if (email == null) {
-            throw new OAuth2AuthenticationException(
-                    new OAuth2Error("email_not_found", "No email found for GitHub user", null));
-        }
-        return email;
-    }
-
-    private String fetchPrimaryEmail(String accessToken) {
-        return githubApiClient.fetchEmails(accessToken).stream()
-                .filter(GithubEmail::isPrimary)
-                .map(GithubEmail::getEmail)
-                .findFirst()
-                .orElseGet(() -> githubApiClient.fetchEmails(accessToken)
-                        .stream()
-                        .findFirst()
-                        .map(GithubEmail::getEmail)
-                        .orElse(null));
-    }
-
-    private void processUser(OAuth2User oAuth2User, String email) {
+        String accessToken = userRequest.getAccessToken().getTokenValue();
+        String email = githubApiClient.extractEmail(oAuth2User, accessToken);
         User user = userService.getByEmail(email)
                 .orElseGet(() -> mapToUser(oAuth2User.getAttributes(), email));
         userService.upsertForOauth(user);
+        return mapToOAuth2User(oAuth2User, email);
     }
 
     private User mapToUser(Map<String, Object> attributes, String email) {

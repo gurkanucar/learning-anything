@@ -30,7 +30,6 @@ public class CustomGoogleOAuth2UserService implements OAuth2UserService<OAuth2Us
         String email = (String) oAuth2User.getAttributes().get("email");
         String name = (String) oAuth2User.getAttributes().get("name");
         String picture = (String) oAuth2User.getAttributes().get("picture");
-
         User user = userService.getByEmail(email)
                 .orElse(User.builder()
                         .email(email)
@@ -38,9 +37,7 @@ public class CustomGoogleOAuth2UserService implements OAuth2UserService<OAuth2Us
                         .profilePicture(picture)
                         .roles(Set.of(Role.USER))
                         .build());
-
         userService.upsertForOauth(user);
-
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 oAuth2User.getAttributes(),

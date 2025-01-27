@@ -45,6 +45,7 @@ public class SecurityConfig {
             "/public/**",
             "/h2-console/**"
     };
+
     private final JwtFilter jwtFilter;
     private final CustomAuthenticationSuccessHandler magicLinkSuccessHandler;
     private final CustomAuthenticationErrorHandler magicLinkErrorHandler;
@@ -80,7 +81,6 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -91,11 +91,9 @@ public class SecurityConfig {
         };
     }
 
-
     @Bean
     public OneTimeTokenService oneTimeTokenService() {
         return new JdbcOneTimeTokenService(jdbcTemplate);
     }
-
 
 }
