@@ -1,21 +1,43 @@
-import { Redirect } from 'expo-router';
-import { useAuth } from './context/auth.context';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { useEffect } from 'react';
+import { router } from 'expo-router';
 
 export default function Index() {
-  const { user, isLoading } = useAuth();
+  useEffect(() => {
+    // Add a small delay to show splash screen
+    const timer = setTimeout(() => {
+      router.replace('/login');
+    }, 1500);
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+    return () => clearTimeout(timer);
+  }, []);
 
-  if (user) {
-    return <Redirect href="/(tabs)/home" />;
-  }
-
-  return <Redirect href="/(auth)/login" />;
+  return (
+    <View style={styles.container}>
+      <Text style={styles.appName}>MyApp</Text>
+      <ActivityIndicator 
+        size="large" 
+        color="#007AFF" 
+        style={styles.spinner}
+      />
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  appName: {
+    fontSize: 42,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#007AFF',
+  },
+  spinner: {
+    marginTop: 20,
+  },
+});

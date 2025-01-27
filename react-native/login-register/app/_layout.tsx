@@ -1,52 +1,17 @@
-import { Stack } from 'expo-router';
-import { useColorScheme } from 'react-native';
-import AuthProvider from './context/auth.context';
-import { View, ActivityIndicator } from 'react-native';
+import { Stack } from "expo-router";
 
-function LoadingScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" />
-    </View>
-  );
-}
-
-function ProtectedLayout() {
-  const colorScheme = useColorScheme();
-
+export default function Layout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: {
-          backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
-        },
-        headerTintColor: colorScheme === 'dark' ? '#fff' : '#000',
-        animation: 'none',
-        gestureEnabled: false,
         headerShown: false,
+        animation: 'none'
       }}
     >
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen 
-        name="(auth)" 
-        options={{ 
-          headerShown: false,
-        }} 
-      />
-      <Stack.Screen 
-        name="(tabs)" 
-        options={{ 
-          headerShown: false,
-        }} 
-      />
+      <Stack.Screen name="(app)" options={{ gestureEnabled: false }} />
+      <Stack.Screen name="index" options={{ gestureEnabled: false }} />
+      <Stack.Screen name="login" options={{ gestureEnabled: false }} />
+      <Stack.Screen name="register" options={{ gestureEnabled: false }} />
     </Stack>
-  );
-}
-
-export default function RootLayout() {
-  return (
-    <AuthProvider>
-      <ProtectedLayout />
-    </AuthProvider>
   );
 }

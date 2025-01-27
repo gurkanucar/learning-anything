@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "login-register-app",
-    "slug": "login-register-app",
+    "name": "login-register-app-v2",
+    "slug": "login-register-app-v2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
