@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -19,23 +21,24 @@ import java.util.List;
 public class JwtTokenServiceImpl implements JwtTokenService {
 
     private final Key signingKey;
-    private final long jwtExpiration;
+    private final long jwtTokenExpiresInMinutes;
 
     public JwtTokenServiceImpl(
             @Value("${jwt-variables.secret-key}") String secretKey,
-            @Value("${jwt-variables.expiration-time}") long jwtExpiration
+            @Value("${jwt-variables.expiration-time}") long jwtTokenExpiresInMinutes
     ) {
         this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
-        this.jwtExpiration = jwtExpiration;
+        this.jwtTokenExpiresInMinutes = jwtTokenExpiresInMinutes;
     }
 
     @Override
     public String generateToken(String username, List<String> roles) {
+        Date expiryDate = Date.from(Instant.now().plus(jwtTokenExpiresInMinutes, ChronoUnit.MINUTES));
         return Jwts.builder()
                 .setSubject(username)
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setExpiration(expiryDate)
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }

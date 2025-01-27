@@ -6,7 +6,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ott.JdbcOneTimeTokenService;
+import org.springframework.security.authentication.ott.OneTimeTokenService;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -42,6 +45,8 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final CustomAuthenticationSuccessHandler magicLinkSuccessHandler;
     private final CustomAuthenticationErrorHandler magicLinkErrorHandler;
+    private final JdbcTemplate jdbcTemplate;
+
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -80,6 +85,12 @@ public class SecurityConfig {
                 registry.addMapping("/**").allowedMethods("*");
             }
         };
+    }
+
+
+    @Bean
+    public OneTimeTokenService oneTimeTokenService() {
+        return new JdbcOneTimeTokenService(jdbcTemplate);
     }
 
 
