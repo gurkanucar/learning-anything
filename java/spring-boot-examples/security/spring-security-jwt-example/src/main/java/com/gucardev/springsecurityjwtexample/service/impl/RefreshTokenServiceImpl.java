@@ -4,7 +4,6 @@ import com.gucardev.springsecurityjwtexample.entity.RefreshToken;
 import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.repository.RefreshTokenRepository;
 import com.gucardev.springsecurityjwtexample.service.RefreshTokenService;
-import com.gucardev.springsecurityjwtexample.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

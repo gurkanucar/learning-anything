@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Modern Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -16,19 +16,23 @@
             overflow: hidden;
             opacity: 0;
         }
+
         .alert.show {
             max-height: 100px;
             opacity: 1;
             margin: 1rem 0;
         }
+
         .loading {
             pointer-events: none;
             opacity: 0.7;
         }
+
         .token-section {
             display: none;
             animation: slideDown 0.5s ease-out;
         }
+
         @keyframes slideDown {
             from {
                 opacity: 0;
@@ -39,9 +43,11 @@
                 transform: translateY(0);
             }
         }
+
         .token-container {
             position: relative;
         }
+
         .copy-button {
             position: absolute;
             top: 8px;
@@ -49,9 +55,11 @@
             opacity: 0;
             transition: opacity 0.2s;
         }
+
         .token-container:hover .copy-button {
             opacity: 1;
         }
+
         .badge {
             display: inline-block;
             padding: 0.25rem 0.5rem;
@@ -75,12 +83,12 @@
 <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
     <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
         <!-- Alert Message -->
-        <div id="alert" class="alert rounded-md p-4"></div>
+        <div class="alert rounded-md p-4" id="alert"></div>
 
         <!-- Login Form -->
-        <form id="loginForm" class="space-y-6">
+        <form class="space-y-6" id="loginForm">
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">
+                <label class="block text-sm font-medium text-gray-700" for="email">
                     Email address
                 </label>
                 <div class="mt-1 relative rounded-md shadow-sm">
@@ -90,20 +98,20 @@
                         <i class="fas fa-envelope text-gray-400"></i>
                     </div>
                     <input
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             id="email"
                             name="email"
-                            type="email"
-                            required
-                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             placeholder="Enter your email"
+                            required
+                            type="email"
                     />
                 </div>
             </div>
 
             <div id="passwordContainer">
                 <label
-                        for="password"
                         class="block text-sm font-medium text-gray-700"
+                        for="password"
                 >
                     Password
                 </label>
@@ -114,29 +122,29 @@
                         <i class="fas fa-lock text-gray-400"></i>
                     </div>
                     <input
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             id="password"
                             name="password"
-                            type="password"
-                            required
-                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             placeholder="Enter your password"
+                            required
+                            type="password"
                     />
                 </div>
             </div>
 
             <div class="flex flex-col space-y-4">
                 <button
-                        type="submit"
-                        id="loginButton"
                         class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        id="loginButton"
+                        type="submit"
                 >
                     Sign in
                 </button>
 
                 <button
-                        type="button"
-                        id="magicLinkButton"
                         class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        id="magicLinkButton"
+                        type="button"
                 >
                     Sign in with Magic Link
                 </button>
@@ -154,16 +162,16 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <button
-                            type="button"
-                            onclick="handleOAuthLogin('github')"
                             class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                            onclick="handleOAuthLogin('github')"
+                            type="button"
                     >
                         <i class="fab fa-github text-xl"></i>
                     </button>
                     <button
-                            type="button"
-                            onclick="handleOAuthLogin('google')"
                             class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                            onclick="handleOAuthLogin('google')"
+                            type="button"
                     >
                         <i class="fab fa-google text-xl"></i>
                     </button>
@@ -174,8 +182,8 @@
 
     <!-- Add Token Display Section -->
     <div
-            id="tokenSection"
             class="token-section mt-8 sm:mx-auto sm:w-full sm:max-w-2xl"
+            id="tokenSection"
     >
         <div class="bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
@@ -196,15 +204,15 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-xs text-gray-500">Username</p>
-                            <p id="username" class="text-sm font-medium"></p>
+                            <p class="text-sm font-medium" id="username"></p>
                         </div>
                         <div>
                             <p class="text-xs text-gray-500">Email</p>
-                            <p id="userEmail" class="text-sm font-medium"></p>
+                            <p class="text-sm font-medium" id="userEmail"></p>
                         </div>
                         <div>
                             <p class="text-xs text-gray-500">User ID</p>
-                            <p id="userId" class="text-sm font-medium break-all"></p>
+                            <p class="text-sm font-medium break-all" id="userId"></p>
                         </div>
                     </div>
                 </div>
@@ -221,8 +229,8 @@
                             <span id="accessToken"></span>
                         </div>
                         <button
-                                onclick="copyToClipboard('accessToken')"
                                 class="copy-button bg-white p-2 rounded-md shadow-sm hover:bg-gray-50"
+                                onclick="copyToClipboard('accessToken')"
                         >
                             <i class="fas fa-copy text-gray-500"></i>
                         </button>
@@ -241,8 +249,8 @@
                             <span id="refreshTokenDisplay"></span>
                         </div>
                         <button
-                                onclick="copyToClipboard('refreshTokenDisplay')"
                                 class="copy-button bg-white p-2 rounded-md shadow-sm hover:bg-gray-50"
+                                onclick="copyToClipboard('refreshTokenDisplay')"
                         >
                             <i class="fas fa-copy text-gray-500"></i>
                         </button>
@@ -256,12 +264,12 @@
                     >
                     <div class="token-container">
                 <pre
-                        id="decodedJwt"
                         class="bg-gray-50 rounded-lg p-3 text-sm overflow-auto"
+                        id="decodedJwt"
                 ></pre>
                         <button
-                                onclick="copyToClipboard('decodedJwt')"
                                 class="copy-button bg-white p-2 rounded-md shadow-sm hover:bg-gray-50"
+                                onclick="copyToClipboard('decodedJwt')"
                         >
                             <i class="fas fa-copy text-gray-500"></i>
                         </button>
@@ -345,7 +353,7 @@
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ email, password }),
+                    body: JSON.stringify({email, password}),
                 });
 
                 const data = await response.json();

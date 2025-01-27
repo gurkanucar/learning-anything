@@ -21,8 +21,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class GithubApiClient {
-    private final RestTemplateBuilder restTemplateBuilder;
     private static final String GITHUB_API_EMAIL_URL = "https://api.github.com/user/emails";
+    private final RestTemplateBuilder restTemplateBuilder;
 
     public String extractEmail(OAuth2User oAuth2User, String accessToken) {
         String email = (String) oAuth2User.getAttributes().get("email");
