@@ -2,83 +2,444 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>GitHub OAuth2 Login Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Modern Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            rel="stylesheet"
+    />
     <style>
-        body {
-            font-family: sans-serif;
-            text-align: center;
-            margin-top: 50px;
+        .alert {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
         }
-        button {
-            font-size: 16px;
-            padding: 8px 16px;
-            cursor: pointer;
-            margin: 5px;
+        .alert.show {
+            max-height: 100px;
+            opacity: 1;
+            margin: 1rem 0;
         }
-        .token {
-            margin-top: 20px;
-            word-wrap: break-word;
-            width: 60%;
-            margin-left: auto;
-            margin-right: auto;
-            text-align: left;
-            background: #f4f4f4;
-            padding: 20px;
-            border-radius: 6px;
-            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-            font-size: 14px;
-            line-height: 1.5;
+        .loading {
+            pointer-events: none;
+            opacity: 0.7;
         }
-        pre {
-            margin: 0;
-            white-space: pre-wrap; /* Wrap long JSON content */
+        .token-section {
+            display: none;
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .token-container {
+            position: relative;
+        }
+        .copy-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .token-container:hover .copy-button {
+            opacity: 1;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
     </style>
 </head>
-<body>
-<h1>GitHub OAuth2 Login Demo</h1>
+<body
+        class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+>
+<div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <h2 class="text-center text-3xl font-extrabold text-gray-900">
+        Sign in to your account
+    </h2>
+</div>
 
-<button onclick="loginWithGithub()">Login with GitHub</button>
-<button onclick="loginWithGoogle()">Login with Google</button>
+<div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <!-- Alert Message -->
+        <div id="alert" class="alert rounded-md p-4"></div>
 
-<div id="token-container" style="display: none;">
-    <h3>Received Token (Decoded):</h3>
-    <div id="token" class="token">
-        <pre id="formatted-token"></pre>
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">
+                    Email address
+                </label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div
+                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                        <i class="fas fa-envelope text-gray-400"></i>
+                    </div>
+                    <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            required
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            placeholder="Enter your email"
+                    />
+                </div>
+            </div>
+
+            <div id="passwordContainer">
+                <label
+                        for="password"
+                        class="block text-sm font-medium text-gray-700"
+                >
+                    Password
+                </label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div
+                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            required
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            placeholder="Enter your password"
+                    />
+                </div>
+            </div>
+
+            <div class="flex flex-col space-y-4">
+                <button
+                        type="submit"
+                        id="loginButton"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                    Sign in
+                </button>
+
+                <button
+                        type="button"
+                        id="magicLinkButton"
+                        class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                    Sign in with Magic Link
+                </button>
+
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-white text-gray-500"
+                >Or continue with</span
+                >
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button
+                            type="button"
+                            onclick="handleOAuthLogin('github')"
+                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                    >
+                        <i class="fab fa-github text-xl"></i>
+                    </button>
+                    <button
+                            type="button"
+                            onclick="handleOAuthLogin('google')"
+                            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                    >
+                        <i class="fab fa-google text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Add Token Display Section -->
+    <div
+            id="tokenSection"
+            class="token-section mt-8 sm:mx-auto sm:w-full sm:max-w-2xl"
+    >
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                    Authentication Details
+                </h3>
+
+                <!-- User Info Section -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-sm font-medium text-gray-700">
+                            User Information
+                        </h4>
+                        <div class="flex space-x-2">
+                            <span id="userRoles"></span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs text-gray-500">Username</p>
+                            <p id="username" class="text-sm font-medium"></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Email</p>
+                            <p id="userEmail" class="text-sm font-medium"></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">User ID</p>
+                            <p id="userId" class="text-sm font-medium break-all"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Access Token -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Access Token</label
+                    >
+                    <div class="token-container">
+                        <div
+                                class="bg-gray-50 rounded-lg p-3 font-mono text-sm break-all"
+                        >
+                            <span id="accessToken"></span>
+                        </div>
+                        <button
+                                onclick="copyToClipboard('accessToken')"
+                                class="copy-button bg-white p-2 rounded-md shadow-sm hover:bg-gray-50"
+                        >
+                            <i class="fas fa-copy text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Refresh Token -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Refresh Token</label
+                    >
+                    <div class="token-container">
+                        <div
+                                class="bg-gray-50 rounded-lg p-3 font-mono text-sm break-all"
+                        >
+                            <span id="refreshTokenDisplay"></span>
+                        </div>
+                        <button
+                                onclick="copyToClipboard('refreshTokenDisplay')"
+                                class="copy-button bg-white p-2 rounded-md shadow-sm hover:bg-gray-50"
+                        >
+                            <i class="fas fa-copy text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Decoded JWT Section -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Decoded JWT Payload</label
+                    >
+                    <div class="token-container">
+                <pre
+                        id="decodedJwt"
+                        class="bg-gray-50 rounded-lg p-3 text-sm overflow-auto"
+                ></pre>
+                        <button
+                                onclick="copyToClipboard('decodedJwt')"
+                                class="copy-button bg-white p-2 rounded-md shadow-sm hover:bg-gray-50"
+                        >
+                            <i class="fas fa-copy text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    function loginWithGithub() {
-        window.location.href = "http://localhost:8080/oauth2/authorization/github";
+    const loginForm = document.getElementById("loginForm");
+    const alertEl = document.getElementById("alert");
+    const passwordContainer = document.getElementById("passwordContainer");
+    const magicLinkButton = document.getElementById("magicLinkButton");
+    const loginButton = document.getElementById("loginButton");
+    let isMagicLinkMode = false;
+
+    function showAlert(message, isError = false) {
+        alertEl.textContent = message;
+        alertEl.className = `alert show rounded-md p-4 ${
+            isError ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"
+        }`;
+        setTimeout(() => {
+            alertEl.classList.remove("show");
+        }, 5000);
     }
-    function loginWithGoogle() {
-        window.location.href = "http://localhost:8080/oauth2/authorization/google";
-    }
 
-    (function getTokenFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("token");
-        if (token) {
-            const tokenContainer = document.getElementById("token-container");
-            const formattedTokenElement = document.getElementById("formatted-token");
-
-            try {
-                // Decode Base64 token
-                const decodedToken = atob(token);
-
-                // Parse JSON and format it
-                const parsedToken = JSON.parse(decodedToken);
-                const formattedToken = JSON.stringify(parsedToken, null, 4);
-
-                formattedTokenElement.textContent = formattedToken; // Insert formatted JSON
-            } catch (error) {
-                formattedTokenElement.textContent = "Error decoding or parsing the token.";
-            }
-
-            tokenContainer.style.display = "block";
+    function setLoading(isLoading) {
+        const form = document.getElementById("loginForm");
+        if (isLoading) {
+            form.classList.add("loading");
+            loginButton.textContent = "Loading...";
+        } else {
+            form.classList.remove("loading");
+            loginButton.textContent = isMagicLinkMode
+                ? "Send Magic Link"
+                : "Sign in";
         }
-    })();
+    }
+
+    magicLinkButton.addEventListener("click", () => {
+        isMagicLinkMode = !isMagicLinkMode;
+        passwordContainer.style.display = isMagicLinkMode ? "none" : "block";
+        loginButton.textContent = isMagicLinkMode
+            ? "Send Magic Link"
+            : "Sign in";
+        magicLinkButton.textContent = isMagicLinkMode
+            ? "Back to Password Login"
+            : "Sign in with Magic Link";
+    });
+
+    // Single event listener for login form
+    loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+            if (isMagicLinkMode) {
+                // Magic Link Login
+                const response = await fetch("http://localhost:8080/ott/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: `username=${encodeURIComponent(email)}`,
+                });
+
+                if (response.ok) {
+                    showAlert("Magic link has been sent to your email!");
+                } else {
+                    showAlert("Failed to send magic link. Please try again.", true);
+                }
+            } else {
+                // Traditional Login
+                const response = await fetch("http://localhost:8080/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem("accessToken", data.accessToken);
+                    localStorage.setItem("refreshToken", data.refreshToken);
+                    showAlert("Login successful!");
+                    displayAuthData(data);
+                } else {
+                    showAlert("Login failed. Please check your credentials.", true);
+                }
+            }
+        } catch (error) {
+            showAlert("An error occurred. Please try again.", true);
+        } finally {
+            setLoading(false);
+        }
+    });
+
+    function handleOAuthLogin(provider) {
+        window.location.href = `http://localhost:8080/oauth2/authorization/${provider}`;
+    }
+
+    function displayAuthData(data) {
+        const tokenSection = document.getElementById("tokenSection");
+        tokenSection.style.display = "block";
+
+        // Display user information
+        document.getElementById("username").textContent = data.user.username;
+        document.getElementById("userEmail").textContent = data.user.email;
+        document.getElementById("userId").textContent = data.user.id;
+
+        // Display roles with badges
+        const rolesContainer = document.getElementById("userRoles");
+        rolesContainer.innerHTML = data.user.roles
+            .map(
+                (role) =>
+                    `<span class="badge ${
+                        role === "ADMIN"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-blue-100 text-blue-800"
+                    }">${role}</span>`
+            )
+            .join(" ");
+
+        // Display tokens
+        document.getElementById("accessToken").textContent = data.accessToken;
+        document.getElementById("refreshTokenDisplay").textContent =
+            data.refreshToken;
+
+        // Decode and display JWT payload
+        try {
+            const payload = JSON.parse(
+                atob(data.accessToken.split(".")[1])
+            );
+            document.getElementById("decodedJwt").textContent = JSON.stringify(
+                payload,
+                null,
+                2
+            );
+        } catch (error) {
+            document.getElementById("decodedJwt").textContent =
+                "Error decoding JWT";
+        }
+    }
+
+    async function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        const text = element.textContent;
+
+        try {
+            await navigator.clipboard.writeText(text);
+            showAlert("Copied to clipboard!", false);
+        } catch (err) {
+            showAlert("Failed to copy text", true);
+        }
+    }
+
+    // Handle OAuth token display
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    if (token) {
+        try {
+            const decodedToken = atob(token);
+            const parsedToken = JSON.parse(decodedToken);
+            localStorage.setItem("accessToken", parsedToken.accessToken);
+            localStorage.setItem("refreshToken", parsedToken.refreshToken);
+            showAlert("OAuth login successful!");
+            displayAuthData(parsedToken);
+        } catch (error) {
+            showAlert("Error processing OAuth login.", true);
+        }
+    }
 </script>
 </body>
 </html>
