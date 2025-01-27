@@ -23,6 +23,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getByEmail(String email) {
+          return repository.findByEmailAndIsEnabledTrue(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found for email: " + email));
+    }
+
+    @Override
     public void createUser(User user) {
         user.setPassword(encodePassword(user.getPassword()));
         repository.save(user);

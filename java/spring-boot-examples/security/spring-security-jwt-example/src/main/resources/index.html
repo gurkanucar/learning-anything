@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>GitHub OAuth2 Login Demo</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        button {
+            font-size: 16px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .token {
+            margin-top: 20px;
+            word-wrap: break-word;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<h1>GitHub OAuth2 Login Demo</h1>
+
+<button onclick="loginWithGithub()">Login with GitHub</button>
+<button onclick="loginWithGoogle()">Login with Google</button>
+
+
+<div id="token-container" style="display: none;">
+    <h3>Received Token:</h3>
+    <div id="token" class="token"></div>
+</div>
+
+<script>
+        function loginWithGithub() {
+        window.location.href = "http://localhost:8080/oauth2/authorization/github";
+    }
+    function loginWithGoogle() {
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    }
+
+    // 2) If your backend redirects back to "index.html?token=YOUR_TOKEN",
+    //    we can capture and display the token here.
+    //    If you do not use a redirect param, you can remove this part.
+    (function getTokenFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get("token");
+        if (token) {
+            const tokenContainer = document.getElementById("token-container");
+            const tokenElement = document.getElementById("token");
+
+            tokenElement.textContent = token;
+            tokenContainer.style.display = "block";
+        }
+    })();
+</script>
+</body>
+</html>

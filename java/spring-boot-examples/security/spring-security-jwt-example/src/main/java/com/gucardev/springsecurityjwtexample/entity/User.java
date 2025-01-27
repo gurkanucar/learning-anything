@@ -22,6 +22,8 @@ public class User extends BaseEntity {
     private String password;
 
     private String email;
+    
+    private String profilePicture;
 
     private Boolean isEnabled;
 

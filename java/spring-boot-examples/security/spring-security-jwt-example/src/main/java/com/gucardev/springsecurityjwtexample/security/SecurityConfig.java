@@ -2,8 +2,10 @@ package com.gucardev.springsecurityjwtexample.security;
 
 import com.gucardev.springsecurityjwtexample.security.magiclink.CustomAuthenticationErrorHandler;
 import com.gucardev.springsecurityjwtexample.security.magiclink.CustomAuthenticationSuccessHandler;
+import com.gucardev.springsecurityjwtexample.security.oauth.OAuth2SecurityConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -46,7 +49,7 @@ public class SecurityConfig {
     private final CustomAuthenticationSuccessHandler magicLinkSuccessHandler;
     private final CustomAuthenticationErrorHandler magicLinkErrorHandler;
     private final JdbcTemplate jdbcTemplate;
-
+    private final OAuth2SecurityConfig oAuth2SecurityConfig;
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -72,6 +75,7 @@ public class SecurityConfig {
                                 .authenticationFailureHandler(magicLinkErrorHandler))
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(x -> x.anyRequest().authenticated())
+                .oauth2Login(oAuth2SecurityConfig::configureOAuth2)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
