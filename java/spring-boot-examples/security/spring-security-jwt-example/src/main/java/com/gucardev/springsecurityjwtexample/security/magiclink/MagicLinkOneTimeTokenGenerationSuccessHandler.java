@@ -13,12 +13,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class MagicLinkOneTimeTokenGenerationSuccessHandler implements OneTimeTokenGenerationSuccessHandler {
 
-//    private final OneTimeTokenGenerationSuccessHandler redirectHandler = new RedirectOneTimeTokenGenerationSuccessHandler("/ott/sent");
-
     private final String BASE_URL = "http://localhost:3000";
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, OneTimeToken oneTimeToken) {
+        // send mail to user here
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(BASE_URL)
                 .path("/login/ott")
                 .queryParam("token", oneTimeToken.getTokenValue());

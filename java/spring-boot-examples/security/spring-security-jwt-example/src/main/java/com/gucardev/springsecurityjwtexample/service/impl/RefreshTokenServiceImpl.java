@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
-    private static final long TOKEN_VALIDITY_DAYS = 7; // Or configure in properties
+    private static final long TOKEN_VALIDITY_DAYS = 7;
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional

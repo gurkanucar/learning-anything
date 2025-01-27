@@ -28,20 +28,16 @@ public class TokenServiceImpl implements TokenService {
                 user.getUsername(),
                 extractRoles(user)
         );
-
         String refreshToken = refreshTokenService.generateAndSaveRefreshToken(user);
-
         return TokenDto.buildTokenDto(user, accessToken, refreshToken);
     }
 
     @Override
     public TokenDto refreshToken(String refreshTokenValue) {
         RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue);
-
         if (!refreshTokenService.isTokenValid(refreshToken)) {
             throw new RuntimeException("Refresh token is expired or invalid!");
         }
-
         return getTokenDto(refreshToken.getUser());
     }
 

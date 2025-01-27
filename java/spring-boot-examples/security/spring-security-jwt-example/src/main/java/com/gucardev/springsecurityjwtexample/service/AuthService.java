@@ -7,10 +7,7 @@ import com.gucardev.springsecurityjwtexample.dto.UserDto;
 import jakarta.validation.constraints.NotBlank;
 
 public interface AuthService {
-
     TokenDto login(LoginRequest loginRequest);
-
     UserDto getAuthenticatedUser();
-
     TokenDto refreshToken(@NotBlank String refreshToken);
 }
