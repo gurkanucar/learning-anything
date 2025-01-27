@@ -2,6 +2,7 @@ package com.gucardev.springsecurityjwtexample.service.impl;
 
 import com.gucardev.springsecurityjwtexample.dto.LoginRequest;
 import com.gucardev.springsecurityjwtexample.dto.TokenDto;
+import com.gucardev.springsecurityjwtexample.dto.TokenRequest;
 import com.gucardev.springsecurityjwtexample.dto.UserDto;
 import com.gucardev.springsecurityjwtexample.entity.User;
 import com.gucardev.springsecurityjwtexample.mapper.UserMapper;
@@ -29,9 +30,9 @@ public class AuthServiceImpl implements AuthService {
         try {
             Authentication authentication = authenticateUser(loginRequest);
             User user = extractUser(authentication);
-            return tokenService.getTokenDto(user);
+            return tokenService.getTokenDto(TokenRequest.builder().email(user.getEmail()).roles(user.getRoles()).build());
         } catch (Exception ex) {
-            log.error("Authentication error for user: {}", loginRequest.getUsername(), ex);
+            log.error("Authentication error for user: {}", loginRequest.getEmail(), ex);
             throw new RuntimeException("Authentication failed", ex);
         }
     }
@@ -56,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
     private Authentication authenticateUser(LoginRequest loginRequest) {
         return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
+                        loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );

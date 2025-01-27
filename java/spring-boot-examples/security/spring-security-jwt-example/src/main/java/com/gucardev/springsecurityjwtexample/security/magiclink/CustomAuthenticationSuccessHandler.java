@@ -1,6 +1,7 @@
 package com.gucardev.springsecurityjwtexample.security.magiclink;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gucardev.springsecurityjwtexample.dto.TokenRequest;
 import com.gucardev.springsecurityjwtexample.security.CustomUserDetails;
 import com.gucardev.springsecurityjwtexample.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 @RequiredArgsConstructor
 @Component
@@ -29,7 +31,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         var authenticationPrincipal = (CustomUserDetails) authentication.getPrincipal();
-        var token = tokenService.getTokenDto(authenticationPrincipal.getUser());
+        var token = tokenService.getTokenDto(TokenRequest.builder().email(authenticationPrincipal.getUsername())
+                .roles(new HashSet<>(authenticationPrincipal.getUser().getRoles())).build());
         objectMapper.writeValue(response.getWriter(), token);
     }
 }

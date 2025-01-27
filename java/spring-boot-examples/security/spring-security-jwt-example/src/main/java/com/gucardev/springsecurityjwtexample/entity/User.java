@@ -1,8 +1,7 @@
 package com.gucardev.springsecurityjwtexample.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,18 +10,20 @@ import java.util.Set;
 @Table(name = "USERS")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class User extends BaseEntity {
 
     private String name;
 
-    @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false)
     private String password;
 
+    @Column(unique = true, nullable = false)
     private String email;
-    
+
     private String profilePicture;
 
     private Boolean isEnabled;

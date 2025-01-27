@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class JwtTokenServiceImpl implements JwtTokenService {
@@ -32,7 +33,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public String generateToken(String username, List<String> roles) {
+    public String generateToken(String username, Set<String> roles) {
         Date expiryDate = Date.from(Instant.now().plus(jwtTokenExpiresInMinutes, ChronoUnit.MINUTES));
         return Jwts.builder()
                 .setSubject(username)
@@ -68,14 +69,14 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getRolesFromToken(String token) {
+    public Set<String> getRolesFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
 
-        return (List<String>) claims.get("roles");
+        return (Set<String>) claims.get("roles");
     }
 }
 

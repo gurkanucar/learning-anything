@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 import java.util.Optional;
 
@@ -13,15 +14,17 @@ import java.util.Optional;
 public class AuditorAwareImpl implements AuditorAware<String> {
     @Override
     public Optional<String> getCurrentAuditor() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal() == "anonymousUser") {
-            return Optional.of(Constants.DEFAULT_AUDITOR);
-        }
-        CustomUserDetails userPrincipal = (CustomUserDetails) authentication.getPrincipal();
         try {
-            return Optional.of(userPrincipal.getUsername());
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+                return Optional.of(Constants.DEFAULT_AUDITOR);
+            }
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof CustomUserDetails) {
+                return Optional.of(((CustomUserDetails) principal).getUsername());
+            }
+            return Optional.of(Constants.DEFAULT_AUDITOR);
         } catch (IllegalArgumentException e) {
-            log.error("Could not get current auditor", e);
             return Optional.of(Constants.DEFAULT_AUDITOR);
         }
     }

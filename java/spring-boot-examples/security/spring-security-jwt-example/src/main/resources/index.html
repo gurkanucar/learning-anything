@@ -13,18 +13,25 @@
             font-size: 16px;
             padding: 8px 16px;
             cursor: pointer;
+            margin: 5px;
         }
         .token {
             margin-top: 20px;
             word-wrap: break-word;
-            width: 50%;
+            width: 60%;
             margin-left: auto;
             margin-right: auto;
             text-align: left;
             background: #f4f4f4;
-            padding: 10px;
-            border-radius: 4px;
-            display: inline-block;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap; /* Wrap long JSON content */
         }
     </style>
 </head>
@@ -34,31 +41,41 @@
 <button onclick="loginWithGithub()">Login with GitHub</button>
 <button onclick="loginWithGoogle()">Login with Google</button>
 
-
 <div id="token-container" style="display: none;">
-    <h3>Received Token:</h3>
-    <div id="token" class="token"></div>
+    <h3>Received Token (Decoded):</h3>
+    <div id="token" class="token">
+        <pre id="formatted-token"></pre>
+    </div>
 </div>
 
 <script>
-        function loginWithGithub() {
+    function loginWithGithub() {
         window.location.href = "http://localhost:8080/oauth2/authorization/github";
     }
     function loginWithGoogle() {
         window.location.href = "http://localhost:8080/oauth2/authorization/google";
     }
 
-    // 2) If your backend redirects back to "index.html?token=YOUR_TOKEN",
-    //    we can capture and display the token here.
-    //    If you do not use a redirect param, you can remove this part.
     (function getTokenFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get("token");
         if (token) {
             const tokenContainer = document.getElementById("token-container");
-            const tokenElement = document.getElementById("token");
+            const formattedTokenElement = document.getElementById("formatted-token");
 
-            tokenElement.textContent = token;
+            try {
+                // Decode Base64 token
+                const decodedToken = atob(token);
+
+                // Parse JSON and format it
+                const parsedToken = JSON.parse(decodedToken);
+                const formattedToken = JSON.stringify(parsedToken, null, 4);
+
+                formattedTokenElement.textContent = formattedToken; // Insert formatted JSON
+            } catch (error) {
+                formattedTokenElement.textContent = "Error decoding or parsing the token.";
+            }
+
             tokenContainer.style.display = "block";
         }
     })();
