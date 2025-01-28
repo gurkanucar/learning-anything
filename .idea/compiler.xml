@@ -27,6 +27,7 @@
         <module name="spring-boot-test" />
         <module name="cache" />
         <module name="aws-s3-file-service" />
+        <module name="untitled" />
         <module name="spring-shell" />
         <module name="mail-sending" />
         <module name="db-config-parameters" />
