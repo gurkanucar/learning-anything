@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/learning-anything.iml" filepath="$PROJECT_DIR$/.idea/learning-anything.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java/spring-boot-examples/security/spring-security-oauth2-server/spring-security-oauth2-server.iml" filepath="$PROJECT_DIR$/java/spring-boot-examples/security/spring-security-oauth2-server/spring-security-oauth2-server.iml" />
     </modules>
   </component>
 </project>
