@@ -4,6 +4,10 @@
   <groupId>com.gucardev</groupId>
   <artifactId>console</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
   <name>Archetype - untitled</name>
   <url>http://maven.apache.org</url>
+  <modules>
+    <module>encrypt-decrypt</module>
+  </modules>
 </project>
