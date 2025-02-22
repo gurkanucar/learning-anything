@@ -42,6 +42,9 @@ public class SecurityConfig {
             "/h2-console/**"
     };
 
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     @Bean
     public AuthenticationManager authenticationManager(
             final AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -61,6 +64,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+                .exceptionHandling(x -> x
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(x -> x.anyRequest().authenticated());
         return httpSecurity.build();
