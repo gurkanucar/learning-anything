@@ -39,6 +39,7 @@ public class SecurityConfig {
             "/timezone",
             "/time",
             "/hello",
+            "/log-level",
             "/h2-console/**"
     };
 
