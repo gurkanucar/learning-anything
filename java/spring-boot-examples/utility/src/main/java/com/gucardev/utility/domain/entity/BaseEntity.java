@@ -1,5 +1,7 @@
 package com.gucardev.utility.domain.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gucardev.utility.infrastructure.util.CustomLocalDateTimeSerializer;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,7 +13,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -27,16 +29,16 @@ public abstract class BaseEntity {
     @ToString.Include
     private Long id;
 
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     @CreatedDate
-    private Date createdDate;
+    private LocalDateTime createdDate;
 
     @LastModifiedDate
-    private Date lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 
     @CreatedBy
     private String createdBy;
 
     @LastModifiedBy
     private String lastModifiedBy;
-
 }

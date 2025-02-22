@@ -36,6 +36,9 @@ public class SecurityConfig {
             "/auth/register",
             "/auth/refresh",
             "/public/**",
+            "/timezone",
+            "/time",
+            "/hello",
             "/h2-console/**"
     };
 
@@ -56,8 +59,8 @@ public class SecurityConfig {
         httpSecurity
                 .headers(x -> x.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(x -> x.anyRequest().authenticated());
         return httpSecurity.build();
