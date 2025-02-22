@@ -5,6 +5,7 @@ import static com.gucardev.utility.infrastructure.exception.helper.ExceptionUtil
 import com.gucardev.utility.domain.dto.Address;
 import com.gucardev.utility.domain.dto.Fizz;
 import com.gucardev.utility.domain.dto.PaginationRequest;
+import com.gucardev.utility.infrastructure.constants.Constants;
 import com.gucardev.utility.infrastructure.exception.ExceptionMessage;
 import com.gucardev.utility.infrastructure.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +41,7 @@ public class ExampleController {
   @GetMapping("/success")
   public ApiResponse<Fizz> success() {
     return ApiResponse.<Fizz>builder()
-        .payload(new Fizz("field", 5))
+        .payload(new Fizz(Constants.API_BASE_URL, 5))
         .message("successfully.data.created")
         .status(HttpStatus.OK).build();
   }

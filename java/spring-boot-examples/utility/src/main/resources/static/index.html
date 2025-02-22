@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple GET Request</title>
+</head>
+<body>
+<h1>Send GET Request</h1>
+<button onclick="sendRequest()">Send Request</button>
+<p id="response"></p>
+
+<script>
+    function sendRequest() {
+        fetch('http://localhost:8080/success', {
+            method: 'GET',
+            headers: {
+                'accept': '*/*'
+            }
+        })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('response').innerText = 'Response: ' + data;
+            })
+            .catch(error => {
+                document.getElementById('response').innerText = 'Error: ' + error;
+            });
+    }
+</script>
+</body>
+</html>
