@@ -45,11 +45,20 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="tree-directory-structure" />
         <module name="large-file-operations" />
         <module name="dockerize-spring-boot-example" />
+      </profile>
+      <profile name="Annotation profile for mail-sending-with-mailhog" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="mail-sending-with-mailhog" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -75,6 +84,7 @@
       <module name="kafka-example" options="-parameters" />
       <module name="large-file-operations" options="-parameters" />
       <module name="mail-sending" options="-parameters" />
+      <module name="mail-sending-with-mailhog" options="-parameters" />
       <module name="mapstruct-example" options="-parameters" />
       <module name="optimistic-pessimistic-locking" options="-parameters" />
       <module name="pure-websocket" options="-parameters" />
